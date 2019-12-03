@@ -3,6 +3,11 @@
 # Summarizing and measuring Key alliance characteristics
 
 
+# load packages
+library(MASS)
+library(tidyverse)
+library(bfa)
+
 # Load ATOP v4 alliance-level data 
 atop <- read.csv("data/atop-alliance-level.csv")
 atop.mem.full <- read.csv("data/atop-member-level.csv")
@@ -116,28 +121,6 @@ table(atop$scope.index)
 ggplot(atop, aes(x = scope.index)) + geom_bar()
 
 
-# Prevalence of restrictions on member autonomy 
-# Noteworthy alliance design considerations: restrictions on autonomy
-table(atop$asymm) # asymmmetric
-table(atop$specthrt) # specific threat
-table(atop$contrib) # specifies specific contribution
-table(atop$divgains) # specific division of gains
-table(atop$base) # basing rights
-table(atop$organ1) # international organizations
-table(atop$terrres) # make territory or resources available
-table(atop$thirdcom) # restrictions on third-party commitments 
-table(atop$notaiden) # promise not to aid enemy
-table(atop$dipaid) # promise diplomatic aid
-table(atop$noothall) # promise not to form competing alliances
-table(atop$compag) # presence of companion agreements
-table(atop$nomicoop) # non-military cooperation
-table(atop$interv) # intervention in domestic affairs
-table(atop$agprois) # commitment to negotiate additional treaties
-table(atop$intcom) # integrated command (peace and war)
-table(atop$subord) # subordination of forces in war
-table(atop$medarb) # mediation and arbitration
-
-
 # Create variables for US and USSR membershipin Cold War treaties
 ussr.mem <- apply(atop[, 72:130], 1, function(x) ifelse(x == 365, 1, 0))
 ussr.mem <- t(ussr.mem)
@@ -242,34 +225,6 @@ atop.depth <- as.data.frame(atop.depth)
 for(i in 1:ncol(atop.depth)){
   atop.depth[, i] <- as.ordered(atop.depth[, i])
 }
-
-
-
-# Create a 1-dimensional IRT model (all dummy inputs)
-atop.depth.mat <- as.matrix(atop.depth)
-latent.depth.irt <- MCMCirtKd(datamatrix = atop.depth.mat, 
-                              dimensions = 1,
-                              burnin = 10000, mcmc = 40000,
-                              thin = 40,
-                              item.constraints = list("uncond.milsup" = list(2,"+")),
-                              store.ability = TRUE,
-                              store.item = TRUE, 
-                              b0 = 0, # prior mean of zero for item parameters
-                              B0 = .5, # prior precision of variances 
-                              verbose = 5000)
-plot(latent.depth.irt)
-
-
-
-# Diagnosis of convergence with coda
-effectiveSize(latent.depth.irt)
-diag.geweke  <- geweke.diag(latent.depth.irt)
-
-# Plot to see if Geweke Z-scores appear to be from Normal(0, 1) distribution
-par(mfrow=c(1, 1))
-plot(density(diag.geweke$z))
-lines(density(rnorm(10000, 0, 1)))
-
 
 # Use Murray BFA approach
 latent.depth <- bfa_mixed(~ intcom + compag.mil + 
@@ -393,12 +348,14 @@ ggplot(atop.milsup, aes(x = num.mem, y = latent.depth.mean)) +
   geom_point()
 
 
-# Export to public-goods-test paper and sources of depth paper
-write.csv(atop, 
-          "../Dissertation/public-goods-test/data/atop-additions.csv", 
-          row.names = F)
-write.csv(atop.milsup, 
-          "../Dissertation/depth-sources/data/atop-milsup.csv", 
-          row.names = F)
+# load data 
+alliance.democ <- read.csv("data/alliance-democ.csv")
 
+
+# combine alliance democ and ATOP milsup data 
+atop.milsup <- left_join(atop.milsup, alliance.democ)
+
+# Create a deep alliance dummy
+atop.milsup$deep.alliance <- ifelse(atop.milsup$latent.depth.mean > median(atop.milsup$latent.depth.mean),
+                                    1, 0)
 
