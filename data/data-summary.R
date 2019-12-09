@@ -3,6 +3,29 @@
 # Exploratory plots 
 
 
+
+# plot depth over time 
+depth.scatter <- ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
+  geom_point() +
+  labs(x = "Alliance Start Year", y = "Latent Measure of Alliance Depth") +
+  ggtitle("Treaty Depth and Alliance Start Year") +
+  theme_bw()
+depth.scatter
+
+# plot results from first paper
+depth.res <- read.csv("data/depth-res.csv")
+depth.res.min <- ggplot(depth.res, aes(x = latent.depth.mean, y = lambda)) +
+  geom_hline(yintercept = 0) +
+  geom_point() +
+  geom_smooth(method = "lm") + theme_bw() +
+  labs(x = "Latent Treaty Depth", y = "Effect of Alliance Participation") +
+  ggtitle("Treaty Depth and the Impact of Alliance on Non-Major Power Military Spending: 1816-2007")
+depth.res.min
+
+multiplot.ggplot(depth.scatter, depth.res.min, cols = 2)
+
+
+
 # Run some correlations, t-tests and scatterplots 
 
 # correlation between avg democracy and depth
@@ -153,5 +176,14 @@ ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
              position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
              aes(color = as.factor(non.maj.only))) +
+  scale_colour_viridis_d(option = "plasma") + # change color scale
+  theme_classic()
+
+
+# Only non-major powers: size by conditionality 
+ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
+  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
+             alpha = 0.7,  # somewhat trasparent
+             aes(color = as.factor(non.maj.only), size = as.factor(uncond.milsup))) +
   scale_colour_viridis_d(option = "plasma") + # change color scale
   theme_classic()

@@ -28,7 +28,8 @@ Department of Political Science, Texas A\&M University.}}
 \doublespace 
 
 \begin{abstract}
-Why do states form deep or shallow alliances? 
+Why do states form deep alliances? 
+Depth adds defense coordination and cooperation to promises of military support in alliances.
 \end{abstract}
 
 
@@ -38,10 +39,125 @@ Why do states form deep or shallow alliances?
 \section{Introduction}
 
 
+% Start with hook: maybe a story of a deep and shallow alliance 
+When do states form deep or shallow alliances? 
+While some alliance treaties include only a promise of military support, others go beyond that by committing to extensive defense cooperation. 
+For example, a 1962 alliance between Jordan and Saudi Arabia supplements defensive and offensive obligations with a planned military union and joint high command. 
+Other alliances, such as a 1951 pact between the US and the Philippines, only include military support. 
 
 
+There is substantial variation in how much depth states incorporate in their alliance treaties. 
+As \autoref{fig:depth-motive} shows, many alliances have some depth. 
+At least half of all ATOP alliances with offensive or defense obligations have at least one source of treaty depth.   
+Moreover, the prevalence of deep alliances increased after 1945. 
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/depth-motive.png}
+\caption{The left panel is a scatter plot of alliance treaty depth against the start year of the alliance. Each point marks an ATOP offensive or defensive alliance from 1815 to 2010. I created this measure of depth measure using a latent variable model. Values around -0.8 are alliances with no depth, so larger values imply the treaty has at least some depth. The right panel shows that the impact of alliance participation on non-major power military spending falls as treaty depth increases.}
+\label{fig:depth-motive}
+\end{figure}
+
+
+% Deep alliances matter: affect milex, maybe credibility 
+The institutional design choice to add formal treaty depth to an alliance has important consequences. 
+Deep alliances encourage reduced military spending by non-major power members because treaty depth increases alliance credibility.  
+The right panel of \autoref{fig:depth-motive} shows this relationship. 
+Therefore, depth exerts a substantial impact on alliance politics by shaping treaty credibility and the distribution of military spending burdens among members. 
+
+
+% Describe question and contribution of the paper
+Despite the consequences of alliance treaty depth, we know fairly little about when states add depth to their alliances.\footnote{\citet{Mattes2012} examines a related measure of military institutionalization.}
+In this paper, I explain when states form deep alliances, which clarifies when states design alliances that facilitate free-riding and require additional cooperation.  
+
+
+% preview the argument 
+My argument uses the alliance negotiation process to predict treaty depth. 
+I argue that alliance member characteristics shape the obligations on military support in the treaty, which in turn affect the use of treaty depth. 
+Alliance negotiations start by determining whether prospective members will offer military support and conditions on that support \citep{Poast2019a}. 
+After establishing defensive or offensive support, alliance members negotiate over the use of treaty depth. 
+In this process, alliance member characteristics shape the direct need for reassurance in this second stage, but also have an indirect effect on depth by affecting conditions on military support. 
+
+
+Several alliance member characteristics could affect depth in this way, and I focus on symmetric alliances between non-major powers. 
+Most studies of alliances examine famous alliances between major powers e.g. \citep{Snyder1997} or asymmetric treaties between major powers and non-major powers e.g. \citep{Morrow1991, Yarhi-Miloetal2016}. 
+However, this approach pays little attention to the 42\% of ATOP military alliances that only involve non-major powers. % 122 / 289
+After 1945, 60\% of all alliances are symmetric pacts between non-major powers. % 96 / 161
+Thus, my argument elucidates dynamics within a large number of understudied alliances. 
+
+% non-major power explains incidence of depth 
+Symmetric alliances between non-major powers have greater depth than other alliances as depth is used to support promises of unconditional military support. 
+Due to limited concern over entrapment and an emphasis on regional concerns, alliances between non-major powers are more likely to have unconditional military support. 
+Non-major powers then add depth to these alliances to facilitate implementation of military support. % indirect effect  
+Depth also helps non-major power allies maximize their limited coercive capacity, which establishes a direct path between non-major power alliances and depth. % direct effect
+
+
+I test this argument with a series of statistical models and an illustrative case studies.
+The statistical models employ multiple equations to approximate the alliance negotiation process. 
+The case study checks the theoretical process and statistical results \citep{Seawright2016}.  
+
+
+% roadmap for the paper 
+The paper proceeds as follows. 
+In the next section, I lay out the argument and hypothesis. 
+Then I describe the data and research design 
 
 \section{Argument}
+
+In this argument, I start by defining treaty depth. 
+Then, I briefly review existing work on alliance treaty design to establish that depth is under-studied. 
+After that, I describe a general model of the process of alliance treaty negotiations. 
+Finally, I describe how alliance negotiations between non-major powers tend to lead to higher treaty depth. 
+
+
+% define alliance treaty depth
+Alliance depth is the extent of defense cooperation formalized in the treaty. 
+Deep alliances require additional military policy coordination and military cooperation. 
+While shallow alliances stipulate more arms-length cooperation between members, deep treaties lead to closer cooperation through intermediate cooperation. 
+Defense cooperation in a deep alliance takes many forms. 
+Allies can form an integrated military command, provide military aid, commit to a common defense policy, provide basing rights, set up an international organization or undertake companion military agreements. 
+
+
+% note that I'm the first one to address this question: lit review. 
+Depth is therefore an important part of alliance treaty design. 
+In general, alliances can be thought of as self-enforcing contracts or institutions \citep{Leedsetal2002, Morrow2000}.
+Given external threats in an anarchic international system, states form treaties to aggregate military capability and secure their foreign policy interests \citep{Altfield1984, Smith1995, Snyder1997, FordhamPoast2014}. 
+
+
+Potential alliance members can design a wide range of treaties \citep{Leedsetal2000, Leedsetal2002, Benson2012, BensonClinton2016}. 
+Design considerations shape the costs and benefits of treaty participation. 
+Beyond the benefit of potential military support, alliances also clarify international alignments \citep{Snyder1990}, support trade \citep{Gowa1995, Long2003, Fordham2010, WolfordKim2017}. 
+The costs of alliances include lost foreign policy autonomy \citep{Altfield1984, Morrow2000, Johnson2015}, as well as the risk of opprtunistic behavior. 
+Potential opportunism in alliances includes abandonment, or the failure of alliance members to honor their commitments \citep{BerkemeierFuhrmann2018}, entrapment in unwanted conflicts \citep{Snyder1984}, and free-riding \citep{Morrow2000}.  
+
+
+% Depth is understudied
+The process of alliance treaty design is understudied in general \citep{Poast2019a}. 
+\citet{Mattes2012} offered an early study of alliance treaty design by using symmetry of capability and history of violation to explain conditionality, issue linkages, and military institutionalization in bilateral alliances. 
+She argues that these three design considerations counter concerns about treaty reliability. 
+\citet{Benson2012} shows that foreign policy disagreements and revisionist protege states increase the likelihood of limited military support commitments. 
+\citep{Chibaetal2015} added to this by showing that democracies are more likely to form alliances with conditional military support or consultation. 
+Other work by \citet{Poast2012, Poast2013} establishes that states often use issue linkages to facilitate alliance formation. 
+
+
+None of these works directly study depth. 
+\citet{Mattes2012} uses a similar measure of military institutionalization, but does not connect alliance conditionality with the use of depth. 
+Rather, she treats depth and institutionalization as independent. 
+Because states can use different foreign policy instruments as substitutes or complements \citep{Starr2000, MorganPalmer2000}, these different sources of reliability are probably related. 
+My argument builds in part on \citet{Mattes2012}, but extends it by placing depth and conditions on military support in a unified theoretical and empirical framework. 
+
+
+% process of alliance negotiations: once agreed on military support, need to bolster. 
+Observed alliance treaty designs are the outcome of negotiations between members \citep{Poast2019}. 
+As states negotiate with potential alliance partners, they attempt to maximize the benefits of treaty participation and reduce costs. 
+Negotiation proceeds in two stages: first by determining the type of military support in the treaty, then by adding depth to the treaty as needed. 
+Both stages address the risk of opportunism, each in different ways. 
+
+
+% Part 1: Establish military support and conditions on that support
+
+
+% Move to process for non-major powers
 
 
 
@@ -59,7 +175,7 @@ Why do states form deep or shallow alliances?
 
 %\singlespace
  
-\bibliography{../../MasterBibliography} 
+\bibliography{../../../MasterBibliography} 
 
 
 
