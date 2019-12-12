@@ -14,7 +14,7 @@ summary(uncond.glm)
 
 # glm model of economic issue linkages
 linkage.glm <- glm(econagg.dum ~ avg.democ + uncond.milsup + latent.depth.mean +
-                    fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                    fp.conc.index + num.mem + wartime + asymm +  asymm.cap + non.maj.only +
                     low.kap.sc + begyr + us.mem + ussr.mem,
                   family = binomial(link = "probit"),
                   data = atop.milsup)
@@ -77,14 +77,7 @@ mediation(brm.multivar, treatment = "non.maj.only", prob = .9)
 
 # use the mediation package instead: (this is not working well)
 # only accepts binary outputs or lm: rather deep dummy than non-robust regression 
-med.out <- mediate(depth.reg.super, uncond.glm, treat = "non.maj.only", mediator = "uncond.milsup",
-                   control.value = -7, treat.value = .61,
-                   robustSE = TRUE, sims = 100)
-summary(med.out)
-sens.out <- medsens(med.out, rho.by = 0.1, effect.type = "indirect", sims = 100)
-summary(sens.out)
-
-
+# can't use sensitivity analysis here, however. 
 med.out <- mediate(depth.glm, uncond.glm, treat = "non.maj.only", mediator = "uncond.milsup",
                    control.value = 0, treat.value = 1,
                    robustSE = TRUE, sims = 100)

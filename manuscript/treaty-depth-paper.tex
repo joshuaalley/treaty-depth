@@ -10,9 +10,16 @@
 \usepackage{hyperref}
 \usepackage{adjustbox}
 \usepackage{amsmath}
-%\usepackage{tikz} % for theoretical flow chart
-%\usetikzlibrary{shapes,arrows}
-%\usepackage{smartdiagram}
+\usepackage{siunitx}
+\usepackage{tikz} % for theoretical flow chart
+\usetikzlibrary{shapes,decorations,arrows,calc,arrows.meta,fit,positioning}
+\tikzset{
+    -Latex,auto,node distance =1 cm and 1 cm,semithick,
+    state/.style ={ellipse, draw, minimum width = 0.7 cm},
+    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
+    bidirected/.style={Latex-Latex,dashed},
+    el/.style = {inner sep=2pt, align=left, sloped}
+}
 \setcitestyle{aysep{}}
 
 
@@ -33,6 +40,8 @@ Department of Political Science, Texas A\&M University.}}
 \begin{abstract}
 Why do states form deep alliances? 
 Depth adds defense coordination and cooperation to promises of military support in alliances.
+I argue that symmetric alliances between non-major powers are especially likely to include high treaty depth. 
+In these alliances, members use treaty depth to support the implementation of unconditional military support and coordinate defense efforts. 
 \end{abstract}
 
 
@@ -173,7 +182,7 @@ Conditional treaties reflect less overlap in foreign policy interests.
 
 
 On the other hand, offering unconditional military support is a strong signal of shared foreign policy interests. 
-Attaching no conditions to a potential intervention means alliance members confront the reputational \citep{Gibler2008, Crescenzietal2012} and audience \citep{Fearon1997} costs of treaty violation in a variety of potential conflicts. 
+Attaching no conditions to a potential intervention means alliance members might hazard the reputational \citep{Gibler2008, Crescenzietal2012} and audience \citep{Fearon1997} costs of treaty violation in a variety of potential conflicts. 
 Accepting these potential costs implies that conflict participation is acceptable; there is less fear of entrapment and many shared foreign policy interests. 
 As a result, unconditional alliances are a key source of reliability. 
 
@@ -187,31 +196,113 @@ Implementing costly depth-enhancing treaty provisions can also signal treaty cre
 
 Treaty depth depends on member characteristics and conditions on promises of military support from the first stage of the negotiations.
 First, the presence of unconditional military support shapes formal treaty depth by increasing the need for policy coordination and intermediate signals of treaty reliability.\footnote{A counterargument is that states could use treaty depth to bolster the perceived reliability of conditional alliances.}
-Time-inconsistency problems due to changing foreign policy interests are a major threat to alliance fulfillment \citep{LeedsSavun2007}. 
+Time-inconsistency problems due to changing foreign policy interests are a major threat to alliance fulfillment 
+\citep{LeedsSavun2007}. 
+Although unconditional promises of military support are more credible, they are also more vulnerable to changing foreign policy interests. 
+Under a deep alliance treaty, members can use implementation of defense cooperation and policy coordination to assess allied reliability. 
 
 
 While alliance member characteristics shape conditions on military support, which then affect treaty depth, they also have a direct impact on treaty depth.  
 Though states often make promises they intend to fulfill \citep{DownsRockeBarsoom1996, Chibaetal2015}, allies may still have greater reliability concerns with some states even after observing their promises of military support. 
-This additional demand for reassurance will increase the use of alliance treaty depth. 
+This additional demand for reassurance increases the use of alliance treaty depth. 
 
 
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}[scale = 10]
+    \node (1) at (0,0) {Member Characteristics};
+    \node (2) at (.6,0)  {Treaty Depth}; %[right = of 1]
+    \node (3) at(.3, -.15) {Unconditional Military Support};
 
-%\textbf{
-%\smartdiagram[flow diagram:horizontal]{
-%Member Characteristics, Conditions on Military Support, Treaty Depth
-% }
-%}
+    \path (1) edge (2);
+    \path (1) edge (3);
+    \path (3) edge (2);
+\end{tikzpicture}
+ \caption{General summary of the theoretical process. Alliance member characteristics affect treaty depth by changing the use of unconditional military support and directly changing the use of depth to boost treaty reliability.}
+  \label{fig:theory-flow}
+\end{center} 
+\end{figure}
+
+
+\autoref{fig:theory-flow} summarizes the process in the argument. 
+Alliance member characteristics have a direct effect on treaty depth and an indirect effect through the use of unconditional military support. 
+This pattern is especially clear for symmetric alliances between non-major powers, which tend to have higher depth. 
 
 
 \subsection{Alliances between Non-major Powers}
 
 % Move to process for non-major powers
+Symmetry of capability in an alliance means all the members have roughly similar capabilities. 
+Asymmetric alliances include both major and non-major powers, which generates an imbalance in military capabilities and foreign policy interests. 
+Many of these treaties feature exchanges where the larger partner provides protection in exchange for foreign policy concessions \citep{Morrow1991, Johnson2015}. 
+As such, alliance members often receive different foreign policy goods in asymmetric treaties. 
 
 
-% More unconditional alliances: use depth to support joint war plans/policy coordination
+% aside on major powers: may cut that bit or footnote it
+Unlike asymmetric alliances, symmetric pacts between states of similar capability share a common foreign policy goal or good.\footnote{Potential foreign policy goals include maintenance or change of the status quo \citep{MorganPalmer2006}.} 
+Symmetric treaties between major powers are concerned with global balance of power \citep{Walt1990}, especially in multipolar international systems \citep{Snyder1984, Snyder1990, ChristensenSnyder1990}. 
+These major power alliances are unlikely to include much depth, because substantial autonomy costs provide ample incentives for reliability, and very few major power alliances offer unconditional military support.
 
 
-% more depth due to potential efficiency gains? 
+% Symmetric 
+Alliance negotiations between non-major powers are more likely to produce alliances with substantial treaty depth. 
+Non-major power treaties are more likely to include substantial depth because these alliances between non-major powers emphasize regional or local concerns.
+Conversely, alliances with major power participation are linked with global concerns.
+Though asymmetric alliances between major and non-major powers immediately address particular regional issues, they are part of major powers' expansive foreign policy concerns.  
+
+
+% More unconditional alliances: less fear of entrapment w/ regional concerns
+The limited scope of non-major power foreign policy ambitions attenuates concerns about entrapment. 
+Where major powers are leery of being drawn into local conflicts, which increases their fear of entrapment.
+Non-major power alliances often address these shared local conflicts. 
+These alliances are often a form of local balancing, as they cannot usually offset a major power. 
+Non-major powers also lack the power projection capabilities to entangle their partners in distant concerns. 
+As a result, unconditional alliances between non-major powers still enhance credibility, but this obligation has different implications. 
+Because there is less risk of entrapment in unwanted conflicts, non-major powers will be more likely to include unconditional military support in their alliances. 
+
+
+% use depth to support joint war plans/policy coordination in uncond milsup
+Their tendency to offer unconditional military support increases the depth of symmetric non-major power alliances. 
+Depth backs unconditional military support by allowing alliance members to provide regular proof of their commitment to the alliance. 
+Adding treaty depth also facilitates plans to provide military support in multiple contingencies.
+Deep cooperation indicates that unconditional promises of military support are believable.  
+
+
+% more depth due to potential efficiency gains
+There is also a direct path between non-major power alliances and treaty depth. 
+As non-major powers have more limited military capabilities, they may benefit more from policy coordination and defense cooperation. 
+Deep alliances allow non-major powers to maximize the foreign policy benefits of their defense efforts. 
+Rather than duplicate allied efforts, non-major powers can focus on particular issues.\footnote{Such policy coordination, coupled with the credibility from a combination of depth and unconditional military support, is the primary cause of free-riding in alliances by non-major powers.} 
+
+
+Non-major powers' use of unconditional military support and desire to maximize their limited military resources both increase the depth of alliance treaties. 
+Of these two mechanisms, the indirect path through unconditional military spending may be more important.
+The sequence of alliance negotiations indicates that most of the effect of symmetric non-major power membership on treaty depth will operate through the establishment of unconditional military support. 
+
+
+% brief illustration: Unconditional military support and policy coordination
+% note that successful coord is not necessary, just thinking about design. 
+% There are times when failure to implement deep promises is revelatory, which matches the argument. 
+Many non-major power alliances combine unconditional military support and high treaty depth. 
+For example, a 1976 alliance between Egypt and Sudan (ATOPID 3785) commits to unconditional military support, reinforced with a joint defense council and a joint staff command. 
+This alliance grew out of shared regional concerns, especially disagreements with Libya. 
+By promising to military support without restrictions on how or where the conflict began, Sudan and Libya increased their need for joint military planning. 
+To give another example, many regional collective security organizations such as the African Union Common Defense and Security Pact (ATOPID 5055), also supplement unconditional defense promises with formal organizations and defense cooperation.  
+
+
+An important caveat: this argument predicts institutional design, not implementation, let alone successful implementation. 
+There are alliances where non-major power aspirations in alliance design are not fully realized, or work poorly. 
+To give one example, several deep Pan-Arab alliances never realized their full intention due to internal political divisions.  
+
+
+Based on the argument and these cases, I expect that alliance negotiations between non-major powers will produce deeper alliance treaties. 
+The main mechanism behind this relationship is the use of unconditional military support, because treaty depth supports unconditional obligations. 
+Non-major powers also use depth to maximize their limited military capabilities. 
+In the next section, I describe how I will test this claim about the association between non-major power membership and treaty depth. 
+
+
+
+
 
 
 \section{Research Design}

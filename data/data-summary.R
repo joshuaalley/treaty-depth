@@ -129,6 +129,14 @@ cor.test(atop.milsup$avg.democ, atop.milsup$begyr) # democracy and start year ar
 cor.test(atop.milsup$avg.democ, atop.milsup$num.mem) # democracy and alliance size are positively correlated 
 
 
+# Start year, democracy and alliance size
+ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
+  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
+             alpha = 0.7,  # somewhat trasparent
+             aes(color = avg.democ, size = num.mem)) +
+  scale_colour_viridis_c(option = "plasma") + # change color scale
+  theme_classic()
+
 # Start year, avg democ and unconditional military support in bilateral treaties
 atop.milsup %>% filter(bilat == 1) %>% 
 ggplot(aes(x = begyr, y = latent.depth.mean)) +

@@ -5,6 +5,14 @@
 
 # focus on the posterior mean in this script: include uncertainty in later scripts
 
+
+# data on non-major only treaties for viewing
+atop.milsup.nonmaj <- filter(atop.milsup, non.maj.only == 1) %>%
+                       select(atopid, latent.depth.mean, avg.democ, econagg.dum, uncond.milsup,
+                                fp.conc.index, num.mem, wartime, asymm, 
+                                asymm.cap, non.maj.only,
+                                low.kap.sc, begyr, us.mem, ussr.mem)
+
 ### Analysis focusing on alliances with military support
 
 
@@ -119,7 +127,7 @@ summary(depth.reg.post45)
 # unconditional military support 
 # if compare non-maj only to (1) symmetric maj  and asymm
 uncond.glm.post45 <- glm(uncond.milsup ~ avg.democ + econagg.dum +
-                          fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                          fp.conc.index + num.mem + wartime + asymm + non.maj.only +
                           low.kap.sc,
                         family = binomial(link = "probit"),
                         data = atop.milsup.post45)
@@ -129,7 +137,7 @@ summary(uncond.glm.post45)
 # analysis after 1919 a la Mattes 2012 
 atop.milsup.post19 <- filter(atop.milsup, begyr >= 1919)
 depth.reg.post19 <- rlm(latent.depth.mean ~ avg.democ + econagg.dum + uncond.milsup +
-                          fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                          fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
                           low.kap.sc + us.mem + ussr.mem,
                         data = atop.milsup.post45)
 summary(depth.reg.post19)

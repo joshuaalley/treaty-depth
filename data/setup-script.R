@@ -31,6 +31,8 @@ conflict_prefer("expand", "tidyr")
 conflict_prefer("lag", "dplyr")
 conflict_prefer("Position", "ggplot2")
 conflict_prefer("rcond", "Matrix")
+conflict_prefer("pack", "tidyr")
+conflict_prefer("unpack", "tidyr") 
 
 # Set up RSTAN guidelines
 rstan_options(auto_write = TRUE)
