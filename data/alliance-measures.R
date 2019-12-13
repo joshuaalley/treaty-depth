@@ -3,11 +3,6 @@
 # Summarizing and measuring Key alliance characteristics
 
 
-# load packages
-library(MASS)
-library(tidyverse)
-library(bfa)
-
 # Load ATOP v4 alliance-level data 
 atop <- read.csv("data/atop-alliance-level.csv")
 atop.mem.full <- read.csv("data/atop-member-level.csv")
@@ -74,8 +69,9 @@ atop <- atop %>%
     io.form = ifelse(organ1 > 0, 1, 0), # promise to form  an IO
     ecaid.dum = ifelse(ecaid > 0, 1, 0), # dummy indicator of economic aid
     
-    milaid.dum = ifelse(milaid > 0, 1, 0), # dummy indicator of military aid
     uncond.milsup = ifelse(conditio == 0 & (offense == 1 | defense == 1), 1, 0), # unconditional military support
+    
+    milaid.dum = ifelse(milaid > 0, 1, 0), # dummy indicator of military aid
     base.dum = ifelse(base > 0, 1, 0),
     milcon.dum = ifelse(milcon > 0, 1, 0),
     
@@ -262,25 +258,22 @@ colnames(latent.factors) <- c("var", "mean", "sd")
 latent.factors <- arrange(latent.factors, desc(mean)) 
 latent.factors$var<- reorder(latent.factors$var, latent.factors$mean)
 
-ggplot(latent.factors, aes(x = mean, y = var)) + 
-  geom_point(size = 2) +
-  geom_errorbarh(aes(xmin = mean - 2*sd, 
+loadings.plot <- ggplot(latent.factors, aes(x = mean, y = var)) + 
+                   geom_point(size = 2) +
+                   geom_errorbarh(aes(xmin = mean - 2*sd, 
                      xmax = mean + 2*sd),
-                 height = .2, size = 1) +
-  geom_vline(xintercept = 0) +
-  labs(x = "Factor Loading", y = "Variable") +
-  theme_classic()
-ggsave("figures/factor-loadings.png", height = 6, width = 8)
+                     height = .2, size = 1) +
+                   geom_vline(xintercept = 0) +
+                   labs(x = "Factor Loading", y = "Variable") +
+                   ggtitle("Factor Loadings in Latent Variable Model") +
+                   theme_bw()
+loadings.plot 
 
 # get posterior scores of latent factor: mean and variance
 post.score <- get_posterior_scores(latent.depth)
 atop.milsup$latent.depth.mean <- as.numeric(t(latent.depth$post.scores.mean))
 atop.milsup$latent.depth.var <- as.numeric(t(latent.depth$post.scores.var))
 atop.milsup$latent.depth.sd <- sqrt(atop.milsup$latent.depth.var)
-
-# Export full posteriors of latent depth to depth-sources project
-write.csv(post.score[1, 1:289, 1:1000], "../Dissertation/depth-sources/data/depth-post.csv",
-          row.names = FALSE)
 
 
 # Summarize latent depth: treaties with military support only
@@ -304,10 +297,11 @@ ls.styear <- ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
                     width=.01), position = position_dodge(0.1)) +
   geom_point(position = position_dodge(0.1)) +
   labs(x = "Start Year", y = "Latent Depth of Treaty") +
+  ggtitle("Latent Depth Measure by Start Year of Treaty") +
   theme_classic()
 ls.styear
-# Combine plots 
-multiplot.ggplot(ls.hist, ls.styear)
+# Combine loadings and styear plot
+multiplot.ggplot(loadings.plot, ls.styear, cols = 1)
 
 # 171 alliances with depth above -.6 
 sum(atop.milsup$latent.depth.mean > -.6)

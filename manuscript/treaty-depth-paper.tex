@@ -59,14 +59,13 @@ Other alliances, such as a 1951 pact between the US and the Philippines, only in
 
 
 There is substantial variation in how much depth states incorporate in their alliance treaties. 
-As \autoref{fig:depth-motive} shows, many alliances have some depth. 
-At least half of all ATOP alliances with offensive or defense obligations have at least one source of treaty depth.   
-Moreover, the prevalence of deep alliances increased after 1945. 
+Many alliances have some depth. 
+At least half of all ATOP alliances with offensive or defense obligations have at least one source of treaty depth and the prevalence of deep alliances increased after 1945. 
 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.95\textwidth]{../figures/depth-motive.png}
-\caption{The left panel is a scatter plot of alliance treaty depth against the start year of the alliance. Each point marks an ATOP offensive or defensive alliance from 1815 to 2010. I created this measure of depth measure using a latent variable model. Values around -0.8 are alliances with no depth, so larger values imply the treaty has at least some depth. The right panel shows that the impact of alliance participation on non-major power military spending falls as treaty depth increases.}
+\caption{This scatter plot shows that the impact of alliance participation on non-major power military spending falls as treaty depth increases. I created this measure of depth measure using a latent variable model. Values around -0.8 are alliances with no depth, so larger values imply the treaty has at least some depth.}
 \label{fig:depth-motive}
 \end{figure}
 
@@ -74,7 +73,7 @@ Moreover, the prevalence of deep alliances increased after 1945.
 % Deep alliances matter: affect milex, maybe credibility 
 The institutional design choice to add formal treaty depth to an alliance has important consequences. 
 Deep alliances encourage reduced military spending by non-major power members because treaty depth increases alliance credibility.  
-The right panel of \autoref{fig:depth-motive} shows this relationship. 
+\autoref{fig:depth-motive} shows this relationship. 
 Therefore, depth exerts a substantial impact on alliance politics by shaping treaty credibility and the distribution of military spending burdens among members. 
 
 
@@ -303,13 +302,99 @@ In the next section, I describe how I will test this claim about the association
 
 
 
-
-
 \section{Research Design}
 
+My research design estimates how unconditional military support mediates the relationship between non-major power alliances and treaty depth. 
+I start by describing the key variables in the analysis. 
+Then I provide more detail on the estimation strategy. 
+
+
+% start with data
+To examine my prediction that symmetric alliances between non-major powers often have greater depth, I employ data on alliance treaty design from the Alliance Treaty Obligations and Provisions dataset \citep{Leedsetal2002}. 
+I focus on 289 alliances with either offensive or defensive obligations, which are treaties with military support. 
+All results in the paper use these 289 alliances as the sample, and I assess robustness to adjusting for non-random selection into alliances in the appendix. 
+
+
+Using the ATOP data, I used a mixed factor analysis to measure alliance treaty depth \citep{Murrayetal2013}.\footnote{See \textbf{\href{https://github.com/joshuaalley/arms-allies/blob/master/manuscript/arms-allies-paper.pdf}{this paper}} for more details on the measure.}
+This measure of depth is weighted combination of ATOP's defense policy coordination, military aid, integrated military command, formal organization, companion military agreement and bases variables. 
+Each of these individual indicators increases alliance treaty depth, but defense policy coordination and an integrated command have the largest positive association, as shown in the top panel of \autoref{fig:loadings-measure}. 
+
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/loadings-measure.png}
+\caption{Factor Loadings and posterior distributions of latent alliance treaty depth measure.}
+\label{fig:loadings-measure}
+\end{figure}
+
+Based on these factor loadings, the measurement model predicts the likely value of treaty depth. 
+The distribution of depth is summarized by the bottom panel of \autoref{fig:loadings-measure}. 
+There is substantial variation in alliance treaty depth. 
+Around half of all formal alliance treaties have an least some depth, and once states add some depth, there is a wide range of how much they include.
+
+
+I measure alliance treaty depth in three ways.
+First, I take the posterior mean of the latent depth posterior for each alliance. 
+I also fit a statistical model that accounts for posterior uncertainty in the latent measure. 
+Last, I measure alliance treaty depth with a dummy indicator of whether the alliance has greater than median depth. 
+Results from these three measures are very similar. 
+
+
+The key independent variable is a dummy indicator of whether the alliance only has non-major power members. 
+I classify alliance participants as major or non-major powers using data from the Correlates of War project \citep{SingerCINC1988}.
+I also control for asymmetric alliances between major powers and non-major powers with a separate dummy variable which is equal to one if an alliance has major and non-major power members. 
+Therefore, the base category is 22 alliances only between non-major powers.\footnote{Results are weaker if I omit the asymmetric capability variable, thereby including asymmetric alliances in the base category. Asymmtertic alliances are another source of depth \citep{Mattes2012}.}  
+
+
+The mediator is an dummy indicator of unconditional military support. 
+Using ATOP's information on whether defensive or offensive promises are conditional on specific locations, adversaries, or non-provocation, I set this variable equal to one if the treaty placed no conditions on military support.
+123 of 289 alliances in the data have unconditional military support. 
+I now describe how I estimate the way this variable mediates the association between non-major power alliances and treaty depth. 
+
+
+\subsection{Estimation Strategy}
+
+Mediation analysis is a common estimation strategy for examining causal mechanisms \citep{Imaietal2011}. 
+But to model treaty depth with the appropriate distribution, I cannot employ common sensitivity tests, which makes assessing the value of causal inferences from these results difficult. 
+Therefore I corroborate correlations from the statistical models, through case study evidence that shows how the sequence of alliance negotiations matches my theoretical argument and the empirical results. 
+
+
+Mediation models generally have two equations: one to predict values of the mediator and other to predict the outcome of interest. 
+The key independent variable is included in both equations, but the dependent variable is not included is the mediation model. 
+The mediator also predicts the dependent variable. 
+Because mediation approximates a process where changes in the mediator proceed shifts in the dependent variable, this is not a model with reciprocal causation. 
+For this project, I specify two models- one where non-major power alliances predict unconditional military support, then a second where unconditional military support and non-major power alliances predict treaty depth. 
+
+
+To model unconditional military support, I fit a binomial model with logistic link function. 
+The non-major power alliance dummy is the key independent variable, and I also control for a range of other factors.
+All of these variables could be correlated with unconditional military support and uno
+Key controls based on existing literature include a dummy for asymmetric capability \citep{Mattes2012} and average alliance democracy at the time of formation \citep{Chibaetal2015}. 
+I also control for foreign policy similarity \citep{Benson2012} using the minimum value of Cohen's $\kappa$ in the alliance \citep{Hage2011}.
+Using the ATOP data \citep{Leedsetal2002}, I also control for asymmetric treaty obligations, the number of alliance members, whether any of the members were at war and the year of treaty formation. 
+To capture the role of issue linkages in facilitating alliance agreements \citep{Poast2012, Poast2013}, I also include a dummy indicator of whether the alliance addressed economic issues.  
+Last, I include a count of foreign policy concessions in the treaty, because concessions can facilitate alliance negotiations \citep{Johnson2015}. 
+
+
+The model of treaty depth retains all of the above control variables and the non-major power variable. 
+All these variables could conceivably alter the need for additional reliability from treaty depth. 
+I then add the unconditional military support dummy to this specification. 
+Modeling depth itself is more complicated because the latent measure is a extremely skewed.
+To facilitate model fitting, I transformed latent depth by transforming the variable to range between zero and one, then modeling depth with a beta distribution.\footnote{I also considered skew-normal, normal and t-distributions for the outcome, but the skew model had poor credible interval coverage, while the normal and t-distributed models made poor posterior predictions.}
+
+
+I fit the mediator and outcome models simultaneously using BRMS \citep{Buerkner2017}. 
+BRMS is an interface to STAN, a probabilistic programming language for Bayesian estimation \citep{Carpenteretal2016}.
+Joint Bayesian estimation has the flexibility to incorporate the logistic and beta models and can be easily extended to account for uncertainty in the depth measure. 
+To facilitate interpretation of effects with a binary mediator, I rescaled all continuous independent variables by dividing by two standard deviations \citep{Gelman2008}. 
+Standard diagnostics suggest that the models converged and the chains adequately explored the posterior distribution.\footnote{Results are based on 1,000 Hamiltonian Monte Carlo iterations from four chains.} 
 
 
 \section{Results}
+
+
+
+\subsection{Case Study}
 
 
 \section{Conclusion}

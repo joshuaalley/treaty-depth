@@ -21,8 +21,7 @@ depth.res.min <- ggplot(depth.res, aes(x = latent.depth.mean, y = lambda)) +
   labs(x = "Latent Treaty Depth", y = "Effect of Alliance Participation") +
   ggtitle("Treaty Depth and the Impact of Alliance on Non-Major Power Military Spending: 1816-2007")
 depth.res.min
-
-multiplot.ggplot(depth.scatter, depth.res.min, cols = 2)
+ggsave("figures/depth-motive.png", height = 6, width = 8)
 
 
 
@@ -58,6 +57,7 @@ ggplot(atop.milsup, aes(x = as.factor(asymm.cap), y = latent.depth.mean)) +
 
 
 # Uncoditional military support
+table(atop.milsup$uncond.milsup)
 t.test(atop.milsup$latent.depth.mean ~ atop.milsup$uncond.milsup)
 
 # Focus on avg democracy 
