@@ -27,6 +27,15 @@ ggsave("figures/depth-motive.png", height = 6, width = 8)
 
 # Run some correlations, t-tests and scatterplots 
 
+
+# non-major powers only
+table(atop.milsup$non.maj.only)
+t.test(atop.milsup$latent.depth.mean ~ atop.milsup$non.maj.only)
+
+# Uncoditional military support
+table(atop.milsup$uncond.milsup)
+t.test(atop.milsup$latent.depth.mean ~ atop.milsup$uncond.milsup)
+
 # correlation between avg democracy and depth
 cor.test(atop.milsup$avg.democ, atop.milsup$latent.depth.mean)
 
@@ -55,10 +64,6 @@ ggplot(atop.milsup, aes(x = as.factor(asymm.cap), y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.5)
 
-
-# Uncoditional military support
-table(atop.milsup$uncond.milsup)
-t.test(atop.milsup$latent.depth.mean ~ atop.milsup$uncond.milsup)
 
 # Focus on avg democracy 
 ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
@@ -191,7 +196,14 @@ ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
 # Only non-major powers: size by conditionality 
 ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
-             alpha = 0.7,  # somewhat trasparent
-             aes(color = as.factor(non.maj.only), size = as.factor(uncond.milsup))) +
-  scale_colour_viridis_d(option = "plasma") + # change color scale
-  theme_classic()
+             alpha = 0.7,  # somewhat trasparent,
+             size = 2.5,
+             aes(color = as.factor(non.maj.only), shape = as.factor(uncond.milsup))) +
+  scale_colour_manual(values = c("0" = "gray30", "1" = "gray0"),
+                      labels = c("Major Power Included", "Non-Major Only")) + # change color scale
+  scale_shape_manual(values = c(16, 17),
+                     labels = c("Conditional", "Unconditional")) +
+  labs(x = "Alliance Start Year", y = "Latent Treaty Depth",
+       shape = "Conditionality", color = "Non-Major Power") +
+  theme_bw()
+ggsave("figures/non-maj-combo.png", height = 6, width = 8)

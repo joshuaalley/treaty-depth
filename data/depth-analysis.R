@@ -96,7 +96,6 @@ t.test(atop.milsup.post45$latent.depth.mean ~ atop.milsup.post45$uncond.milsup)
 t.test(atop.milsup.pre45$latent.depth.mean ~ atop.milsup.pre45$non.maj.only)
 t.test(atop.milsup.post45$latent.depth.mean ~ atop.milsup.post45$non.maj.only)
 
-
 # analysis before 1945 
 # depth 
 depth.reg.pre45 <- rlm(latent.depth.mean ~ avg.democ + econagg.dum + uncond.milsup +

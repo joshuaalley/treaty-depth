@@ -14,6 +14,7 @@ library(sjstats)
 library(mediation)
 library(arm)
 library(bfa)
+library(xtable)
 library(conflicted)
 
 
@@ -33,7 +34,8 @@ conflict_prefer("lag", "dplyr")
 conflict_prefer("Position", "ggplot2")
 conflict_prefer("rcond", "Matrix")
 conflict_prefer("pack", "tidyr")
-conflict_prefer("unpack", "tidyr") 
+conflict_prefer("unpack", "tidyr")
+conflict_prefer("display", "xtable")
 
 # Set up RSTAN guidelines
 rstan_options(auto_write = TRUE)
