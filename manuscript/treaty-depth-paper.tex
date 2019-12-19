@@ -330,6 +330,7 @@ Each of these individual indicators increases alliance treaty depth, but defense
 \label{fig:loadings-measure}
 \end{figure}
 
+
 Based on these factor loadings, the measurement model predicts the likely value of treaty depth. 
 The distribution of depth is summarized by the bottom panel of \autoref{fig:loadings-measure}. 
 There is substantial variation in alliance treaty depth. 
@@ -361,7 +362,7 @@ But to model treaty depth with the appropriate distribution, I cannot employ com
 Therefore I corroborate correlations from the statistical models, through case study evidence that shows how the sequence of alliance negotiations matches my theoretical argument and the empirical results. 
 
 
-Mediation models generally have two equations: one to predict values of the mediator and other to predict the outcome of interest. 
+Mediation models have two equations: one to predict values of the mediator and other to predict the outcome of interest. 
 The key independent variable is included in both equations, but the dependent variable is not included is the mediation model. 
 The mediator also predicts the dependent variable. 
 Because mediation approximates a process where changes in the mediator proceed shifts in the dependent variable, this is not a model with reciprocal causation. 
@@ -383,6 +384,7 @@ All these variables could conceivably alter the need for additional reliability 
 I then add the unconditional military support dummy to this specification. 
 Modeling depth itself is more complicated because the latent measure is a extremely skewed.
 To facilitate model fitting, I transformed latent depth by transforming the variable to range between zero and one, then modeling depth with a beta distribution.\footnote{I also considered skew-normal, normal and t-distributions for the outcome, but the skew model had poor credible interval coverage, while the normal and t-distributed models made poor posterior predictions.}
+The flexibility of the beta distribution also facilitates fitting models that account for uncertainty in the latent measure of treaty depth, which I describe in more detail below. 
 
 
 I fit the mediator and outcome models simultaneously using BRMS \citep{Buerkner2017}. 
@@ -484,6 +486,11 @@ The magnitude of the direct and indirect effects falls.
 Still, the indirect effect has a fairly clear positive effect on treaty depth, while the direct effect has a negative mean and is indistinguishable from zero. 
 
 
+The indirect effect works through a positive correlation between non-major power membership and unconditional military support. 
+In all three models, non-major power membership has a large positive association with unconditional military support. 
+This increased use of unconditional military support then leads to greater treaty depth. 
+
+
 Though the results from the three models are not equivalent, there is a common pattern. 
 Unconditional military support is the primary mechanism by which symmetric non-major power alliances lead to greater treaty depth. 
 There is little evidence of a direct link between non-major power alliances and treaty depth. 
@@ -492,7 +499,7 @@ As such, there is partial support for my argument about the connection between n
 
 
 Aggregate patterns in the above analyses give some sense of the theoretical process. 
-The modeling choices functionally impose an order to alliance negotiations however. 
+The statistical models impose an order on alliance negotiations, however. 
 To show that potential alliance members start by setting conditions on military support before turning to treaty depth, I now offer a brief case study. 
 
 
@@ -501,7 +508,6 @@ To show that potential alliance members start by setting conditions on military 
 The case study examines the alliance negotiation process in two treaties. 
 By tracing the process of alliance negotiations, I show how differences in non-major power participation affect conditions on military support and treaty depth, in that order. 
 I compare the outcomes of negotiations that led to a 1955 alliance between Egpyt, Syria and Jordan (ATOPID 3300) and a 1939 pact between France and Turkey (ATOPID 2465). 
-
 
 
 I selected these cases using matching software, following the recommendations of \citet{Nielsen2016}. 
@@ -520,10 +526,29 @@ The specific matching pair I chose did not have the minimum Mahalanobis distance
 
 % main evidence for an indirect effect
 The findings from the statistical model (and maybe the case study) are consistent with an indirect effect of non-major power alliances on treaty depth. 
-In the first stage of alliance negotiations, 
+In the first stage of alliance negotiations, non-major powers tend to produce unconditional military support. 
+After setting conditions on military support, non-major powers use treaty depth to support their obligations. 
 
+
+% Less evidence of a direct effect 
+There is less evidence symmetric non-major power alliance membership has a direct effect on treaty depth.
+I attributed this effect to the potential efficiency gains of defense coordination and cooperation.  
+Contrary findings may reflect the prevalence of unconditional military support in non-major power treaties. 
+They may also indicate that the benefits of policy coordination and defense cooperation are just as strong in asymmetric alliances. 
+If military institutionalization is a source of credibility in asymmetric treaties \citep{Mattes2012}, these alliances may also have high depth. 
+Thus, comparing symmetric non-major power treaties with asymmetric alliances and symmetric major power alliances will show few direct differences.
+Consistent with this logic, the direct effect is more positive when the base category is only symmetric non-major power treaties.  
 
 % Therefore, sources of alliance credibility are rather entangled
+My findings show how different aspects of alliance treaty design are related. 
+\citet{BensonClinton2016} use measurement models to show this in a descriptive fashion, but my findings give a sense of the process behind different combinations of depth and conditions on military support. 
+Previous research on the causes of alliance treaty design \citep{Benson2012, Mattes2012, Chibaetal2015} has focused on particular characteristics, and treated them as independent. 
+My results suggest that this approach can be informative, but it is incomplete. 
+
+
+Different sources of alliance treaty credibility are thoroughly entangled. 
+Non-major powers use depth to reinforce their promises of unconditional military support. 
+This has important implications for scholarship and policy. 
 
 \section{Conclusion}
 

@@ -48,7 +48,8 @@ depth.priors.unc <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthrs
 # same uncond milsup model and priors as earlier analysis
 priors.unc <- depth.priors.unc + uncond.priors
 
-# run the model on all 1000 datasets
+# run the model on 500 of the 1000 datasets
+# 1000 datasets has 12+ hour run time
 system.time(
 brm.multivar.unc <- brm_multiple(bf.depth.unc + bf.uncond +
                       set_rescor(FALSE), 
