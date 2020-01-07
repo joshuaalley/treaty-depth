@@ -18,7 +18,8 @@ atop.milsup.nonmaj <- filter(atop.milsup, non.maj.only == 1) %>%
 
 # Regression of depth on other alliance characteristics
 depth.reg <- lm(latent.depth.mean ~ avg.democ + econagg.dum + uncond.milsup +
-                  fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                  fp.conc.index + num.mem + wartime + asymm + 
+                  asymm.cap + non.maj.only +
                   low.kap.sc + begyr,
                 data = atop.milsup)
 summary(depth.reg)

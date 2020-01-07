@@ -31,7 +31,7 @@ summary(linkage.glm)
 # Set up unique dataframe
 brms.data <- select(atop.milsup, latent.depth.mean, deep.alliance, avg.democ, econagg.dum, uncond.milsup, 
                   fp.conc.index, num.mem, wartime, asymm,
-                   low.kap.sc, begyr, asymm.cap, non.maj.only)
+                   low.kap.sc, begyr, asymm.cap, non.maj.only, cond.milsup)
 brms.data[2:ncol(brms.data)] <- lapply(brms.data[2:ncol(brms.data)], 
                                        function(x) rescale(x, binary.inputs = "0/1")) 
 
