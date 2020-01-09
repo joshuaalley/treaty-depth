@@ -31,7 +31,7 @@ summary(linkage.glm)
 # Set up unique dataframe
 brms.data <- select(atop.milsup, latent.depth.mean, deep.alliance, avg.democ, econagg.dum, uncond.milsup, 
                   fp.conc.index, num.mem, wartime, asymm,
-                   low.kap.sc, begyr, asymm.cap, non.maj.only, cond.milsup)
+                   low.kap.sc, begyr, asymm.cap, non.maj.only, milinst)
 brms.data[2:ncol(brms.data)] <- lapply(brms.data[2:ncol(brms.data)], 
                                        function(x) rescale(x, binary.inputs = "0/1")) 
 
@@ -44,7 +44,6 @@ summary(brms.data$latent.depth.mean.rs)
 bf.depth <- brmsformula(latent.depth.mean.rs ~ avg.democ + econagg.dum + uncond.milsup +
                  fp.conc.index + num.mem + wartime + asymm +
                  low.kap.sc + begyr + non.maj.only,
-                 #+ (1 | p | gr(begyr, dist = "gaussian")),
                  center = TRUE) + Beta(link = "logit", link_phi = "log")
 depth.priors <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthmeanrs") 
 
@@ -52,7 +51,6 @@ depth.priors <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthmeanrs
 bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
                   fp.conc.index + num.mem + wartime + asymm +
                   low.kap.sc + begyr + non.maj.only,
-                  #+ (1 | p | gr(begyr, dist = "gaussian")), 
                   center = TRUE) + bernoulli(link = "logit")
 uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
 
@@ -71,15 +69,6 @@ mediation(brm.multivar, treatment = "avg.democ", prob = .9)
 mediation(brm.multivar, treatment = "num.mem", prob = .9)
 # mediation(brm.multivar, treatment = "asymm.cap", prob = .9)
 mediation(brm.multivar, treatment = "non.maj.only", prob = .9)
-
-
-# use the mediation package instead: (this is not working well)
-# only accepts binary outputs or lm: rather deep dummy than non-robust regression 
-# can't use sensitivity analysis here, however. 
-med.out <- mediate(depth.glm, uncond.glm, treat = "non.maj.only", mediator = "uncond.milsup",
-                   control.value = 0, treat.value = 1,
-                   robustSE = TRUE, sims = 100)
-summary(med.out)
 
 
 

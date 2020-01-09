@@ -223,15 +223,17 @@ atop <- left_join(atop, all.fpsim.first)
 atop.milsup <- filter(atop, offense == 1 | defense == 1) 
 atop.depth <- select(atop.milsup,
                      intcom, compag.mil,  
-                     milaid, milcon, base, organ1) 
+                     milaid, milcon, base, 
+                     organ1, contrib) 
 atop.depth <- as.data.frame(atop.depth)
 for(i in 1:ncol(atop.depth)){
   atop.depth[, i] <- as.ordered(atop.depth[, i])
 }
 
 # Use Murray BFA approach
-latent.depth <- bfa_mixed(~ intcom + compag.mil + 
-                            milaid + milcon + base + organ1, 
+latent.depth <- bfa_copula(~ intcom + compag.mil + 
+                            milaid + milcon + base + 
+                            organ1 + contrib, 
                           data = atop.depth, num.factor = 1,
                           factor.scales = FALSE,
                           keep.scores = TRUE, loading.prior = "gdp", 
@@ -255,7 +257,7 @@ lines(density(rnorm(10000, 0, 1)))
 # Create a dataset of factors
 latent.factors <- cbind.data.frame(c("Integrated Command", "Companion Mil. Agreement", 
                                      "Military Aid", "Policy Coordination", "Bases",
-                                     "Formal IO"),
+                                     "Formal IO", "Specific Contribution"),
                                    latent.depth[["post.loadings.mean"]],
                                    sqrt(latent.depth[["post.loadings.var"]])
 )
