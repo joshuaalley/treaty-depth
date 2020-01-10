@@ -183,27 +183,31 @@ ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
 t.test(atop.milsup$latent.depth.mean ~ atop.milsup$asymm)
 
 
-# Only non-major powers
-ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
-  geom_point(size = 3,
-             position = position_jitter(width = 0.1),  # jitter points to prevent overlap
-             alpha = 0.7,  # somewhat trasparent
-             aes(color = as.factor(non.maj.only))) +
-  scale_colour_viridis_d(option = "plasma") + # change color scale
-  theme_classic()
 
-
-# Only non-major powers: size by conditionality 
-ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
+# Plot depth against average democracy, color by uncond milsup
+ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent,
              size = 2.5,
-             aes(color = as.factor(non.maj.only), shape = as.factor(uncond.milsup))) +
-  scale_colour_manual(values = c("0" = "gray30", "1" = "gray0"),
-                      labels = c("Major Power Included", "Non-Major Only")) + # change color scale
+             aes(shape = as.factor(uncond.milsup))) +
   scale_shape_manual(values = c(16, 17),
-                     labels = c("Conditional", "Unconditional")) +
-  labs(x = "Alliance Start Year", y = "Latent Treaty Depth",
-       shape = "Conditionality", color = "Non-Major Power") +
+                      labels = c("Conditional", "Unconditional")) + # change color scale
+  geom_smooth(method = "lm") +
+  labs(x = "Average Democracy", y = "Latent Treaty Depth",
+       shape = "Conditionality") +
   theme_bw()
-ggsave("figures/non-maj-combo.png", height = 6, width = 8)
+
+
+# make shape by bilateral/multilateral: too busy for paper
+ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
+  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
+             alpha = 0.7,  # somewhat trasparent,
+             size = 2.5,
+             aes(color = as.factor(uncond.milsup), shape = as.factor(bilat))) +
+  scale_colour_manual(values = c("0" = "gray30", "1" = "red4"),
+                      labels = c("Conditional", "Unconditional")) + # change color scale
+  scale_shape_manual(values = c(16, 17),
+                     labels = c("Multilateral", "Bilateral")) +
+  labs(x = "Average Democracy", y = "Latent Treaty Depth",
+       shape = "Size", color = "Conditionality") +
+  theme_bw()

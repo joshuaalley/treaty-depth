@@ -24,86 +24,101 @@ summary(linkage.glm)
 
 # Joint analysis of multiple sources of credibility
 
-# May need to use a trivariate sample selection model from GJRM (Instrument, though?)
-# Mixed trivariate model may be possible in BRMS, but no error correlation
-# In general, the design needs to think about alliances that were not formed. Poast k-ad. stuff. 
+# May need to use a trivariate model from GJRM w/ issue linkages
 
 # Set up unique dataframe
-brms.data <- select(atop.milsup, latent.depth.mean, deep.alliance, avg.democ, econagg.dum, uncond.milsup, 
+key.data <- select(atop.milsup, latent.depth.mean, deep.alliance, avg.democ, econagg.dum, uncond.milsup, 
                   fp.conc.index, num.mem, wartime, asymm,
                    low.kap.sc, begyr, asymm.cap, non.maj.only, milinst)
-brms.data[2:ncol(brms.data)] <- lapply(brms.data[2:ncol(brms.data)], 
+key.data[2:ncol(key.data)] <- lapply(key.data[2:ncol(key.data)], 
                                        function(x) rescale(x, binary.inputs = "0/1")) 
 
-brms.data$latent.depth.mean.rs <- (brms.data$latent.depth.mean + 1) / (1 + max(brms.data$latent.depth.mean) + .01)
-summary(brms.data$latent.depth.mean.rs)
-
-# Use brms
-# set up model formulas and priors
-# depth model
-bf.depth <- brmsformula(latent.depth.mean.rs ~ avg.democ + econagg.dum + uncond.milsup +
-                 fp.conc.index + num.mem + wartime + asymm +
-                 low.kap.sc + begyr + non.maj.only,
-                 center = TRUE) + Beta(link = "logit", link_phi = "log")
-depth.priors <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthmeanrs") 
-
-# Unconditional military support model  
-bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
-                  fp.conc.index + num.mem + wartime + asymm +
-                  low.kap.sc + begyr + non.maj.only,
-                  center = TRUE) + bernoulli(link = "logit")
-uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
-
-# Fit the model
-full.priors <- depth.priors + uncond.priors
-brm.multivar <- brm(bf.depth + bf.uncond +
-                    set_rescor(FALSE), 
-                    data = brms.data,
-                    prior = full.priors,
-                    chains = 2, cores = 2)
-# brm.multivar <- add_criterion(brm.multivar, "loo", reloo = TRUE)
-pp_check(brm.multivar, resp = "latentdepthmeanrs")
-summary(brm.multivar)
-
-mediation(brm.multivar, treatment = "avg.democ", prob = .9)
-mediation(brm.multivar, treatment = "num.mem", prob = .9)
-# mediation(brm.multivar, treatment = "asymm.cap", prob = .9)
-mediation(brm.multivar, treatment = "non.maj.only", prob = .9)
+key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
+summary(key.data$latent.depth.mean.rs)
 
 
 
-# fit the model with a dummy indicator of depth
-# depth model
-bf.depth.dum <- brmsformula(deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
-                          fp.conc.index + num.mem + wartime + asymm +
-                          low.kap.sc + begyr + non.maj.only,
-                        #+ (1 | p | gr(begyr, dist = "gaussian")),
-                        center = TRUE) + bernoulli(link = "logit")
-depth.priors.dum <- set_prior("student_t(7, 0, 3)", class = "b", resp = "deepalliance") 
 
-# Unconditional military support model  
-bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
-                           fp.conc.index + num.mem + wartime + asymm +
-                           low.kap.sc + begyr + non.maj.only,
-                         #+ (1 | p | gr(begyr, dist = "gaussian")), 
-                         center = TRUE) + bernoulli(link = "logit")
-uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
+### use GJRM instead: allows for correlated errors
+# Bivariate model of unconditional military support and depth
+uncond.formula <- uncond.milsup ~ avg.democ + econagg.dum + latent.depth.mean +
+                 fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
+                  low.kap.sc + begyr
 
-# Fit the model
-full.priors.dum <- depth.priors.dum + uncond.priors
-brm.multivar.dum <- brm(bf.depth.dum + bf.uncond +
-                      set_rescor(FALSE), 
-                    data = brms.data,
-                    prior = full.priors.dum,
-                    chains = 2, cores = 2)
-# brm.multivar <- add_criterion(brm.multivar, "loo", reloo = TRUE)
-summary(brm.multivar.dum)
-
-mediation(brm.multivar.dum, treatment = "avg.democ", prob = .9)
-mediation(brm.multivar.dum, treatment = "num.mem", prob = .9)
-# mediation(brm.multivar.dum, treatment = "asymm.cap", prob = .9)
-mediation(brm.multivar.dum, treatment = "non.maj.only", prob = .9)
+depth.formula <- latent.depth.mean.rs ~ avg.democ + econagg.dum + uncond.milsup +
+                   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
+                   low.kap.sc + begyr
 
 
+copulas <- c("N", "C0", "C90", "C180", "C270", "J0", "J90", "J180", "J270",
+               "G0", "G90", "G180", "G270", "F", "AMH", "FGM", "T", "PL", "HO")
 
+# Create a list of models
+gjrm.models <- vector(mode = "list", length = length(copulas))
+
+for(i in 1:length(copulas)){
+gjrm.models[[i]]  <- gjrm(list(uncond.formula, depth.formula), data = key.data,
+                   margins = c("probit", "BE"),
+                   Model = "B",
+                   BivD = copulas[i]
+                   )
+}
+aic.gjrm <- lapply(gjrm.models, AIC)
+aic.gjrm
+lapply(gjrm.models, conv.check)
+
+# NB for interpretation: rescaled continuous covariates (helps with substance)
+# start with a normal copula: converged and lowest AIC
+# this implies symmetric dependence in the errors.
+copulas[1]
+joint.gjrm <- gjrm.models[[1]] 
+conv.check(joint.gjrm)
+AIC(joint.gjrm)
+summary(joint.gjrm)
+post.check(joint.gjrm)
+
+# AIC with T copula is also close
+# start with a normal copula: converged and lowest AIC
+copulas[17]
+joint.gjrm2 <- gjrm.models[[17]] 
+conv.check(joint.gjrm2)
+AIC(joint.gjrm2)
+summary(joint.gjrm2)
+
+
+# The two models give very similar inferences about covariates in each model and
+# the presence of correlated errors
+
+
+# Trivariate model is not fitting well: no variation with different copulas
+# and theta estimates are poor 
+# can only get it to fit with Cholesky method for covariance matrix
+depth.formula.tri <- deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
+  low.kap.sc + begyr
+
+linkage.formula <- econagg.dum ~ avg.democ + uncond.milsup + latent.depth.mean +
+  fp.conc.index + num.mem + wartime + asymm +  asymm.cap + non.maj.only +
+  low.kap.sc + begyr
+
+# Create a list of models
+gjrm.models.tri <- vector(mode = "list", length = length(copulas))
+
+for(i in 1:length(copulas)){
+  gjrm.models.tri[[i]]  <- gjrm(list(uncond.formula, depth.formula.tri, linkage.formula), data = key.data,
+                            margins = c("logit", "logit", "logit"),
+                            Model = "T", Chol = TRUE, penCor = "lasso",
+                            BivD = copulas[i]
+  )
+}
+lapply(gjrm.models.tri, AIC)
+lapply(gjrm.models.tri, conv.check)
+
+# NB for interpretation: rescaled continuous covariates (helps with substance)
+# No difference in AIC or convergence across these models
+copulas[1]
+joint.gjrm.tri <- gjrm.models.tri[[1]] 
+conv.check(joint.gjrm)
+AIC(joint.gjrm.tri)
+summary(joint.gjrm.tri)
 

@@ -17,6 +17,7 @@ library(coda)
 library(xtable)
 library(caseMatch)
 library(RStata)
+library(GJRM)
 library(conflicted)
 
 
@@ -39,6 +40,11 @@ conflict_prefer("pack", "tidyr")
 conflict_prefer("unpack", "tidyr")
 conflict_prefer("display", "xtable")
 conflict_prefer("traceplot", "coda")
+conflict_prefer("collapse", "dplyr")
+conflict_prefer("t2", "mgcv")
+conflict_prefer("mm", "brms")
+conflict_prefer("lmList", "nlme")
+conflict_prefer("s", "mgcv") 
 
 # Set up RSTAN guidelines
 rstan_options(auto_write = TRUE)

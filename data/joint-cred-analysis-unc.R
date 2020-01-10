@@ -3,6 +3,74 @@
 # Analysis of Treaty depth accounting for uncertainty in the latent measure
 
 
+
+
+# Use brms
+# set up model formulas and priors
+# depth model
+bf.depth <- brmsformula(latent.depth.mean.rs ~ avg.democ + econagg.dum + uncond.milsup +
+                          fp.conc.index + num.mem + wartime + asymm +
+                          low.kap.sc + begyr + non.maj.only,
+                        center = TRUE) + Beta(link = "logit", link_phi = "log")
+depth.priors <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthmeanrs") 
+
+# Unconditional military support model  
+bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
+                           fp.conc.index + num.mem + wartime + asymm +
+                           low.kap.sc + begyr + non.maj.only,
+                         center = TRUE) + bernoulli(link = "logit")
+uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
+
+# Fit the model
+full.priors <- depth.priors + uncond.priors
+brm.multivar <- brm(bf.depth + bf.uncond +
+                      set_rescor(FALSE), 
+                    data = key.data,
+                    prior = full.priors,
+                    chains = 2, cores = 2)
+# brm.multivar <- add_criterion(brm.multivar, "loo", reloo = TRUE)
+pp_check(brm.multivar, resp = "latentdepthmeanrs")
+summary(brm.multivar)
+
+mediation(brm.multivar, treatment = "avg.democ", prob = .9)
+mediation(brm.multivar, treatment = "num.mem", prob = .9)
+# mediation(brm.multivar, treatment = "asymm.cap", prob = .9)
+mediation(brm.multivar, treatment = "non.maj.only", prob = .9)
+
+
+
+# fit the model with a dummy indicator of depth
+# depth model
+bf.depth.dum <- brmsformula(deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
+                              fp.conc.index + num.mem + wartime + asymm +
+                              low.kap.sc + begyr + non.maj.only,
+                            #+ (1 | p | gr(begyr, dist = "gaussian")),
+                            center = TRUE) + bernoulli(link = "logit")
+depth.priors.dum <- set_prior("student_t(7, 0, 3)", class = "b", resp = "deepalliance") 
+
+# Unconditional military support model  
+bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
+                           fp.conc.index + num.mem + wartime + asymm +
+                           low.kap.sc + begyr + non.maj.only,
+                         #+ (1 | p | gr(begyr, dist = "gaussian")), 
+                         center = TRUE) + bernoulli(link = "logit")
+uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
+
+# Fit the model
+full.priors.dum <- depth.priors.dum + uncond.priors
+brm.multivar.dum <- brm(bf.depth.dum + bf.uncond +
+                          set_rescor(FALSE), 
+                        data = key.data,
+                        prior = full.priors.dum,
+                        chains = 2, cores = 2)
+# brm.multivar <- add_criterion(brm.multivar, "loo", reloo = TRUE)
+summary(brm.multivar.dum)
+
+mediation(brm.multivar.dum, treatment = "avg.democ", prob = .9)
+mediation(brm.multivar.dum, treatment = "num.mem", prob = .9)
+
+
+
 # Use brms to analyze multiple datasets and combine the results. 
 
 # create multiple datasets with results from the latent depth analysis

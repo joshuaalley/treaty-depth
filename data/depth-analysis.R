@@ -138,6 +138,6 @@ summary(uncond.glm.post45)
 atop.milsup.post19 <- filter(atop.milsup, begyr >= 1919)
 depth.reg.post19 <- rlm(latent.depth.mean ~ avg.democ + econagg.dum + uncond.milsup +
                           fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
-                          low.kap.sc + us.mem + ussr.mem,
-                        data = atop.milsup.post45)
+                          low.kap.sc,
+                        data = atop.milsup.post19)
 summary(depth.reg.post19)
