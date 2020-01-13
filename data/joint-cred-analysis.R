@@ -42,11 +42,11 @@ summary(key.data$latent.depth.mean.rs)
 ### use GJRM instead: allows for correlated errors
 # Bivariate model of unconditional military support and depth
 uncond.formula <- uncond.milsup ~ avg.democ + econagg.dum + latent.depth.mean +
-                 fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
+                 fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
                   low.kap.sc + begyr
 
 depth.formula <- latent.depth.mean.rs ~ avg.democ + econagg.dum + uncond.milsup +
-                   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
+                   fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
                    low.kap.sc + begyr
 
 
@@ -56,6 +56,9 @@ copulas <- c("N", "C0", "C90", "C180", "C270", "J0", "J90", "J180", "J270",
 # Create a list of models
 gjrm.models <- vector(mode = "list", length = length(copulas))
 
+# FISK (log-logistic), inverse gaussian, Dagum and beta distributions are best
+# in terms of residual fit
+# Beta has the lowest AIC. 
 for(i in 1:length(copulas)){
 gjrm.models[[i]]  <- gjrm(list(uncond.formula, depth.formula), data = key.data,
                    margins = c("probit", "BE"),
@@ -84,7 +87,6 @@ joint.gjrm2 <- gjrm.models[[17]]
 conv.check(joint.gjrm2)
 AIC(joint.gjrm2)
 summary(joint.gjrm2)
-
 
 # The two models give very similar inferences about covariates in each model and
 # the presence of correlated errors

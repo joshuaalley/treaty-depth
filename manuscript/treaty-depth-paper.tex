@@ -315,19 +315,21 @@ In the next section, I describe how I will test this claim about the association
 
 \section{Research Design}
 
-My research design estimates how unconditional military support mediates the relationship between non-major power alliances and treaty depth. 
+
+My argument claims that the processes behind deep treaties and conditions on military support are related. 
+Therefore, the research design uses multiple equations with correlated errors to assess how democracy affects the inclusion of unconditional military support and depth in alliance treaties.
 I start by describing the key variables in the analysis. 
 Then I provide more detail on the estimation strategy. 
 
 
 % start with data
-To examine my prediction that symmetric alliances between non-major powers often have greater depth, I employ data on alliance treaty design from the Alliance Treaty Obligations and Provisions dataset \citep{Leedsetal2002}. 
+To examine my prediction that democracies tend to produce conditional alliances with substantial depth, I employ data on alliance treaty design from the Alliance Treaty Obligations and Provisions dataset \citep{Leedsetal2002}. 
 I focus on 289 alliances with either offensive or defensive obligations, which is the set of treaties with military support. 
-All results in the paper use these 289 alliances as the sample, and I assess robustness to adjusting for non-random selection into alliances in the appendix. 
+All results in the paper use these 289 alliances as the sample, and I will assess robustness to adjusting for non-random selection into alliances in the appendix. 
 
 
 Using the ATOP data, I used a semiparametric mixed factor analysis to measure alliance treaty depth \citep{Murrayetal2013}.\footnote{See \textbf{\href{https://github.com/joshuaalley/arms-allies/blob/master/manuscript/arms-allies-paper.pdf}{this paper}} for more details on the measure.}
-This measure of depth is weighted combination of ATOP's defense policy coordination, military aid, integrated military command, formal organization, companion military agreement and bases variables. 
+This measure of depth is weighted combination of ATOP's defense policy coordination, military aid, integrated military command, formal organization, companion military agreement, specific contribution, and bases variables. 
 Each of these individual indicators increases alliance treaty depth, but defense policy coordination and an integrated command have the largest positive association, as shown in the top panel of \autoref{fig:loadings-measure}. 
 
 
@@ -352,34 +354,37 @@ Last, I measure alliance treaty depth with a dummy indicator of whether the alli
 Results from these three measures are very similar. 
 
 
-The key independent variable is a dummy indicator of whether the alliance only has non-major power members. 
-I classify alliance participants as major or non-major powers using data from the Correlates of War project \citep{SingerCINC1988}.
-Therefore, the base category is 22 alliances only between major powers and 138 asymmetric alliances between major and non-major powers.\footnote{Results are stronger if I include a dummy for asymmetric alliances, thereby removing these alliances in the base category. There is a direct relationship between asymmetric alliances and treaty depth \citep{Mattes2012}.}  
-
-
-The mediator is an dummy indicator of unconditional military support. 
+The second outcome variable is a dummy indicator of unconditional military support. 
 Using ATOP's information on whether defensive or offensive promises are conditional on specific locations, adversaries, or non-provocation, I set this variable equal to one if the treaty placed no conditions on military support.
 123 of 289 alliances in the data have unconditional military support. 
-I now describe how I estimate the mediation between non-major power alliances, unconditional military support, and treaty depth. 
+
+The key independent variable is the average democracy of alliance members at the time of treaty formation. 
+I use the POLITY measure of regime type to measure democracy. 
+I also consider a ``strongest link'' measure, which is the maximum democracy value at the time of formation.
+
+
+% Justify this choice compared to a joint democracy dummy
+An alternative measure of democracy is a dummy variable which is equal to one if both alliance members have a polity score greater than 5. 
+I prefer the average and maximum polity score measures because they translate better to multilateral alliances. 
+Moreover, democracy in one member will impact alliance treaties with less democratic partners, and a joint democracy variable would not capture that effect. 
+
+
+Hypothesis 1 expects that as average democracy in an alliance increases, the probability of unconditional military support in the treaty decreases.
+Hypothesis 2 predicts a positive association between democracy and treaty depth. 
+I now describe how I examine these predictions. 
 
 
 \subsection{Estimation Strategy}
 
-Mediation analysis is a common strategy for examining causal mechanisms \citep{Imaietal2011}. 
-But to model treaty depth with the appropriate distribution, I cannot employ common sensitivity tests, which makes assessing the value of causal inferences from these results difficult. 
-Based on my models, I cannot make confident causal claims, though mediation is often connected with causal inference. 
-Therefore I corroborate correlations from the statistical models, through case study evidence that shows how the sequence of alliance negotiations matches my theoretical argument and the empirical results. 
 
-
-Mediation models have two equations: one to predict values of the mediator and other to predict the outcome of interest. 
-The key independent variable is included in both equations, but the dependent variable is not included is the mediation model. 
-The mediator also predicts the dependent variable. 
-Because mediation approximates a process where changes in the mediator proceed shifts in the dependent variable, this is not a model with reciprocal causation. 
-I specify two models- one where non-major power alliances predict unconditional military support, then a second where unconditional military support and non-major power alliances predict treaty depth. 
+Because there is feedback between unconditional military support and treaty depth, I specify a statistical model with two equations and correlated errors. 
+One model predicts the probability unconditional military support, and the other predicts treaty depth.
+Unconditional military support is included as a predictor of depth, and depth also predicts unconditional military support.  
+I also corroborate correlations from the statistical models, through case study evidence that shows how the sequence of alliance negotiations matches my theoretical argument and the empirical results. 
 
 
 To model unconditional military support, I fit a binomial model with logistic link function. 
-The non-major power alliance dummy is the key independent variable, and I also control for a range of other factors.
+The average democracy dummy is the key independent variable, and I also control for a range of other factors.
 All of these variables could be correlated with unconditional military support and non-major power membership. 
 Key controls include a dummy for asymmetric capability \citep{Mattes2012} and average alliance democracy at the time of formation \citep{Chibaetal2015}. 
 I also control for foreign policy similarity \citep{Benson2012} using the minimum value of Cohen's $\kappa$ in the alliance \citep{Hage2011}.
@@ -388,28 +393,34 @@ To capture the role of issue linkages in facilitating alliance agreements \citep
 Last, I include a count of foreign policy concessions in the treaty, because concessions can facilitate alliance negotiations \citep{Johnson2015}. 
 
 
-The model of treaty depth retains all of the above control variables and the non-major power variable. 
+The model of treaty depth retains all of the above control variables and the average democracy variable. 
 All these variables could conceivably alter the need for additional reliability from treaty depth. 
 I then add the unconditional military support dummy to this specification. 
 Modeling depth is more complicated because the latent measure is a extremely skewed.
-To facilitate model fitting, I transformed latent depth by transforming the variable to range between zero and one, then used a beta distribution for outcome.\footnote{I also considered skew-normal, normal and t-distributions for the outcome, but the skew model had poor credible interval coverage, while the normal and t-distributed models made poor posterior predictions.}
+To facilitate model fitting, I transformed latent depth by transforming the variable to range between zero and one, then used a beta distribution for outcome.\footnote{I also considered log-logistic, Dagum and inverse Gaussian distributions for the outcome, but the beta model gave the best predictions.}
 The flexibility of the beta distribution helps predict mean latent depth and facilitates fitting models that account for uncertainty in the latent measure, which I describe in more detail below. 
 As an alternative measure of the outcome, I also fit a model with a dummy variable indicating whether the latent depth of the treaty was greater than the median depth value. 
 
 
-I fit the mediator and outcome models simultaneously using BRMS \citep{Buerkner2017}. 
-BRMS is an interface to STAN, a probabilistic programming language for Bayesian estimation \citep{Carpenteretal2016}.
-Joint Bayesian estimation has the flexibility to incorporate the logistic and beta models and can be easily extended to account for uncertainty in the depth measure. 
-To facilitate interpretation of effects with a binary mediator, I rescaled all continuous independent variables by dividing by two standard deviations \citep{Gelman2008}. 
-Standard diagnostics suggest that the models converged and the chains adequately explored the posterior distribution.\footnote{Results are based on 2,000 Hamiltonian Monte Carlo iterations from two chains, with 1,000 warmup iterations.} 
+I fit the mediator and outcome models simultaneously using generalized joint regression modeling (GJRM) \citep{Braumoelleretal2018}.
+\footnote{For models of depth with uncertainty, I use BRMS \citep{Buerkner2017}. BRMS is an interface to STAN, a probabilistic programming language for Bayesian estimation \citep{Carpenteretal2016}. Joint Bayesian estimation has the flexibility to incorporate the logistic and beta models and can be easily extended to account for uncertainty in the depth measure. It does not allow correlated errors, however.} 
+GJRM uses copulas to model correlations in the error terms of multiple equation models, which makes it more flexible than parametric models and facilitates causal inference. 
+Modeling any unobserved correlation between depth and unconditional military support facilitates accurate inferences about democracy and other covariates. 
+Copulas are distributions over functions, and model fit can express both the symmetry and direction of the dependence between the outcomes. 
+While the substitution argument suggests a symmetric copula will best capture the dependence between depth and conditionality, I fit models with all copulas, and selected the best-fitting model using AIC, conditional on that estimator having converged.\footnote{GJRM is estimated with maximum likelihood, and diagnostics for the gradient as well as the information matrix suggest that the GJRM models converged.} 
+The Gaussian and T copulas, both of which are symmetric, provide the best model fit. 
+
+
+Fianlly, I rescaled all continuous independent variables by dividing by two standard deviations to facilitate substantive interpretation of effects \citep{Gelman2008}. 
+In the next section, I summarize the results of the analysis. 
+
 
 
 \section{Results}
 
 
-My findings are consistent with the claim that symmetric non-major power alliances have higher depth. 
-A large portion of that effect is due to the prevalence of unconditional military support in non-major power treaties. 
-In this section, I first offer some descriptive statistics that are consistent with my claim, before turning to inferences from parametric modeling. 
+My findings are consistent with the claim that increasing democracy in an alliance leads to treaties with conditional support and greater depth. 
+In this section, I first offer some descriptive statistics that are consistent with my claim, before turning to inferences from full models. 
 
 
 First, unconditional alliances are common among non-major powers. 
