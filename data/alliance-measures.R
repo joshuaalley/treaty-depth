@@ -369,3 +369,9 @@ table(atop.milsup$cond.milsup, atop.milsup$uncond.milsup)
 
 # Quick tabulation of Leeds and Anac Military institutionalization measure
 table(atop.milsup$milinst)
+
+
+# add a variable splitting the democracy variable at 0
+summary(atop.milsup$avg.democ)
+atop.milsup$democ.pos <- ifelse(atop.milsup$avg.democ > 0, 1, 0)
+table(atop.milsup$democ.pos)

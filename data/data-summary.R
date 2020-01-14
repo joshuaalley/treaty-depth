@@ -27,11 +27,6 @@ ggsave("figures/depth-motive.png", height = 6, width = 8)
 
 # Run some correlations, t-tests and scatterplots 
 
-
-# non-major powers only
-table(atop.milsup$non.maj.only)
-t.test(atop.milsup$latent.depth.mean ~ atop.milsup$non.maj.only)
-
 # Uncoditional military support
 table(atop.milsup$uncond.milsup)
 t.test(atop.milsup$latent.depth.mean ~ atop.milsup$uncond.milsup)
@@ -55,14 +50,6 @@ ggplot(atop.milsup, aes(x = low.kap.sc, y = latent.depth.mean)) +
 cor.test(atop.milsup$num.mem, atop.milsup$latent.depth.mean)
 ggplot(atop.milsup, aes(x = num.mem, y = latent.depth.mean)) +
   geom_point()
-
-# Asymmetric capability
-# Plot alliance depth against size
-t.test( atop.milsup$latent.depth.mean ~ atop.milsup$asymm.cap)
-ggplot(atop.milsup, aes(x = as.factor(asymm.cap), y = latent.depth.mean)) +
-  geom_violin() +
-  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
-             alpha = 0.5)
 
 
 # Focus on avg democracy 
@@ -162,40 +149,53 @@ atop.milsup %>% filter(bilat == 0) %>%
   theme_classic()
 
 
-# Asymmetric capability
-ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
-  geom_point(size = 3,
-             position = position_jitter(width = 0.1),  # jitter points to prevent overlap
-             alpha = 0.7,  # somewhat trasparent
-             aes(color = as.factor(asymm.cap))) +
-  scale_colour_viridis_d(option = "plasma") + # change color scale
-  theme_classic()
-t.test(atop.milsup$latent.depth.mean ~ atop.milsup$asymm.cap)
 
-# Asymmetric obligations
-ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
-  geom_point(size = 3,
-             position = position_jitter(width = 0.1),  # jitter points to prevent overlap
-             alpha = 0.7,  # somewhat trasparent
-             aes(color = as.factor(asymm))) +
-  scale_colour_viridis_d(option = "plasma") + # change color scale
-  theme_classic()
-t.test(atop.milsup$latent.depth.mean ~ atop.milsup$asymm)
-
-
-
-# Plot depth against average democracy, color by uncond milsup
+# Plot depth against average democracy, shape by uncond milsup
 ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent,
              size = 2.5,
              aes(shape = as.factor(uncond.milsup))) +
   scale_shape_manual(values = c(16, 17),
-                      labels = c("Conditional", "Unconditional")) + # change color scale
+                      labels = c("Conditional", "Unconditional")) +
   geom_smooth(method = "lm") +
   labs(x = "Average Democracy", y = "Latent Treaty Depth",
        shape = "Conditionality") +
   theme_bw()
+ggsave("figures/democ-combo.png", height = 6, width = 8)
+
+# TODO(Josh): think about the best descriptive plot 
+ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
+  geom_boxplot() +
+  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
+             alpha = 0.7,  # somewhat trasparent,
+             size = 2.5)  +
+  facet_wrap(vars(democ.pos)) +
+  labs(x = "Unconditional", y = "Latent Treaty Depth",
+       shape = "Conditionality") +
+  theme_bw()
+
+
+ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
+  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
+             alpha = 0.7,  # somewhat trasparent,
+             size = 2.5)  +
+  geom_smooth(method = "lm") +
+  facet_wrap(vars(uncond.milsup)) +
+  labs(x = "Unconditional", y = "Latent Treaty Depth") +
+  theme_bw()
+
+
+ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
+  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
+             alpha = 0.7,  # somewhat trasparent
+             size = 2.5,
+             aes(color = as.factor(democ.pos), shape = as.factor(uncond.milsup))) +
+  scale_colour_manual(values = c("0" = "gray30", "1" = "red4"),
+                      labels = c("Negative Polity", "Positive Polity")) + # change color scale
+  scale_shape_manual(values = c(16, 17),
+                     labels = c("Conditional", "Unconditional")) + # shape scale
+  theme_classic()
 
 
 # make shape by bilateral/multilateral: too busy for paper

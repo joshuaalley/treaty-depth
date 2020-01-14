@@ -92,6 +92,39 @@ summary(joint.gjrm2)
 # the presence of correlated errors
 
 
+## fit a model with the deep alliance dummy variable outcome 
+### use GJRM instead: allows for correlated errors
+# Bivariate model of unconditional military support and depth
+depth.formula.dum <- deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  low.kap.sc + begyr
+
+# Create a list of models
+gjrm.models.dum <- vector(mode = "list", length = length(copulas))
+
+# FISK (log-logistic), inverse gaussian, Dagum and beta distributions are best
+# in terms of residual fit
+# Beta has the lowest AIC. 
+for(i in 1:length(copulas)){
+  gjrm.models.dum[[i]]  <- gjrm(list(uncond.formula, depth.formula.dum), data = key.data,
+                            margins = c("probit", "probit"),
+                            Model = "B",
+                            BivD = copulas[i]
+  )
+}
+aic.gjrm.dum <- lapply(gjrm.models.dum, AIC)
+aic.gjrm.dum
+lapply(gjrm.models.dum, conv.check)
+
+# examine the results: 
+copulas[1] # normal copula again minimizes AIC
+joint.gjrm.dum <- gjrm.models.dum[[1]] 
+conv.check(joint.gjrm.dum)
+AIC(joint.gjrm.dum)
+summary(joint.gjrm.dum)
+
+
+
 # Trivariate model is not fitting well: no variation with different copulas
 # and theta estimates are poor 
 # can only get it to fit with Cholesky method for covariance matrix
@@ -99,7 +132,7 @@ depth.formula.tri <- deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
   low.kap.sc + begyr
 
-linkage.formula <- econagg.dum ~ avg.democ + uncond.milsup + latent.depth.mean +
+linkage.formula <- econagg.dum ~ avg.democ + latent.depth.mean +
   fp.conc.index + num.mem + wartime + asymm +  asymm.cap + non.maj.only +
   low.kap.sc + begyr
 
