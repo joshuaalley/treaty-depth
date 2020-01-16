@@ -15,40 +15,53 @@ ggplot(atop.milsup, aes(x = as.ordered(milinst), y = latent.depth.mean)) +
 cor.test(atop.milsup$latent.depth.mean, atop.milsup$milinst)
 # Strong positive correlation
 
-# add ordering to the variable
-atop.milsup$milinst <- as.ordered(atop.milsup$milinst)
-
-
 # Fit the same model specification on an ordinal outcome
-milinst.m1 <- polr(milinst ~ avg.democ + econagg.dum + uncond.milsup +
+milinst.m1 <- polr(as.ordered(milinst) ~ avg.democ + econagg.dum + uncond.milsup +
                     fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
-                    low.kap.sc + us.mem + ussr.mem,
+                    low.kap.sc,
                   data = atop.milsup)
 summary(milinst.m1)
 
 
+# Set up the key formula and data
+table(key.data$milinst)
+key.data$high.milinst <- ifelse(key.data$milinst == 2, 1, 0)
+table(key.data$high.milinst)
 
-# Specify milinst formula and set variable to ordered
-bf.milinst <- brmsformula(milinst ~ avg.democ + econagg.dum + uncond.milsup +
-                          fp.conc.index + num.mem + wartime + asymm +
-                          low.kap.sc + begyr + asymm.cap + non.maj.only,
-                        center = TRUE) + cumulative(link = "logit", threshold = "flexible")
-milinst.priors <- set_prior("normal(0, 1)", class = "b", resp = "milinst") 
 
-brms.data$milinst <- as.ordered(brms.data$milinst)
+# Define formulas 
+milinst.formula <- high.milinst ~ avg.democ + econagg.dum + uncond.milsup +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  low.kap.sc + begyr
 
-# Keep the same unconditional military support model  
+uncond.formula.milinst <- uncond.milsup ~ avg.democ + econagg.dum + high.milinst +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  low.kap.sc + begyr
 
-# Fit the model
-joint.milinst.priors <- milinst.priors + uncond.priors
-brm.milinst <- brm(bf.milinst + bf.uncond +
-                      set_rescor(FALSE), 
-                    data = brms.data,
-                    prior = joint.milinst.priors,
-                    chains = 2, cores = 2)
-summary(brm.milinst)
 
-mediation(brm.milinst, treatment = "non.maj.only", prob = .9)
+# Create a list of models
+gjrm.models.milinst <- vector(mode = "list", length = length(copulas))
+
+# Cannot fit an ordinal version with this version of gjrm
+# Dummy for high 
+for(i in 1:length(copulas)){
+  gjrm.models.milinst[[i]]  <- gjrm(list(uncond.formula.milinst, milinst.formula), 
+                                    data = key.data,
+                            margins = c("probit", "probit"),
+                            Model = "B",
+                            BivD = copulas[i]
+  )
+}
+aic.milinst <- lapply(gjrm.models.milinst, AIC)
+aic.milinst
+lapply(gjrm.models.milinst, conv.check)
+
+# Summarize results
+copulas[1] # normal remains the best
+joint.gjrm.milinst <- gjrm.models.milinst[[1]] 
+conv.check(joint.gjrm.milinst)
+AIC(joint.gjrm.milinst)
+summary(joint.gjrm.milinst)
 
 
 
@@ -88,32 +101,49 @@ ggplot(benson.clinton.comp, aes(x = Depth.score.rs, y = latent.depth.rs)) +
 # Analysis with the Benson and Clinton measure
 # need a new dataframe 
 # Set up unique dataframe
-brms.data.bc <- select(benson.clinton.comp, Depth.score, avg.democ, econagg.dum, uncond.milsup, 
+key.data.bc <- select(benson.clinton.comp, Depth.score, avg.democ, econagg.dum, uncond.milsup, 
                     fp.conc.index, num.mem, wartime, asymm,
                     low.kap.sc, begyr, asymm.cap, non.maj.only)
-brms.data.bc[2:ncol(brms.data.bc)] <- lapply(brms.data.bc[2:ncol(brms.data.bc)], 
+key.data.bc[2:ncol(key.data.bc)] <- lapply(key.data.bc[2:ncol(key.data.bc)], 
                                        function(x) rescale(x, binary.inputs = "0/1")) 
 
-brms.data.bc$depthscore.rs.max <- (brms.data.bc$Depth.score + 1) / (1 + max(brms.data.bc$Depth.score, na.rm = TRUE) + .01)
-summary(brms.data.bc$depthscore.rs.max)
+key.data.bc$depthscore.rs.max <- (key.data.bc$Depth.score + 1) / (1 + max(key.data.bc$Depth.score, na.rm = TRUE) + .01)
+summary(key.data.bc$depthscore.rs.max)
 
 # Specify bc depth formula
-bf.bc <- brmsformula(depthscore.rs.max ~ avg.democ + econagg.dum + uncond.milsup +
-                            fp.conc.index + num.mem + wartime + asymm +
-                            low.kap.sc + begyr + asymm.cap + non.maj.only,
-                          center = TRUE) + Beta(link = "logit", link_phi = "log")
-bc.priors <- set_prior("normal(0, 1)", class = "b", resp = "depthscorersmax") 
+bcdepth.formula <- depthscore.rs.max ~ avg.democ + econagg.dum + uncond.milsup +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  low.kap.sc + begyr
+
+# Alternative unconditional formula
+bcuncond.formula <- uncond.milsup ~ avg.democ + econagg.dum + depthscore.rs.max +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  low.kap.sc + begyr
+
+# Create a list of models
+gjrm.models.bcdepth <- vector(mode = "list", length = length(copulas))
+
+# fit the models with different copulas
+# Use a logit link for unconditional military support: probit gives huge standard errors
+for(i in 1:length(copulas)){
+  gjrm.models.bcdepth[[i]]  <- gjrm(list(bcuncond.formula, bcdepth.formula), 
+                                    data = key.data.bc,
+                                    margins = c("logit", "BE"),
+                                    Model = "B",
+                                    BivD = copulas[i]
+  )
+}
+aic.bcdepth <- lapply(gjrm.models.bcdepth, AIC)
+aic.bcdepth
+lapply(gjrm.models.bcdepth, conv.check)
+
+# Summarize results
+copulas[1] # normal remains the best
+joint.gjrm.bc <- gjrm.models.bcdepth[[1]] 
+conv.check(joint.gjrm.bc)
+AIC(joint.gjrm.bc)
+summary(joint.gjrm.bc)
+# residual fit is really poor because Benson and Clinton measure has more outliers
+post.check(joint.gjrm.bc) 
 
 
-# Keep the same unconditional military support model  
-
-# Fit the model
-joint.bc.priors <- bc.priors + uncond.priors
-brm.bcdepth <- brm(bf.bc + bf.uncond +
-                     set_rescor(FALSE), 
-                   data = brms.data.bc,
-                   prior = joint.bc.priors,
-                   chains = 2, cores = 2)
-summary(brm.bcdepth)
-
-mediation(brm.bcdepth, treatment = "non.maj.only", prob = .9)

@@ -30,7 +30,7 @@ summary(linkage.glm)
 key.data <- select(atop.milsup, latent.depth.mean, deep.alliance, avg.democ, econagg.dum, uncond.milsup, 
                   fp.conc.index, num.mem, wartime, asymm,
                    low.kap.sc, begyr, asymm.cap, non.maj.only, milinst)
-key.data[2:ncol(key.data)] <- lapply(key.data[2:ncol(key.data)], 
+key.data[2:(ncol(key.data) - 1)] <- lapply(key.data[2:(ncol(key.data) - 1)], 
                                        function(x) rescale(x, binary.inputs = "0/1")) 
 
 key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
