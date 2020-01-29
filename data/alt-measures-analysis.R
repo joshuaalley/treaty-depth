@@ -17,7 +17,7 @@ cor.test(atop.milsup$latent.depth.mean, atop.milsup$milinst)
 
 # Fit the same model specification on an ordinal outcome
 milinst.m1 <- polr(as.ordered(milinst) ~ avg.democ + econagg.dum + uncond.milsup +
-                    fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
+                    fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
                     low.kap.sc,
                   data = atop.milsup)
 summary(milinst.m1)
@@ -31,11 +31,11 @@ table(key.data$high.milinst)
 
 # Define formulas 
 milinst.formula <- high.milinst ~ avg.democ + econagg.dum + uncond.milsup +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
   low.kap.sc + begyr
 
 uncond.formula.milinst <- uncond.milsup ~ avg.democ + econagg.dum + high.milinst +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
   low.kap.sc + begyr
 
 
@@ -103,21 +103,18 @@ ggplot(benson.clinton.comp, aes(x = Depth.score.rs, y = latent.depth.rs)) +
 # Set up unique dataframe
 key.data.bc <- select(benson.clinton.comp, Depth.score, avg.democ, econagg.dum, uncond.milsup, 
                     fp.conc.index, num.mem, wartime, asymm,
-                    low.kap.sc, begyr, asymm.cap, non.maj.only)
-key.data.bc[2:ncol(key.data.bc)] <- lapply(key.data.bc[2:ncol(key.data.bc)], 
-                                       function(x) rescale(x, binary.inputs = "0/1")) 
-
+                    low.kap.sc, begyr, asymm.cap, mean.threat)
 key.data.bc$depthscore.rs.max <- (key.data.bc$Depth.score + 1) / (1 + max(key.data.bc$Depth.score, na.rm = TRUE) + .01)
 summary(key.data.bc$depthscore.rs.max)
 
 # Specify bc depth formula
 bcdepth.formula <- depthscore.rs.max ~ avg.democ + econagg.dum + uncond.milsup +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
   low.kap.sc + begyr
 
 # Alternative unconditional formula
 bcuncond.formula <- uncond.milsup ~ avg.democ + econagg.dum + depthscore.rs.max +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
   low.kap.sc + begyr
 
 # Create a list of models

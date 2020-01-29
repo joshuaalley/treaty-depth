@@ -16,7 +16,6 @@ library(bfa)
 library(coda)
 library(xtable)
 library(caseMatch)
-library(RStata)
 library(GJRM)
 library(conflicted)
 

@@ -11,15 +11,6 @@
 \usepackage{adjustbox}
 \usepackage{amsmath}
 \usepackage{siunitx}
-\usepackage{tikz} % for theoretical flow chart
-\usetikzlibrary{shapes,decorations,arrows,calc,arrows.meta,fit,positioning}
-\tikzset{
-    -Latex,auto,node distance =1 cm and 1 cm,semithick,
-    state/.style ={ellipse, draw, minimum width = 0.7 cm},
-    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
-    bidirected/.style={Latex-Latex,dashed},
-    el/.style = {inner sep=2pt, align=left, sloped}
-}
 \setcitestyle{aysep{}}
 
 
@@ -40,10 +31,11 @@ Department of Political Science, Texas A\&M University.}}
 \begin{abstract}
 Why do states form deep alliances? 
 Deep treaties add defense coordination and cooperation to promises of military support.
-I argue that symmetric alliances between democracies are especially likely to include high treaty depth. 
+I argue that alliances between democracies are especially likely to include high treaty depth. 
 In these alliances, members use treaty depth as a substitute for commitments of unconditional military support.
 Using several statistical models, I show that decisions to include depth and unconditional military support in alliance treaties are correlated.
 Moreover, I find that as the average democracy of alliance members at the time of formation increases, treaty depth increases, but the probability the treaty offers unconditional military support decreases. 
+Thus, democracies do not uniformly offer limited commitments, but instead they substitute different sources of treaty depth. 
 The argument and findings have important implications for our understanding of the process and consequences of alliance treaty design. 
 \end{abstract}
 
@@ -67,10 +59,10 @@ Moreover, the prevalence of deep alliances increased after 1945.
 
 % Deep alliances matter: affect milex, maybe credibility 
 Adding formal treaty depth to an alliance has important consequences. 
-Deep alliances encourage reduced military spending by non-major power members because treaty depth increases alliance credibility.  
+Deep alliances encourage  non-major power members to reduce military spending because treaty depth increases alliance credibility.  
 On the other hand, participation in shallow alliances increases military spending because partners can use the threat of abandonment as bargaining leverage. 
 \autoref{fig:depth-motive} shows this relationship. 
-Therefore, treaty depth affects alliance politics by shaping treaty credibility and the distribution of military spending burdens among members. 
+The issue of military spending shows treaty depth affects alliance politics by shaping treaty credibility and the distribution of military spending burdens among members. 
 
 
 \begin{figure}[hbtp]
@@ -86,7 +78,7 @@ Despite the consequences of alliance treaty depth, we know little about when sta
 In this paper, I explain when states form deep alliances.
 I argue that alliance member characteristics shape conditions on military support in the treaty, which then affect treaty depth. 
 Alliance negotiations center on whether prospective members will offer military support and conditions on that support \citep{Poast2019a}. 
-When alliance members are unwilling to offer unconditional military support, they can use depth as a substitute source of reliability.\footnote{Depth could also complement promises of unconditional military support in alliances among autocracies.}
+When alliance members are unwilling to offer unconditional military support, they can use depth as a substitute source of reliability.%\footnote{Depth could also complement promises of unconditional military support in alliances among autocracies.}
 
 
 Because democracies tend to offer alliances with conditional obligations \citep{Mattes2012, Chibaetal2015}, they also increase treaty depth. 
@@ -98,15 +90,15 @@ Therefore, democracies can use costly provisions in deep alliances as an alterna
 I test this argument with a series of statistical models and an illustrative case study.
 The statistical models employ multiple equations to approximate the alliance negotiation process as well as the correlation between depth and unconditional military support. 
 The case studies check the theoretical process and statistical results \citep{SeawrightGerring2008, Seawright2016}. 
-I find consistent evidence that as alliance members become more democratic, treaty depth increases and unconditional military support is less likely. 
+I find consistent evidence that as allied democracy at the time of alliance formation increases, treaty depth increases and unconditional military support is less likely. 
 
 
 % Para on implications: sources of credibility and reassurance are connected
-My argument and findings have important consequences for our understanding of alliance treaty design. 
+My argument and findings have important consequences for research on alliance treaty design. 
 Existing scholarship considers individual parts of treaty design in isolation \citep{Benson2012, Mattes2012, Chibaetal2015}. 
 My argument shows that sources of credibility in alliance treaty design are connected. 
 Theorizing about and modeling different alliance characteristics in isolation may generate misleading conclusions. 
-Previous estimates of the connection between democracy and treaty depth have led to null findings, in large part because previous models do not consider the association between depth and conditions on military support. 
+Previous estimates of the connection between democracy and treaty depth produced null findings, in large part because previous models do not consider the association between depth and conditions on military support. 
 
 
 % Paragraph on the importance of democracy in alliance pol
@@ -114,7 +106,6 @@ This paper adds to knowledge of how democracy and domestic politics shape allian
 Scholars have long acknowledged that democracy and alliances are connected \citep{LaiReiter2000, GiblerWolford2006, Warren2016, McManusYarhi-Milo2017}. 
 Democratic commitments are often seen as more credible due to audience costs \citep{DigiuseppePoast2016}. 
 My argument suggests that although democracies do screen the scope of their commitments carefully, they form deeper alliances on other dimensions.  
-
 
 
 % roadmap for the paper 
@@ -428,7 +419,7 @@ Conversely, average polity score in alliances with conditional obligations is -1
 There is also a small positive correlation between average alliance democracy at the time of formation and treaty depth. 
 
 % plot 
-\autoref{fig:democ-combo} shows the mix of unconditional military support and high treaty depth in alliannce design as democracy increases. 
+\autoref{fig:democ-combo} shows the mix of unconditional military support and high treaty depth in alliance design as democracy increases. 
 Triangular points mark unconditional military support. 
 At high levels of democracy, there are more conditional treaties, and most alliances have some depth. 
 
@@ -450,7 +441,6 @@ First, I tabulate the results of the model of unconditional military support in 
   \hline
  & Estimate & Std. Error & z value & Pr($>$|$z$|) \\ 
   \hline
-(Intercept) & -0.06 & 0.13 & -0.45 & 0.65 \\ 
   avg.democ & -0.40 & 0.15 & -2.63 & 0.01 \\ 
   econagg.dum & 0.32 & 0.17 & 1.93 & 0.05 \\ 
   latent.depth.mean & 1.07 & 0.09 & 12.59 & 0.00 \\ 
@@ -461,14 +451,18 @@ First, I tabulate the results of the model of unconditional military support in 
   asymm.cap & -0.28 & 0.15 & -1.81 & 0.07 \\ 
   low.kap.sc & 0.02 & 0.16 & 0.12 & 0.90 \\ 
   begyr & 0.29 & 0.17 & 1.74 & 0.08 \\ 
+  (Intercept) & -0.06 & 0.13 & -0.45 & 0.65 \\ 
    \hline
 \end{tabular}
+\caption{Results from probit model predicting the presence of unconditional military support. All continuous independent variables are rescaled, so those coefficients reflect the effect of a two-standard deviation increase.}
 \label{tab:uncond-res}
 \end{table}
 
 
 As expected, as average democracy in an alliance increases, the probability a treaty offers unconditional military support decreases. 
 Thus, even after accounting for the relationship between depth and unconditional military support, my analysis supports previous findings about democracy and conditional obligations. 
+Moreover, this is a substantively large effect. 
+
 Depth is positively correlated with the likelihood of unconditional military support, as is the presence of economic issue linkages. 
 I also find suggestive evidence that asymmetric capability in a treaty decreases the likelihood of unconditional military support. 
 With these results in hand, I now turn to findings about treaty depth. 
@@ -479,8 +473,7 @@ With these results in hand, I now turn to findings about treaty depth.
 \begin{tabular}{rrrrr}
   \hline
  & Estimate & Std. Error & z value & Pr($>$|$z$|) \\ 
-  \hline
-(Intercept) & -2.06 & 0.47 & -4.39 & 0.00 \\ 
+  \hline 
   avg.democ & 0.43 & 0.15 & 2.96 & 0.00 \\ 
   econagg.dum & -0.33 & 0.16 & -2.04 & 0.04 \\ 
   uncond.milsup & 1.02 & 0.05 & 21.94 & 0.00 \\ 
@@ -491,14 +484,16 @@ With these results in hand, I now turn to findings about treaty depth.
   asymm.cap & 0.23 & 0.15 & 1.57 & 0.12 \\ 
   low.kap.sc & -0.00 & 0.16 & -0.03 & 0.98 \\ 
   begyr & -0.27 & 0.16 & -1.70 & 0.09 \\ 
+  (Intercept) & -2.06 & 0.47 & -4.39 & 0.00 \\
    \hline
 \end{tabular}
+\caption{Results from the Beta regression of recaled treaty depth. All continuous independent variables are rescaled, so those coefficients reflect the effect of a two-standard deviation increase.}
 \label{tab:depth-res}
 \end{table}
 
 
 The results in \autoref{tab:depth-res} are consistent with Hypothesis 2. 
-A two standard deviation increase in the average democracy of an alliance (which is equivalent to an 11-point increase in the average polity score) increases treaty depth by 1.5 standard deviations. 
+A two standard deviation increase in the average democracy of an alliance, which is roughly an 11-point increase in the average polity score, increases treaty depth by 1.5 standard deviations. 
 This is a substantively large effect. 
 
 

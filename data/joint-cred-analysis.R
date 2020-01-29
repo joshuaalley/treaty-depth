@@ -5,7 +5,7 @@
 
 # glm model of unconditional military support
 uncond.glm <- glm(uncond.milsup ~ avg.democ + econagg.dum +
-                       fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
+                       fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
                        low.kap.sc + begyr + us.mem + ussr.mem,
                      family = binomial(link = "probit"),
                      data = atop.milsup)
@@ -14,7 +14,7 @@ summary(uncond.glm)
 
 # glm model of economic issue linkages
 linkage.glm <- glm(econagg.dum ~ avg.democ + uncond.milsup + latent.depth.mean +
-                    fp.conc.index + num.mem + wartime + asymm +  asymm.cap + non.maj.only +
+                    fp.conc.index + num.mem + wartime + asymm +  asymm.cap + mean.threat +
                     low.kap.sc + begyr + us.mem + ussr.mem,
                   family = binomial(link = "probit"),
                   data = atop.milsup)
@@ -29,10 +29,7 @@ summary(linkage.glm)
 # Set up unique dataframe
 key.data <- select(atop.milsup, latent.depth.mean, deep.alliance, avg.democ, econagg.dum, uncond.milsup, 
                   fp.conc.index, num.mem, wartime, asymm,
-                   low.kap.sc, begyr, asymm.cap, non.maj.only, milinst)
-key.data[2:(ncol(key.data) - 1)] <- lapply(key.data[2:(ncol(key.data) - 1)], 
-                                       function(x) rescale(x, binary.inputs = "0/1")) 
-
+                   low.kap.sc, begyr, asymm.cap, mean.threat, milinst)
 key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
 summary(key.data$latent.depth.mean.rs)
 
@@ -41,13 +38,12 @@ summary(key.data$latent.depth.mean.rs)
 
 ### use GJRM instead: allows for correlated errors
 # Bivariate model of unconditional military support and depth
-uncond.formula <- uncond.milsup ~ avg.democ + econagg.dum + latent.depth.mean +
-                 fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
-                  low.kap.sc + begyr
-
-depth.formula <- latent.depth.mean.rs ~ avg.democ + econagg.dum + uncond.milsup +
-                   fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
-                   low.kap.sc + begyr
+uncond.formula <- uncond.milsup ~ s(avg.democ) + econagg.dum + latent.depth.mean.rs +
+                 fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
+                  s(low.kap.sc) + s(begyr)
+depth.formula <- latent.depth.mean.rs ~ s(avg.democ) + econagg.dum + uncond.milsup +
+                   fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
+                   s(low.kap.sc) + s(begyr)
 
 
 copulas <- c("N", "C0", "C90", "C180", "C270", "J0", "J90", "J180", "J270",
@@ -70,34 +66,46 @@ aic.gjrm <- lapply(gjrm.models, AIC)
 aic.gjrm
 lapply(gjrm.models, conv.check)
 
-# NB for interpretation: rescaled continuous covariates (helps with substance)
-# start with a normal copula: converged and lowest AIC
+# NB for interpretation: smoothed terms
+# start with a plank copula: converged and lowest AIC
 # this implies symmetric dependence in the errors.
-copulas[1]
-joint.gjrm <- gjrm.models[[1]] 
+copulas[17]
+joint.gjrm <- gjrm.models[[17]] 
 conv.check(joint.gjrm)
 AIC(joint.gjrm)
 summary(joint.gjrm)
 post.check(joint.gjrm)
+plot(joint.gjrm, eq = 1, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+plot(joint.gjrm, eq = 2, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
 
-# AIC with T copula is also close
-# start with a normal copula: converged and lowest AIC
-copulas[17]
-joint.gjrm2 <- gjrm.models[[17]] 
-conv.check(joint.gjrm2)
-AIC(joint.gjrm2)
-summary(joint.gjrm2)
+# Democracy smooths
+# uncond milsup
+plot(joint.gjrm, eq = 1, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Average Democracy"
+     )
 
-# The two models give very similar inferences about covariates in each model and
-# the presence of correlated errors
+# Depth
+plot(joint.gjrm, eq = 2, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Average Democracy"
+     )
+
+# build out predictions
+model.matrix <- predict(joint.gjrm, type = "lpmatrix", eq = 2)
+depth.coefs <- 
+linear.pred.depth <- model.matrix %*% joint.gjrm$coefficients[37:72]
 
 
-## fit a model with the deep alliance dummy variable outcome 
-### use GJRM instead: allows for correlated errors
+
+
+### fit a model with the deep alliance dummy variable outcome 
 # Bivariate model of unconditional military support and depth
-depth.formula.dum <- deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
-  low.kap.sc + begyr
+depth.formula.dum <- deep.alliance ~ s(avg.democ) + econagg.dum + uncond.milsup +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
+  s(low.kap.sc) + s(begyr)
 
 # Create a list of models
 gjrm.models.dum <- vector(mode = "list", length = length(copulas))
@@ -117,11 +125,25 @@ aic.gjrm.dum
 lapply(gjrm.models.dum, conv.check)
 
 # examine the results: 
-copulas[1] # normal copula again minimizes AIC
-joint.gjrm.dum <- gjrm.models.dum[[1]] 
+copulas[17] # T copula again minimizes AIC and has best convergence
+joint.gjrm.dum <- gjrm.models.dum[[17]] 
 conv.check(joint.gjrm.dum)
 AIC(joint.gjrm.dum)
 summary(joint.gjrm.dum)
+
+
+# Democracy smooths
+# uncond milsup
+plot(joint.gjrm.dum, eq = 1, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Average Democracy"
+)
+
+# Depth
+plot(joint.gjrm.dum, eq = 2, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Average Democracy"
+)
 
 
 
@@ -129,11 +151,11 @@ summary(joint.gjrm.dum)
 # and theta estimates are poor 
 # can only get it to fit with Cholesky method for covariance matrix
 depth.formula.tri <- deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
   low.kap.sc + begyr
 
 linkage.formula <- econagg.dum ~ avg.democ + latent.depth.mean +
-  fp.conc.index + num.mem + wartime + asymm +  asymm.cap + non.maj.only +
+  fp.conc.index + num.mem + wartime + asymm +  asymm.cap + mean.threat +
   low.kap.sc + begyr
 
 # Create a list of models
@@ -149,7 +171,6 @@ for(i in 1:length(copulas)){
 lapply(gjrm.models.tri, AIC)
 lapply(gjrm.models.tri, conv.check)
 
-# NB for interpretation: rescaled continuous covariates (helps with substance)
 # No difference in AIC or convergence across these models
 copulas[1]
 joint.gjrm.tri <- gjrm.models.tri[[1]] 

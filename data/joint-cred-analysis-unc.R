@@ -9,15 +9,15 @@
 # set up model formulas and priors
 # depth model
 bf.depth <- brmsformula(latent.depth.mean.rs ~ avg.democ + econagg.dum + uncond.milsup +
-                          fp.conc.index + num.mem + wartime + asymm +
-                          low.kap.sc + begyr + non.maj.only,
+                          fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                          max.threat + low.kap.sc + begyr,
                         center = TRUE) + Beta(link = "logit", link_phi = "log")
 depth.priors <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthmeanrs") 
 
 # Unconditional military support model  
 bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
-                           fp.conc.index + num.mem + wartime + asymm +
-                           low.kap.sc + begyr + non.maj.only,
+                           fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                           max.threat + low.kap.sc + begyr,
                          center = TRUE) + bernoulli(link = "logit")
 uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
 
@@ -32,26 +32,29 @@ brm.multivar <- brm(bf.depth + bf.uncond +
 pp_check(brm.multivar, resp = "latentdepthmeanrs")
 summary(brm.multivar)
 
-mediation(brm.multivar, treatment = "avg.democ", prob = .9)
-mediation(brm.multivar, treatment = "num.mem", prob = .9)
-# mediation(brm.multivar, treatment = "asymm.cap", prob = .9)
-mediation(brm.multivar, treatment = "non.maj.only", prob = .9)
+# Plot marginal effects of average democracy
+plot(marginal_effects(brm.multivar,
+                        effects = "avg.democ",
+                        method = "fitted",
+                        theme = "bw"),
+                     ask = FALSE)
+
 
 
 
 # fit the model with a dummy indicator of depth
 # depth model
 bf.depth.dum <- brmsformula(deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
-                              fp.conc.index + num.mem + wartime + asymm +
-                              low.kap.sc + begyr + non.maj.only,
+                              fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                              max.threat + low.kap.sc + begyr,
                             #+ (1 | p | gr(begyr, dist = "gaussian")),
                             center = TRUE) + bernoulli(link = "logit")
 depth.priors.dum <- set_prior("student_t(7, 0, 3)", class = "b", resp = "deepalliance") 
 
 # Unconditional military support model  
 bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
-                           fp.conc.index + num.mem + wartime + asymm +
-                           low.kap.sc + begyr + non.maj.only,
+                           fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                           max.threat + low.kap.sc + begyr,
                          #+ (1 | p | gr(begyr, dist = "gaussian")), 
                          center = TRUE) + bernoulli(link = "logit")
 uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
@@ -63,11 +66,7 @@ brm.multivar.dum <- brm(bf.depth.dum + bf.uncond +
                         data = key.data,
                         prior = full.priors.dum,
                         chains = 2, cores = 2)
-# brm.multivar <- add_criterion(brm.multivar, "loo", reloo = TRUE)
 summary(brm.multivar.dum)
-
-mediation(brm.multivar.dum, treatment = "avg.democ", prob = .9)
-mediation(brm.multivar.dum, treatment = "num.mem", prob = .9)
 
 
 
@@ -79,7 +78,7 @@ mediation(brm.multivar.dum, treatment = "num.mem", prob = .9)
 # create an empty list of dataframes with all the variables
 brms.data.key <- select(atop.milsup, avg.democ, econagg.dum, uncond.milsup, 
                                      fp.conc.index, num.mem, wartime, asymm,
-                                     low.kap.sc, begyr, non.maj.only) 
+                                     low.kap.sc, begyr, max.threat) 
 
 # Create a list of dataframes 
 brms.data.unc <- vector(mode = "list", length = ncol(post.score[1, , ]))
@@ -108,8 +107,8 @@ brms.data.unc.short <- sample(brms.data.unc.rs, size = 500, replace = FALSE)
 
 # depth model: update formula
 bf.depth.unc <- brmsformula(latent.depth.rs ~ avg.democ + econagg.dum + uncond.milsup +
-                          fp.conc.index + num.mem + wartime + asymm +
-                          low.kap.sc + begyr + non.maj.only,
+                          fp.conc.index + num.mem + wartime + asymm + asymm.cap + max.threat +
+                          low.kap.sc + begyr,
                         #+ (1 | p | gr(begyr, dist = "gaussian")),
                         center = TRUE) + Beta(link = "logit", link_phi = "log")
 depth.priors.unc <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthrs") 
@@ -134,7 +133,5 @@ summary(brm.multivar.unc)
 round(brm.multivar.unc$rhats, 2) # rhats are fine in the submodels
 summary(brm.multivar.unc$rhats) # summary by parameters
 max(brm.multivar.unc$rhats) # maximum rhat is not problematic
-
-mediation(brm.multivar.unc, treatment = "non.maj.only", prob = .9)
 
 

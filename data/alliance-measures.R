@@ -8,13 +8,6 @@ atop <- read.csv("data/atop-alliance-level.csv")
 atop.mem.full <- read.csv("data/atop-member-level.csv")
 
 
-
-# Use do-file to create Leeds and Anac measure of institutionalization
-chooseStataBin() # need to manually select
-atop <- stata("data/leeds-anac-2005.do", data.in = atop, data.out = TRUE,
-              stata.version = 13)
-table(atop$milinst)
-
 # identify non-aggression only pacts
 # Also, recode arms requirements and military aid variables from ATOP into dummy 
 # variables that capture conditions where increases in arms spending are likely
@@ -233,7 +226,7 @@ for(i in 1:ncol(atop.depth)){
 # Use Murray BFA approach
 latent.depth <- bfa_copula(~ intcom + compag.mil + 
                             milaid + milcon + base + 
-                            organ1 + contrib, 
+                            organ1, 
                           data = atop.depth, num.factor = 1,
                           factor.scales = FALSE,
                           keep.scores = TRUE, loading.prior = "gdp", 
