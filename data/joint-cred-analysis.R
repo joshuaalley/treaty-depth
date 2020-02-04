@@ -39,11 +39,17 @@ summary(key.data$latent.depth.mean.rs)
 ### use GJRM instead: allows for correlated errors
 # Bivariate model of unconditional military support and depth
 uncond.formula <- uncond.milsup ~ s(avg.democ) + econagg.dum + latent.depth.mean.rs +
-                 fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
-                  s(low.kap.sc) + s(begyr)
+                 fp.conc.index + num.mem + wartime + asymm + asymm.cap + s(mean.threat) +
+                  low.kap.sc + s(begyr)
+
 depth.formula <- latent.depth.mean.rs ~ s(avg.democ) + econagg.dum + uncond.milsup +
-                   fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
-                   s(low.kap.sc) + s(begyr)
+                   fp.conc.index + num.mem + wartime + asymm + asymm.cap + s(mean.threat) +
+                   low.kap.sc + s(begyr)
+
+# model the dependence between the error terms
+theta.formula <- ~ s(avg.democ) + s(begyr)
+eq.sigma <- ~ 1
+
 
 
 copulas <- c("N", "C0", "C90", "C180", "C270", "J0", "J90", "J180", "J270",
@@ -56,7 +62,9 @@ gjrm.models <- vector(mode = "list", length = length(copulas))
 # in terms of residual fit
 # Beta has the lowest AIC. 
 for(i in 1:length(copulas)){
-gjrm.models[[i]]  <- gjrm(list(uncond.formula, depth.formula), data = key.data,
+gjrm.models[[i]]  <- gjrm(list(uncond.formula, depth.formula,
+                               eq.sigma, theta.formula), 
+                          data = key.data,
                    margins = c("probit", "BE"),
                    Model = "B",
                    BivD = copulas[i]
@@ -67,7 +75,7 @@ aic.gjrm
 lapply(gjrm.models, conv.check)
 
 # NB for interpretation: smoothed terms
-# start with a plank copula: converged and lowest AIC
+# T copula: converged and lowest AIC
 # this implies symmetric dependence in the errors.
 copulas[17]
 joint.gjrm <- gjrm.models[[17]] 
@@ -85,18 +93,13 @@ plot(joint.gjrm, eq = 2, seWithMean = TRUE,
 plot(joint.gjrm, eq = 1, seWithMean = TRUE,
      shade = TRUE, select = 1,
      xlab = "Average Democracy"
-     )
+)
 
 # Depth
 plot(joint.gjrm, eq = 2, seWithMean = TRUE,
      shade = TRUE, select = 1,
      xlab = "Average Democracy"
-     )
-
-# build out predictions
-model.matrix <- predict(joint.gjrm, type = "lpmatrix", eq = 2)
-depth.coefs <- 
-linear.pred.depth <- model.matrix %*% joint.gjrm$coefficients[37:72]
+)
 
 
 
@@ -104,8 +107,8 @@ linear.pred.depth <- model.matrix %*% joint.gjrm$coefficients[37:72]
 ### fit a model with the deep alliance dummy variable outcome 
 # Bivariate model of unconditional military support and depth
 depth.formula.dum <- deep.alliance ~ s(avg.democ) + econagg.dum + uncond.milsup +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
-  s(low.kap.sc) + s(begyr)
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + s(mean.threat) +
+  low.kap.sc + s(begyr)
 
 # Create a list of models
 gjrm.models.dum <- vector(mode = "list", length = length(copulas))
@@ -125,8 +128,8 @@ aic.gjrm.dum
 lapply(gjrm.models.dum, conv.check)
 
 # examine the results: 
-copulas[17] # T copula again minimizes AIC and has best convergence
-joint.gjrm.dum <- gjrm.models.dum[[17]] 
+copulas[18] # T copula again minimizes AIC and has best convergence
+joint.gjrm.dum <- gjrm.models.dum[[18]] 
 conv.check(joint.gjrm.dum)
 AIC(joint.gjrm.dum)
 summary(joint.gjrm.dum)

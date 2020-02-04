@@ -377,7 +377,7 @@ I also corroborate correlations from the statistical models, through case study 
 To model unconditional military support, I fit a binomial model with logistic link function. 
 The average democracy dummy is the key independent variable, and I also control for a range of other factors.
 All of these variables could be correlated with unconditional military support and non-major power membership. 
-Key controls include a dummy for asymmetric capability \citep{Mattes2012} and average alliance democracy at the time of formation \citep{Chibaetal2015}. 
+Key controls include a dummy for asymmetric capability \citep{Mattes2012} and the average threat among alliance members at the time of treaty formation \citep{LeedsSavun2007}. 
 I also control for foreign policy similarity \citep{Benson2012} using the minimum value of Cohen's $\kappa$ in the alliance \citep{Hage2011}.
 Using the ATOP data \citep{Leedsetal2002}, I control for asymmetric treaty obligations, the number of alliance members, whether any of the members were at war and the year of treaty formation. 
 To capture the role of issue linkages in facilitating alliance agreements \citep{Poast2012, Poast2013}, I also include a dummy indicator of whether the alliance addressed economic issues.  
@@ -398,10 +398,11 @@ GJRM uses copulas to model correlations in the error terms of multiple equation 
 Modeling any unobserved correlation between depth and unconditional military support facilitates accurate inferences about democracy and other covariates. 
 Copulas are distributions over functions, and model fit can express both the symmetry and direction of the dependence between the outcomes. 
 While the substitution argument suggests a symmetric copula will best capture the dependence between depth and conditionality, I fit models with all copulas, and selected the best-fitting model using AIC, conditional on that estimator having converged.\footnote{GJRM is estimated with maximum likelihood, and diagnostics for the gradient as well as the information matrix suggest that the GJRM models converged.} 
-The Gaussian and T copulas, both of which are symmetric, provide the best model fit. 
+The symmetric T copula, provides the best model fit. 
 
 
-Fianlly, I rescaled all continuous independent variables by dividing by two standard deviations to facilitate substantive interpretation of effects \citep{Gelman2008}. 
+GJRM also facilitates checking for non-linear relationships by allowing smoothed terms. 
+I estimated smoothed terms for democracy, mean threat and the start year of the alliance to capture potential non-linear relationships.\footnote{Fitting models with other continuous terms smoothed returned effective degrees of freedom = 1 for foreign policy similarity, which suggests a linear fit is equivalent. As the the results will show, the smoothed term for democracy is highly linear.}  
 In the next section, I summarize the results of the analysis. 
 
 
@@ -416,7 +417,7 @@ In this section, I first offer some descriptive statistics that are consistent w
 First, unconditional alliances tend to have lower average democracy values. 
 The average of democracy among alliances with unconditional military support is -3.7. 
 Conversely, average polity score in alliances with conditional obligations is -1.9.\footnote{Based on a t-test, the difference between these values is statistically significant.} 
-There is also a small positive correlation between average alliance democracy at the time of formation and treaty depth. 
+There is also a slight positive correlation between average alliance democracy at the time of formation and treaty depth. 
 
 % plot 
 \autoref{fig:democ-combo} shows the mix of unconditional military support and high treaty depth in alliance design as democracy increases. 
@@ -432,78 +433,93 @@ At high levels of democracy, there are more conditional treaties, and most allia
 \end{figure}
 
 
-To show the theoretical process, I report the results of the joint analysis of depth and unconditional military support. 
-First, I tabulate the results of the model of unconditional military support in \autoref{tab:uncond-res}, where the estimates are consistent with Hypothesis 1. 
+I now report the results of the joint analysis of depth and unconditional military support. 
+\autoref{fig:results-democ} plots the estimated effect of democracy on the two outcomes. 
+The predicted effects of democracy on unconditional military support match the two Hypotheses. 
+As this figure shows, average democracy impacts both depth and unconditional military support in a very linear fashion. 
+
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/results-democ.png}
+\caption{Predicted probabilities of unconditional military support and predicted changes in treaty depth across the range of alliance democracy. The line marks predicted values, and the shaded areas encapsulate the standard errors. Points mark observed values of average democracy.}
+\label{fig:results-democ}
+\end{figure}
+
+
+The left-hand plot of \autoref{fig:results-democ} shows the association between the average democracy of alliance members and the predicted probability of unconditional military support. 
+Highly autocratic alliance membership at the time of alliance formation increases the probability of unconditional military support. 
+Alliances with more democratic membership are less likely to offer unconditional military support. 
+This finding matches existing results about democracy and conditional commitments \citep{Mattes2012, Chibaetal2015}.
+
+
+The right-hand plot of \autoref{fig:results-democ} shows that greater democracy at the time of alliance formation increases treaty depth. 
+Substantial democracy in an alliance is associated with greater treaty depth. 
+Autocracies form shallower alliances, on the other hand. 
+This trend of greater depth as the democracy of alliance members rises matches the treaty depth hypothesis. 
+
+
+There are some other interesting inferences in the control variables, which I present in two tables. 
+First, I tabulate the results of the model of unconditional military support in \autoref{tab:uncond-res}.
+Depth is positively correlated with the likelihood of unconditional military support.
+I also find that asymmetric capability in a treaty and more alliance members decrease the likelihood of unconditional military support. 
 
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrr}
   \hline
- & Estimate & Std. Error & z value & Pr($>$|$z$|) \\ 
-  \hline
-  avg.democ & -0.40 & 0.15 & -2.63 & 0.01 \\ 
-  econagg.dum & 0.32 & 0.17 & 1.93 & 0.05 \\ 
-  latent.depth.mean & 1.07 & 0.09 & 12.59 & 0.00 \\ 
-  fp.conc.index & -0.09 & 0.16 & -0.56 & 0.57 \\ 
-  num.mem & -0.23 & 0.21 & -1.08 & 0.28 \\ 
-  wartime & -0.03 & 0.26 & -0.11 & 0.91 \\ 
-  asymm & -0.25 & 0.27 & -0.92 & 0.36 \\ 
-  asymm.cap & -0.28 & 0.15 & -1.81 & 0.07 \\ 
-  low.kap.sc & 0.02 & 0.16 & 0.12 & 0.90 \\ 
-  begyr & 0.29 & 0.17 & 1.74 & 0.08 \\ 
-  (Intercept) & -0.06 & 0.13 & -0.45 & 0.65 \\ 
+ & Estimate & Std. Error & z value & Approx. p-value. \\ 
+  \hline 
+  Economic Issue Linkage & 0.04 & 0.19 & 0.19 & 0.85 \\ 
+  Mean Latent Depth & 4.37 & 0.31 & 14.16 & 0.00 \\ 
+  Foreign Policy Concessions & 0.04 & 0.10 & 0.41 & 0.68 \\ 
+  Number of Members & -0.04 & 0.02 & -2.82 & 0.00 \\ 
+  Wartime Alliance & -0.00 & 0.37 & -0.01 & 0.99 \\ 
+  Asymmetric Obligations & -0.12 & 0.21 & -0.57 & 0.57 \\ 
+  Asymmetric Capability & -0.43 & 0.20 & -2.17 & 0.03 \\ 
+  Foreign Policy Disagreement & -0.00 & 0.31 & -0.00 & 1.00 \\ 
+  (Intercept) & -1.25 & 0.31 & -3.98 & 0.00 \\
    \hline
 \end{tabular}
-\caption{Results from probit model predicting the presence of unconditional military support. All continuous independent variables are rescaled, so those coefficients reflect the effect of a two-standard deviation increase.}
+\caption{Results from binomial model with a probit link function that predicts the presence of unconditional military support in offensive and defensive alliances from 1816 to 2007.}
 \label{tab:uncond-res}
 \end{table}
 
 
-As expected, as average democracy in an alliance increases, the probability a treaty offers unconditional military support decreases. 
-Thus, even after accounting for the relationship between depth and unconditional military support, my analysis supports previous findings about democracy and conditional obligations. 
-Moreover, this is a substantively large effect. 
 
-Depth is positively correlated with the likelihood of unconditional military support, as is the presence of economic issue linkages. 
-I also find suggestive evidence that asymmetric capability in a treaty decreases the likelihood of unconditional military support. 
-With these results in hand, I now turn to findings about treaty depth. 
+There are also some notable patterns among the other variables in \autoref{tab:depth-res}. 
+Unconditional military support is positively correlated with depth, as we would expect from \autoref{tab:uncond-res}. 
+Asymmetric capability and the size of the alliance also increase depth. 
 
 
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrr}
   \hline
- & Estimate & Std. Error & z value & Pr($>$|$z$|) \\ 
+ & Estimate & Std. Error & z value & Approx. p-value \\ 
   \hline 
-  avg.democ & 0.43 & 0.15 & 2.96 & 0.00 \\ 
-  econagg.dum & -0.33 & 0.16 & -2.04 & 0.04 \\ 
-  uncond.milsup & 1.02 & 0.05 & 21.94 & 0.00 \\ 
-  fp.conc.index & 0.05 & 0.14 & 0.34 & 0.73 \\ 
-  num.mem & 0.35 & 0.13 & 2.58 & 0.01 \\ 
-  wartime & -0.15 & 0.18 & -0.83 & 0.41 \\ 
-  asymm & 0.38 & 0.18 & 2.19 & 0.03 \\ 
-  asymm.cap & 0.23 & 0.15 & 1.57 & 0.12 \\ 
-  low.kap.sc & -0.00 & 0.16 & -0.03 & 0.98 \\ 
-  begyr & -0.27 & 0.16 & -1.70 & 0.09 \\ 
-  (Intercept) & -2.06 & 0.47 & -4.39 & 0.00 \\
+  Economic Issue Linkage & 0.01 & 0.16 & 0.06 & 0.95 \\ 
+  Unconditional Support & 0.71 & 0.09 & 8.06 & 0.00 \\ 
+  Foreign Policy Concessions & -0.09 & 0.08 & -1.08 & 0.28 \\ 
+  Number of Members & 0.02 & 0.01 & 1.70 & 0.09 \\ 
+  Wartime Alliance & -0.08 & 0.18 & -0.42 & 0.67 \\ 
+  Asymmetric Obligations & 0.19 & 0.17 & 1.11 & 0.27 \\ 
+  Asymmetric Capability & 0.31 & 0.14 & 2.19 & 0.03 \\ 
+  Foreign Policy Disagreement & 0.24 & 0.23 & 1.05 & 0.30 \\ 
+  (Intercept) & -1.29 & 0.22 & -5.93 & 0.00 \\
    \hline
 \end{tabular}
-\caption{Results from the Beta regression of recaled treaty depth. All continuous independent variables are rescaled, so those coefficients reflect the effect of a two-standard deviation increase.}
+\caption{Results from the Beta regression of rescaled treaty depth in offensive and defensive alliances from 1816 to 2007. Smoothed terms for mean threat and start year are not included.}
 \label{tab:depth-res}
 \end{table}
 
 
-The results in \autoref{tab:depth-res} are consistent with Hypothesis 2. 
-A two standard deviation increase in the average democracy of an alliance, which is roughly an 11-point increase in the average polity score, increases treaty depth by 1.5 standard deviations. 
-This is a substantively large effect. 
+Based on the coefficients in the model, depth and unconditional military support are positively correlated. 
+The errors of the data-generating processes for these two variables are negatively correlated, however. 
+Kendall's $\tau$ measures the correlation between the error terms, and it has a mean of -0.956, while the (-0.98,-0.902).
+Positive errors in one process are likely to have negative values in the other. 
 
-
-There are a few other notable patterns among the other variables in \autoref{tab:depth-res}. 
-Unconditional military support is positively correlated with depth, as we would expect from \autoref{tab:uncond-res}. 
-On the other hand, economic issue linkages are negatively associated with treaty depth.
-Asymmetric obligations and the size of the alliance also increase depth. 
-The effect of asymmetric capability is substantively large, but there is substantial uncertainty in the estimate. 
-
-
+ 
 In a separate model, I consider how measurement uncertainty shapes inferences about the connection between non-major power alliances and treaty depth. 
 The credible intervals in the bottom panel of \autoref{fig:loadings-measure} show, the latent measure of treaty depth has some uncertainty. 
 This is a reasonable approximation of alliance politics, because alliance treaty depth is not observed with certainty. 
@@ -554,8 +570,7 @@ The specific matching pair I chose did not have the minimum Mahalanobis distance
 
 % main evidence for an indirect effect
 The findings from the statistical model (and maybe the case study) are consistent with my claim that democracies substitute treaty depth for conditions on military support. 
-Although democracies tend to provide conditional military support, they use depth as an alternative means of 
-establishing reliability. 
+Although democracies tend to provide conditional military support, they use depth as an alternative means of establishing reliability. 
 
  
 My findings suggest that the conventional wisdom democracies make limited alliance commitments is partially correct.
@@ -572,7 +587,7 @@ My results suggest that this approach can be informative, but it is incomplete.
 
 
 Different sources of alliance treaty credibility are thoroughly entangled. 
-Depth and unconditional military support are closely related. 
+Depth and unconditional military support are closely related because democracies substitute between these sources of credibility, but autocracies use them as complements. 
 This has important implications for scholarship. 
 
 
