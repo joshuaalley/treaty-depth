@@ -3,13 +3,40 @@
 # Plot results for mediation analyses of latent depth
 
 
+# Tabulate single equations
+stargazer(list(beta.reg.depth, uncond.glm),
+          style = "all2")
+
 # Look at the results: depth variable
 summary.depth.gjrm <- summary(joint.gjrm)
 summary.depth.gjrm[["tableP1"]] # uncond milsup
 summary.depth.gjrm[["tableP2"]] # depth 
 
-xtable(summary.depth.gjrm[["tableP1"]])
-xtable(summary.depth.gjrm[["tableP2"]])
+# Combine all the results in a single table. 
+# Start with unconditional table
+uncond.tab <- as.data.frame(rbind(summary.depth.gjrm[["tableP1"]][, 1:2],
+                               summary.depth.gjrm[["tableNP1"]][, c(1, 3)]
+                               ))
+uncond.tab$variable <- rownames(uncond.tab)
+
+# table for treaty depth
+depth.tab <- as.data.frame(rbind(summary.depth.gjrm[["tableP2"]][, 1:2],
+                    summary.depth.gjrm[["tableNP2"]][, c(1, 3)]
+                     ))
+depth.tab$variable <- rownames(depth.tab)
+
+joint.tab <- full_join(uncond.tab, depth.tab, by = "variable")
+joint.tab <- as.data.frame(joint.tab[, c(3, 1, 2, 4, 5)])
+
+
+# Tabulate all the equations together
+stargazer(joint.tab, summary = FALSE,
+          style = "io")
+xtable(joint.tab)
+
+# plot tau: estimated corrlated between the two equations
+boxplot(joint.gjrm$tau, ylim=c(-1, 1), 
+        main = expression(hat(tau)))
 
 # results with deep alliance dummy 
 summary.dum.gjrm <- summary(joint.gjrm.dum)
@@ -75,12 +102,21 @@ ggsave("figures/results-democ.png", results.democ,
 
 # look at Taus by group
 # Low democracy
-boxplot(joint.gjrm$tau[joint.gjrm$dataset < 4 ,], ylim=c(-1, 1), 
+boxplot(joint.gjrm$tau[joint.gjrm$dataset$avg.democ < 4 ,], ylim=c(-1, 1), 
         main=expression(hat(tau)), xlab="Low Democracy")
 
 # high democracy
-boxplot(joint.gjrm$tau[joint.gjrm$dataset >= 5 ,], ylim=c(-1, 1), 
+boxplot(joint.gjrm$tau[joint.gjrm$dataset$avg.democ >= 5 ,], ylim=c(-1, 1), 
         main=expression(hat(tau)), xlab="High Democracy")
+
+
+# before 1950
+boxplot(joint.gjrm$tau[joint.gjrm$dataset$begyr < 1946 ,], ylim=c(-1, 0), 
+        main=expression(hat(tau)), xlab="Before 1946")
+
+# after 1950
+boxplot(joint.gjrm$tau[joint.gjrm$dataset$begyr >= 1946 ,], ylim=c(-1, 0), 
+        main=expression(hat(tau)), xlab="After 1946")
 
 
 # Summarize brms results with uncertainty

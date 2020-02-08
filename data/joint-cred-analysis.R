@@ -3,21 +3,31 @@
 
 # data is loaded by the alliance-measures script
 
+
+# Set up unique dataframe
+key.data <- select(atop.milsup, latent.depth.mean, deep.alliance, avg.democ, econagg.dum, uncond.milsup, 
+                   fp.conc.index, num.mem, wartime, asymm,
+                   low.kap.sc, begyr, asymm.cap, mean.threat, milinst)
+key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
+summary(key.data$latent.depth.mean.rs)
+
+
+
 # glm model of unconditional military support
-uncond.glm <- glm(uncond.milsup ~ avg.democ + econagg.dum +
+uncond.glm <- glm(uncond.milsup ~ avg.democ + latent.depth.mean.rs + econagg.dum +
                        fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
-                       low.kap.sc + begyr + us.mem + ussr.mem,
+                       low.kap.sc + begyr,
                      family = binomial(link = "probit"),
-                     data = atop.milsup)
+                     data = key.data)
 summary(uncond.glm)
 
 
 # glm model of economic issue linkages
-linkage.glm <- glm(econagg.dum ~ avg.democ + uncond.milsup + latent.depth.mean +
+linkage.glm <- glm(econagg.dum ~ avg.democ + uncond.milsup + latent.depth.mean.rs +
                     fp.conc.index + num.mem + wartime + asymm +  asymm.cap + mean.threat +
-                    low.kap.sc + begyr + us.mem + ussr.mem,
+                    low.kap.sc + begyr,
                   family = binomial(link = "probit"),
-                  data = atop.milsup)
+                  data = key.data)
 summary(linkage.glm)
 
 
@@ -26,14 +36,15 @@ summary(linkage.glm)
 
 # May need to use a trivariate model from GJRM w/ issue linkages
 
-# Set up unique dataframe
-key.data <- select(atop.milsup, latent.depth.mean, deep.alliance, avg.democ, econagg.dum, uncond.milsup, 
-                  fp.conc.index, num.mem, wartime, asymm,
-                   low.kap.sc, begyr, asymm.cap, mean.threat, milinst)
-key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
-summary(key.data$latent.depth.mean.rs)
 
 
+
+
+# Use a beta regression with rescaled depth 
+beta.reg.depth <- betareg(latent.depth.mean.rs ~ avg.democ + econagg.dum + uncond.milsup +
+                      fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+                         mean.threat + low.kap.sc + begyr, data = key.data)
+summary(beta.reg.depth)
 
 
 ### use GJRM instead: allows for correlated errors
@@ -83,6 +94,8 @@ conv.check(joint.gjrm)
 AIC(joint.gjrm)
 summary(joint.gjrm)
 post.check(joint.gjrm)
+
+# Plot smooths
 plot(joint.gjrm, eq = 1, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
 plot(joint.gjrm, eq = 2, seWithMean = TRUE,
@@ -153,13 +166,13 @@ plot(joint.gjrm.dum, eq = 2, seWithMean = TRUE,
 # Trivariate model is not fitting well: no variation with different copulas
 # and theta estimates are poor 
 # can only get it to fit with Cholesky method for covariance matrix
-depth.formula.tri <- deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
-  low.kap.sc + begyr
+depth.formula.tri <- deep.alliance ~ s(avg.democ) + econagg.dum + uncond.milsup +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + s(mean.threat) +
+  low.kap.sc + s(begyr)
 
-linkage.formula <- econagg.dum ~ avg.democ + latent.depth.mean +
-  fp.conc.index + num.mem + wartime + asymm +  asymm.cap + mean.threat +
-  low.kap.sc + begyr
+linkage.formula <- econagg.dum ~ s(avg.democ) + latent.depth.mean + uncond.milsup +
+  fp.conc.index + num.mem + wartime + asymm +  asymm.cap + s(mean.threat) +
+  low.kap.sc + s(begyr)
 
 # Create a list of models
 gjrm.models.tri <- vector(mode = "list", length = length(copulas))
@@ -181,3 +194,32 @@ conv.check(joint.gjrm)
 AIC(joint.gjrm.tri)
 summary(joint.gjrm.tri)
 
+
+
+# Plot smooths
+plot(joint.gjrm.tri, eq = 1, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+plot(joint.gjrm.tri, eq = 2, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+plot(joint.gjrm.tri, eq = 3, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+
+
+# Democracy smooths
+# uncond milsup
+plot(joint.gjrm.tri, eq = 1, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Average Democracy"
+)
+
+# Depth
+plot(joint.gjrm.tri, eq = 2, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Average Democracy"
+)
+
+# Issue linkages
+plot(joint.gjrm.tri, eq = 2, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Average Democracy"
+)
