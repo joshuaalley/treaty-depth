@@ -8,7 +8,7 @@
 # Use brms
 # set up model formulas and priors
 # depth model
-bf.depth <- brmsformula(latent.depth.mean.rs ~ avg.democ + econagg.dum + uncond.milsup +
+bf.depth <- brmsformula(latent.depth.mean.rs ~ avg.democ + econagg.dum +
                           fp.conc.index + num.mem + wartime + asymm + asymm.cap +
                           mean.threat + low.kap.sc + begyr,
                         center = TRUE) + Beta(link = "logit", link_phi = "log")
@@ -38,35 +38,6 @@ plot(marginal_effects(brm.multivar,
                         method = "fitted",
                         theme = "bw"),
                      ask = FALSE)
-
-
-
-
-# fit the model with a dummy indicator of depth
-# depth model
-bf.depth.dum <- brmsformula(deep.alliance ~ avg.democ + econagg.dum + uncond.milsup +
-                              fp.conc.index + num.mem + wartime + asymm + asymm.cap +
-                              mean.threat + low.kap.sc + begyr,
-                            #+ (1 | p | gr(begyr, dist = "gaussian")),
-                            center = TRUE) + bernoulli(link = "logit")
-depth.priors.dum <- set_prior("student_t(7, 0, 3)", class = "b", resp = "deepalliance") 
-
-# Unconditional military support model  
-bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
-                           fp.conc.index + num.mem + wartime + asymm + asymm.cap +
-                           mean.threat + low.kap.sc + begyr,
-                         #+ (1 | p | gr(begyr, dist = "gaussian")), 
-                         center = TRUE) + bernoulli(link = "logit")
-uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
-
-# Fit the model
-full.priors.dum <- depth.priors.dum + uncond.priors
-brm.multivar.dum <- brm(bf.depth.dum + bf.uncond +
-                          set_rescor(FALSE), 
-                        data = key.data,
-                        prior = full.priors.dum,
-                        chains = 2, cores = 2)
-summary(brm.multivar.dum)
 
 
 

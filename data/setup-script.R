@@ -47,6 +47,7 @@ conflict_prefer("t2", "mgcv")
 conflict_prefer("mm", "brms")
 conflict_prefer("lmList", "nlme")
 conflict_prefer("s", "mgcv") 
+conflict_prefer("combine", "dplyr")
 
 # Set up RSTAN guidelines
 rstan_options(auto_write = TRUE)
