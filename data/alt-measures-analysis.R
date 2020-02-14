@@ -16,7 +16,7 @@ cor.test(atop.milsup$latent.depth.mean, atop.milsup$milinst)
 # Strong positive correlation
 
 # Fit the same model specification on an ordinal outcome
-milinst.m1 <- polr(as.ordered(milinst) ~ avg.democ + econagg.dum + uncond.milsup +
+milinst.m1 <- polr(as.ordered(milinst) ~ max.democ + econagg.dum + uncond.milsup +
                     fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
                     low.kap.sc,
                   data = atop.milsup)
@@ -24,19 +24,19 @@ summary(milinst.m1)
 
 
 # Set up the key formula and data
-table(key.data$milinst)
-key.data$high.milinst <- ifelse(key.data$milinst == 2, 1, 0)
-table(key.data$high.milinst)
+table(atop.milsup$milinst)
+atop.milsup$high.milinst <- ifelse(atop.milsup$milinst == 2, 1, 0)
+table(atop.milsup$high.milinst)
 
 
 # Define formulas 
-milinst.formula <- high.milinst ~ avg.democ + econagg.dum + uncond.milsup +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
-  low.kap.sc + begyr
+milinst.formula <- high.milinst ~ s(max.democ) + econagg.dum +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + s(mean.threat) +
+  low.kap.sc + s(begyr)
 
-uncond.formula.milinst <- uncond.milsup ~ avg.democ + econagg.dum + high.milinst +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
-  low.kap.sc + begyr
+uncond.formula.milinst <- uncond.milsup ~ s(max.democ) + econagg.dum +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + s(mean.threat) +
+  low.kap.sc + s(begyr)
 
 
 # Create a list of models
@@ -45,8 +45,9 @@ gjrm.models.milinst <- vector(mode = "list", length = length(copulas))
 # Cannot fit an ordinal version with this version of gjrm
 # Dummy for high 
 for(i in 1:length(copulas)){
-  gjrm.models.milinst[[i]]  <- gjrm(list(uncond.formula.milinst, milinst.formula), 
-                                    data = key.data,
+  gjrm.models.milinst[[i]]  <- gjrm(list(uncond.formula, milinst.formula,
+                                        theta.formula.max), 
+                                    data = atop.milsup,
                             margins = c("probit", "probit"),
                             Model = "B",
                             BivD = copulas[i]
@@ -57,8 +58,8 @@ aic.milinst
 lapply(gjrm.models.milinst, conv.check)
 
 # Summarize results
-copulas[1] # normal remains the best
-joint.gjrm.milinst <- gjrm.models.milinst[[1]] 
+copulas[16] # normal remains the best
+joint.gjrm.milinst <- gjrm.models.milinst[[16]] 
 conv.check(joint.gjrm.milinst)
 AIC(joint.gjrm.milinst)
 summary(joint.gjrm.milinst)
@@ -101,21 +102,21 @@ ggplot(benson.clinton.comp, aes(x = Depth.score.rs, y = latent.depth.rs)) +
 # Analysis with the Benson and Clinton measure
 # need a new dataframe 
 # Set up unique dataframe
-key.data.bc <- select(benson.clinton.comp, Depth.score, avg.democ, econagg.dum, uncond.milsup, 
+key.data.bc <- select(benson.clinton.comp, Depth.score, max.democ, econagg.dum, uncond.milsup, 
                     fp.conc.index, num.mem, wartime, asymm,
                     low.kap.sc, begyr, asymm.cap, mean.threat)
 key.data.bc$depthscore.rs.max <- (key.data.bc$Depth.score + 1) / (1 + max(key.data.bc$Depth.score, na.rm = TRUE) + .01)
 summary(key.data.bc$depthscore.rs.max)
 
 # Specify bc depth formula
-bcdepth.formula <- depthscore.rs.max ~ avg.democ + econagg.dum + uncond.milsup +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
-  low.kap.sc + begyr
+bcdepth.formula <- depthscore.rs.max ~ s(max.democ) + econagg.dum +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + s(mean.threat) +
+  low.kap.sc + s(begyr)
 
 # Alternative unconditional formula
-bcuncond.formula <- uncond.milsup ~ avg.democ + econagg.dum + depthscore.rs.max +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
-  low.kap.sc + begyr
+bcuncond.formula <- uncond.milsup ~ s(max.democ) + econagg.dum +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + s(mean.threat) +
+  low.kap.sc + s(begyr)
 
 # Create a list of models
 gjrm.models.bcdepth <- vector(mode = "list", length = length(copulas))
@@ -123,7 +124,8 @@ gjrm.models.bcdepth <- vector(mode = "list", length = length(copulas))
 # fit the models with different copulas
 # Use a logit link for unconditional military support: probit gives huge standard errors
 for(i in 1:length(copulas)){
-  gjrm.models.bcdepth[[i]]  <- gjrm(list(bcuncond.formula, bcdepth.formula), 
+  gjrm.models.bcdepth[[i]]  <- gjrm(list(bcuncond.formula, bcdepth.formula,
+                                         eq.sigma, theta.formula.max), 
                                     data = key.data.bc,
                                     margins = c("logit", "BE"),
                                     Model = "B",
@@ -135,12 +137,17 @@ aic.bcdepth
 lapply(gjrm.models.bcdepth, conv.check)
 
 # Summarize results
-copulas[1] # normal remains the best
-joint.gjrm.bc <- gjrm.models.bcdepth[[1]] 
+copulas[14] # normal remains the best
+joint.gjrm.bc <- gjrm.models.bcdepth[[14]] 
 conv.check(joint.gjrm.bc)
 AIC(joint.gjrm.bc)
 summary(joint.gjrm.bc)
 # residual fit is really poor because Benson and Clinton measure has more outliers
 post.check(joint.gjrm.bc) 
 
+# plot smooths 
+plot(joint.gjrm.bc, eq = 1, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+plot(joint.gjrm.bc, eq = 2, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
 

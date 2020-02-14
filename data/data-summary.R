@@ -32,7 +32,7 @@ table(atop.milsup$uncond.milsup)
 t.test(atop.milsup$latent.depth.mean ~ atop.milsup$uncond.milsup)
 
 # correlation between avg democracy and depth
-cor.test(atop.milsup$avg.democ, atop.milsup$latent.depth.mean)
+cor.test(atop.milsup$max.democ, atop.milsup$latent.depth.mean, na.rm = TRUE)
 
 ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) + 
   geom_point() + geom_smooth(method = "lm") +
@@ -151,7 +151,7 @@ atop.milsup %>% filter(bilat == 0) %>%
 
 
 # Plot depth against average democracy, shape by uncond milsup
-ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
+ggplot(atop.milsup, aes(x = max.democ, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent,
              size = 2.5,
@@ -159,10 +159,12 @@ ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
   scale_shape_manual(values = c(16, 17),
                       labels = c("Conditional", "Unconditional")) +
   geom_smooth(method = "lm") +
-  labs(x = "Average Democracy", y = "Latent Treaty Depth",
+  labs(x = "Maximum Democracy", y = "Latent Treaty Depth",
        shape = "Conditionality") +
   theme_bw()
 ggsave("figures/democ-combo.png", height = 6, width = 8)
+
+
 
 # TODO(Josh): think about the best descriptive plot 
 ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
@@ -176,13 +178,13 @@ ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
   theme_bw()
 
 
-ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
+ggplot(atop.milsup, aes(x = max.democ, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent,
              size = 2.5)  +
   geom_smooth(method = "lm") +
   facet_wrap(vars(uncond.milsup)) +
-  labs(x = "Unconditional", y = "Latent Treaty Depth") +
+  labs(x = "Maximum Democracy", y = "Latent Treaty Depth") +
   theme_bw()
 
 
@@ -199,7 +201,7 @@ ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
 
 
 # make shape by bilateral/multilateral: too busy for paper
-ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
+ggplot(atop.milsup, aes(x = max.democ, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent,
              size = 2.5,
@@ -208,6 +210,6 @@ ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
                       labels = c("Conditional", "Unconditional")) + # change color scale
   scale_shape_manual(values = c(16, 17),
                      labels = c("Multilateral", "Bilateral")) +
-  labs(x = "Average Democracy", y = "Latent Treaty Depth",
+  labs(x = "Maximum Democracy", y = "Latent Treaty Depth",
        shape = "Size", color = "Conditionality") +
   theme_bw()
