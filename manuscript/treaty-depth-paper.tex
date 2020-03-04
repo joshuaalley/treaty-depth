@@ -11,6 +11,7 @@
 \usepackage{adjustbox}
 \usepackage{amsmath}
 \usepackage{siunitx}
+\usepackage{multirow}
 \setcitestyle{aysep{}}
 
 
@@ -35,7 +36,7 @@ I argue that alliances between democracies tend to have greater treaty depth.
 Democratic states use treaty depth to reassure allies, because they are less likely to offer unconditional military support.
 To test this claim, I implement a series of statistical models and offer a short case study of the North Atlantic Treaty Organization.
 I find that as the maximum polity score of alliance members at the time of formation increases, treaty depth increases, but there is mixed evidence that the probability the treaty offers unconditional military support decreases with allied democracy. 
-Thus, democracies do not uniformly offer limited commitments. 
+Thus, democracies offer moderate commitments with some treaty depth and perhaps some conditions on military support. 
 The argument and findings have implications for our understanding of how domestic politics shapes institutional design. 
 \end{abstract}
 
@@ -56,7 +57,7 @@ Treaty depth is a common policy choice, and it has important consequences.
 At least half of all ATOP alliances with offensive or defense obligations have at least one source of treaty depth.
 Deep alliances encourage non-major power members to reduce military spending because treaty depth adds credibility.  
 On the other hand, participation in shallow alliances increases military spending because states use military spending to hedge against abandonment.
-The issue of military spending shows treaty depth affects alliance politics by shaping treaty credibility and the distribution of military spending burdens among members. 
+Treaty depth affects alliance politics by shaping treaty credibility and the distribution of military spending burdens among members. 
 
 
 % Describe question and contribution of the paper
@@ -65,12 +66,20 @@ In this paper, I explain when states make deep alliance treaties.
 I argue that domestic politics shape how states use different sources of alliance credibility. 
 Alliance negotiations center on whether prospective members will offer military support and conditions on that support \citep{Poast2019a}. 
 When alliance members are unwilling to offer unconditional military support, depth provides an alternative source of reliability.%\footnote{Depth could also complement promises of unconditional military support.}
-
-
 Because democracies tend to offer alliances with conditional obligations \citep{Mattes2012, Chibaetal2015}, they use treaty depth as a substitute source of reliability. 
 Democracies make conditional promises because leaders fear audience costs of violation, and limited commitments are harder to violate.
 At the same time, these limited alliances can increase allied fears of abandonment. 
 Therefore, democracies use the costly provisions in deep alliances to reassure their partners.   
+
+
+Depth and unconditional promises of military support both increase treaty credibility. 
+Therefore, we cannot examine these aspects of alliance treaty design in isolation. 
+Treaties may offer limited promises of military support, but include substantial depth. 
+I combine depth and unconditional military support to classify alliances as weak, strong, or moderate commitments. 
+Alliances with both depth and unconditional support are particularly strong commitments on paper--- they include high peacetime costs and a higher risk that the treaty will be invoked. 
+Weak alliance commitments lack depth and only provide conditional military support. 
+Moderate strength commitments have depth or unconditional military support. 
+My argument suggests that democracies often form moderately strong alliances with depth and conditional military support.  
 
 
 I test this argument with several statistical models and an illustrative case study of the North Atlantic Treaty Organization (NATO).
@@ -84,14 +93,14 @@ My argument and findings have important consequences for research on alliance tr
 Existing scholarship considers parts of treaty design in isolation \citep{Benson2012, Mattes2012, Chibaetal2015}. 
 My argument and findings show that sources of credibility in alliance treaty design are connected. 
 Theories and models that address different alliance characteristics in isolation may generate misleading conclusions. 
-For example, previous estimates of the connection between democracy and treaty depth produced null findings, in large part because previous models do not consider the association between depth and conditions on military support. 
+For example, previous estimates of the connection between democracy and treaty depth produced null findings, in large part because previous models do not jointly model treaty depth and conditions on military support. 
 
 
 % Paragraph on the importance of democracy in alliance pol
 This paper adds to knowledge of how domestic politics affect alliance politics. 
 Scholars have long acknowledged that democracy and alliances are connected \citep{LaiReiter2000, GiblerWolford2006, Warren2016, McManusYarhi-Milo2017}. 
 Democratic commitments are often seen as more credible due to audience costs \citep{Gaubatz1996, DigiuseppePoast2016}, but this relationship is disputed \citep{GartzkeGleditsch2004}. 
-Existing scholarship mostly suggests that democracies prefer limited commitments \citep{Mattes2012, Chibaetal2015}. 
+Existing scholarship suggests that democracies prefer limited commitments \citep{Mattes2012, Chibaetal2015} because they are more likely to make conditional promises of military support. 
 My argument suggests that although democracies screen the scope of their commitments carefully, they form deeper alliances on other dimensions.  
 The net effect of these differences on democratic credibility requires further research. 
 My argument also contributes to a rich literature on domestic politics and international cooperation, e.g. \citep{DownesRocke1995, Fearon1998, Leeds1999, MattesRodriguez2014}. 
@@ -141,6 +150,7 @@ Treaty design can address abandonment and entrapment, but the process of allianc
 She argues that all three design considerations increase treaty reliability.  
 While checking the validity of their latent measure of treaty depth, \citet{BensonClinton2016} find that foreign policy agreement, major power involvement and treaty scope are all positively correlated with depth. 
 Their latent measure of scope is based on the type of military support offered and conditions on that support. 
+Benson and Clinton also use a broader latent measure of depth that 
 
 
 We have a better sense of when states offer conditional military support. 
@@ -155,15 +165,27 @@ Her argument and research design treat depth and institutionalization as indepen
 Though \citet{BensonClinton2016} use scope to predict depth and depth to predict scope, they do not consider the correlation between the two processes. 
 Perhaps as a result of these theoretical and empirical choices, both works find no association between the democracy of alliance members and treaty depth. 
 Because states can use different foreign policy instruments as substitutes or complements \citep{Starr2000, MorganPalmer2000}, treaty depth and conditions on military support are probably related. 
+
+
 My argument builds on existing scholarship by placing depth and conditions on military support in a unified theoretical and empirical framework. 
-I now describe the general process of the argument. 
+Conceptually, depth and unconditional military support shape the strength of the alliance commitment. 
+Strong commitments combine deep alliance treaty obligations and unconditional promises of military support. 
+Weak commitments have neither depth nor unconditional support. 
+Moderate commitments have one source of credibility, but not the other. 
+
+
+If strength combines depth and unconditional military support, why not analyze strength alone? 
+I separate depth and unconditional military support for two reasons. 
+First, they provide credibility in different ways, so states can decide to form alliances with one, both, or neither.  
+Second, existing theoretical and empirical work has examined conditions on military support and depth separately. 
+In the next section, I describe the general process of the argument, which connects depth and conditionality. 
 
 
 \subsection{Alliance Negotiations and Obligations}
 
 
 % process of alliance negotiations: once agreed on military support, need to bolster. 
-Alliance treaty design is the result of negotiations between members \citep{Poast2019a}, where states determine conditions on military support and treaty depth.\footnote{The alliance formation stage is something I will need to model in a later robustness check.}
+Alliance treaty design is the result of negotiations between members \citep{Poast2019a}, where states determine conditions on military support and treaty depth.\footnote{I will model the alliance formation stage is something in a later robustness check.}
 Both parts of treaty design address the benefits and costs of alliance participation. 
 Depth and conditions on military support have different consequences, however. 
 
@@ -176,7 +198,7 @@ To form an alliance, the members must have sufficient overlap in foreign policy 
 
 Promises of military support in an alliance vary widely, however. 
 The extent of shared foreign policy interests shapes whether alliance members offer unconditional or conditional military support.
-Many alliances limit promises of intervention to particular regions, conflicts, or instances of non-provocation \citep{Leedsetal2000}. 
+Conditional alliances limit promises of intervention to particular regions, conflicts, or instances of non-provocation \citep{Leedsetal2000}. 
 For example, if alliance members fear entrapment in unwanted conflicts, they will only offer military support in specific circumstances \citep{Kim2011, Benson2012}.\footnote{Such deliberate design of alliances means clear instances of entrapment are rare \citep{Kim2011, Beckley2015}.} 
 Conditional treaties reflect less overlap in foreign policy interests. 
 
@@ -191,39 +213,63 @@ Therefore unconditional alliances are a key source of credibility, because they 
 % Part 2: depth
 Alliance partners also negotiate over how to reinforce promises of military support and put them into action. 
 This determines the depth of the treaty and provides additional evidence of alliance reliability. 
-Depth shapes the perceived reliability of an alliance by providing opportunities for states to fulfill treaty obligations in peacetime. 
+Depth shapes the perceived reliability of an alliance by providing opportunities for states to fulfill treaty obligations in peacetime \citep{Morrow1994}. 
 Implementing deep treaty provisions can also enhance joint war-fighting. 
 
 
-Because treaty depth and conditions on military support both add to alliance credibility, they are interdependent decisions.
-Though depth and conditions on military support are related, they are not equivalent. 
+% clarify difference in costs
+Though depth and conditions on military support both add to alliance credibility, they are not equivalent. 
 Depth and military support conditions generate credibility through different costs. 
-
-
-Conditions on military support do not change absent treaty renegotiation, and their costs are hypothetical unless the alliance is invoked.  
+Conditions on military support do not change without a treaty renegotiation, and their costs are hypothetical unless the alliance is invoked.  
 Alliance members and other states use the potential costs of military support to assess treaty reliability. 
 Highly conditional alliances are less costly in expectation, which reduces their credibility. 
-
-
-The costs of depth can be observed without invoking promises of military support. 
-Therefore depth addresses time-inconsistency problems from changing foreign policy interests, which are a major threat to alliance fulfillment \citep{LeedsSavun2007}. 
+Conversely, the costs of depth can be observed without invoking promises of military support. 
+Depth addresses time-inconsistency problems from changing foreign policy interests, which are a major threat to alliance fulfillment \citep{LeedsSavun2007}. 
 Under a deep alliance treaty, members can use implementation of defense cooperation and policy coordination to assess allied reliability. 
 Observing that alliance members adhere to peacetime promises indicates they will also honor promises of military support. 
 
 
+% Combine the two: strong/weak/moderate
+Because depth and unconditional military support both generate credibility, these aspects of alliance treaty design are related. 
+States could use depth as a substitute source of reliability.
+Depth could also complement promises of unconditional military support with treaty depth. 
+Or prospective alliance members could design an arms-length alliance commitment with neither depth nor unconditional military support. 
+\autoref{tab:str-table} summarizes the possible combinations of depth and unconditional military support in alliance treaty design. 
+Strong alliances combine depth and unconditional military support, while weak alliances have neither. 
+Moderate alliance commitments have one source of credibility. 
+
+
+\begin{table}[hbt!]
+\begin{center}
+\caption{Potenital alliance treaty strength based given depth and military support conditions.}
+\begin{tabular}{ccc} 
+                 & Conditional & Unconditional \\
+\toprule
+          Deep   &  Moderate & Strong \\
+         Shallow & Weak      & Moderate \\
+ \bottomrule
+\end{tabular}
+\label{tab:str-table}
+\end{center} 
+\end{table}
+
+
+
 This connection between depth and conditions on military support means that understanding how alliance member characteristics affect alliance treaty design must account for both sources of credibility.  
 As I detail below, democracies are more likely to design alliances with conditional military support. 
-As a result, democracies must then use greater treaty depth to address reliability concerns from these limited commitments.  
-Alliances between democracies therefore include limited military support and high depth. 
+As a result, democracies must then use greater treaty depth to address reliability concerns from these limited commitments.
+Alliances between democracies therefore include limited military support and high depth, which means they have moderate commitment strength. 
 
 
 \subsection{Alliances between Democracies}
 
 
-% focus on maximum democracy score
+% focus on maximum democracy score: change this
+How domestic political regimes affects alliance design depends on regime type and capability a state brings to an alliance. 
 I use a strongest-link conceptualization of democracy in the argument and empirical results. 
 Successful alliance negotiations require agreement between all members- so objections from one can have a substantial impact on the outcome.  
 Therefore, the most democratic member is likely to push for conditional obligations and accept higher treaty depth.\footnote{I find similar, but somewhat weaker results with an average measure of alliance treaty depth. See the appendix for details.}
+However, influence over alliance negotiations also depends on capability. 
 
 
 % Start with a well-established result: democracy and conditional obligations
@@ -231,7 +277,8 @@ There is already ample evidence that democracies often prefer conditional milita
 \citet{Mattes2012} and \citet{Chibaetal2015} both show that democracies are more likely to design conditional alliances. 
 They attribute this finding to higher audience costs in democracies. 
 Because democratic leaders face substantial audience costs from violating their international commitments, leaders design more limited commitments that are easier to fulfill. 
-Based on this logic, even after accounting for the correlation between depth and scope, increasing the maximum democracy score of alliance members at the time of formation should reduce the probability of unconditional military support.
+On the other hand, autocracies may be more willing to make promises of unconditional military support, because they have lower audience costs. 
+Based on this logic, even after accounting for the correlation between depth and conditionality, increasing the maximum democracy score of alliance members at the time of formation should reduce the probability of unconditional military support.
 
 
 \begin{quote}
@@ -243,15 +290,13 @@ Based on this logic, even after accounting for the correlation between depth and
 Limiting alliance commitments through conditional military support reduces audience costs because it is easier for democratic leaders to backtrack on military support. 
 Under a conditional alliance, states are not automatically obligated to intervene. 
 As a result, it is possible for leaders to either claim that the conditions for intervention were not met, or that new information obviates the alliance commitment \citep{LevenduskyHorowitz2012}. 
-
-
 Because allied states understand these limits on conditional alliances, these alliances will increase reliability concerns. 
 Knowing that allies have given themselves an out will increase the fear of abandonment. 
-This may undermine the effectiveness of deterrence from the alliance, as potential challengers pick on unreliable pacts \citep{Smith1995}. 
+This may undermine the effectiveness of deterrence from the alliance, as unreliable pacts invite challengers \citep{Smith1995}. 
 Therefore, democracies may need to find other ways to indicate their commitments are credible. 
 
 
-Democracies can substitute treaty depth for unconditional military support. 
+Democracies can use treaty depth to offset reliability concerns from their conditional alliance promises.  
 By including peacetime costs in a deep alliance, democratic states provide a different signal of reliability. 
 Providing regular access to military aid, bases, or policy coordination indicates that alliance members are committed to the treaty. 
 This increases allied confidence that democracies will honor their treaty obligations, even with conditional military support. 
@@ -277,6 +322,12 @@ As the maximum democracy of alliance members at the time of treaty formation inc
 \begin{quote}
 \textsc{Treaty Depth Hypothesis: As the maximum democracy of alliance members at the time of formation increases, the depth of an alliance treaty will increase.}
 \end{quote} 
+
+
+% Taking the two hypotheses together
+The unconditional military support is a well-established finding, and is often used to claim that democracies make limited alliance commitments. 
+But if democracies are more likely to add depth to their alliance treaties, democracies do not make the weakest possible alliances. 
+Rather, democracies are inclined to form moderate alliances. 
 
 
 % brief case illustration 
@@ -313,7 +364,7 @@ Then I provide more detail on the estimation strategy.
 
 
 % start with data
-To examine my expectations that democracies tend to produce conditional alliances with substantial depth, I employ data on alliance treaty design from the Alliance Treaty Obligations and Provisions dataset \citep{Leedsetal2002}. 
+To examine my expectations that democracies tend to produce conditional alliances with substantial depth, I employ data on alliance treaty design from the Alliance Treaty Obligations and Provisions Data \citep{Leedsetal2002}. 
 My sample includes 289 alliances with either offensive or defensive obligations, which is the set of treaties with military support.\footnote{I plan to assess robustness to adjusting for non-random selection into alliances in the appendix.} 
 
 
@@ -590,7 +641,8 @@ To corroborate my theoretical claim that democracies substitute depth for uncond
 \subsection{Case Study: NATO}
 
 
-The case study examines the alliance negotiations behind NATO, which is one of the most important alliances.
+The case study illustrates the process behind the aggregate patterns in the statistical analysis. 
+Here, I detail the alliance negotiations behind NATO, which is one of the most important alliances.
 US foreign policy after World War II illustrates the tendency of democratic states to use treaty depth for reassurance, while also providing conditional obligations.  
 Most US alliances have conditional promises of military support and some depth, and NATO fits this pattern. 
 
@@ -632,9 +684,10 @@ NATO negotiations reveal the tendency of democracies to add conditions on milita
 The United States preferred conditional military support, but was willing to invest in deep military cooperation. 
 The Atlantic Council and bureaucratic machinery of the NATO treaty are the basis for substantial defense cooperation. 
 Therefore, though Article V is more limited than many realize, NATO is still a deep alliance. 
+US alliances are not as strong on paper as treaties with unconditional military support, but nor are they weak commitments. 
 
 
-\section{Discussion}
+\section{Discussion and Conclusion}
 
 
 % main evidence for an indirect effect
@@ -643,17 +696,17 @@ I find regular evidence that democracies tend to form deep alliances.
 There is mixed evidence that allied democracy decreases the probability of unconditional military support, however. 
 This suggests a modification to the conventional wisdom that democracies make limited alliance commitments.
 The effect of democracy on conditions for military support may be weaker than previously thought, but they are are more prone to increase the depth of their alliances. 
+Therefore, democracies often make moderately strong alliance commitments. 
 
 
 % Conclusion depends on how alliances and military spending are connected
 The new conclusion about democracy and unconditional military support in this paper comes from a bivariate model of depth and unconditional military support.
-Without a joint model, my alternative sample finds the expected negative correlation between maximum democracy and unconditional military support.  
+Without a joint model, I find the expected negative correlation between maximum democracy and unconditional military support.  
 Inferences about democracy and other covariates depend on this theoretical and empirical choice to model depth and unconditional military support together. 
 Again, treaty depth and unconditional military support are not included as independent variables for the other outcome. 
 A fully recursive model that includes depth and unconditional military support as predictors requires valid instruments for identification. 
 The independent models suggest that non-major power symmetry in an alliance could instrument for unconditional military support as a predictor of treaty depth. 
-Given the potential for biased findings from a weak instrument or one that fails the exclusion restriction, and lack of clear instruments for treaty depth, I am hesitant to employ a fully recursive model.  
-
+Given the potential for biased findings from a weak instrument or one that violates the exclusion restriction, and lack of clear instruments for treaty depth, I am hesitant to employ a fully recursive model.  
 
 
 % Therefore, sources of alliance credibility are rather entangled
@@ -666,16 +719,16 @@ This approach can be informative, but it is incomplete.
 Although my argument and evidence offer some innovations, they have some limitations. 
 First, I only examine variation in formal treaty design. 
 This omits the implementation of alliance promises, which may be deeper or shallower than the treaty language alone implies. 
-As the NATO case study shows, formal treaty depth is a guide for practical depth, but it may miss some differences between the alliance. 
+As the NATO case study shows, formal treaty depth is a guide for practical depth, but it may miss some differences between alliances. 
 At the same time, this study focuses on institutional design. 
-Evolution and changes in practice are a useful subject for future inquiry. 
+Changes in practical alliance depth are a useful subject for future inquiry. 
 
 
 The claims in this paper have important consequences for several branches of scholarship. 
 First, they speaks to debates about whether democracies make more credible commitments. 
-This literature could benefit from incorporating these findings about alliance treaty design. 
 The effect of democracy on credibility can be divided into conditions on military support, treaty depth, and the direct effect of institutions and domestic politics. 
-These may have competing or conditional effects, and the net effect will require further explanation. 
+These may have competing or conditional effects, which could help explain mixed findings about the credibility of democratic commitments \citep{Schultz1999, Leeds1999, Thyne2012, DownesSechser2012}.
+The net effect of democracy on credible commitment in international relations requires further explanation. 
 
 
 In general, studies of the consequences of alliance participation should account for alliance design and membership. 
@@ -683,11 +736,8 @@ This study shows that alliance membership and design are closely related.
 Estimates of only member characteristics, or only treaty design, risk omitting correlated factors that also change the consequences of alliance participation. 
 
 
-\section{Conclusion}
-
-
-
-The key implication for scholarship is that alliance treaty design is the result of a series of correlated decisions. 
+The key implication for scholarship is that alliance treaty design contains multiple correlated decisions. 
+States do not decide to add depth or unconditional military support in isolation. 
 Rather than address each part of treaty design piecemeal, scholars should think about connections between the core aspects of treaty design. 
 For example, future work might examine the connections between conditions on military support, treaty depth, and issue linkages.  
 Debating what promises to include among these core obligations will be a crucial next step. 
@@ -701,8 +751,8 @@ Debates about the trade off between breadth and depth \citep{Downsetal1998, Gill
 Still, this literature could work to clarify how different aspects of institutional design are related. 
 
 
-In conclusion, democratic alliance membership is a source of treaty depth. 
-This may reflect a desire to substitute for . 
+In conclusion, democratic alliance membership increases treaty depth. 
+This may reflect a desire to reassure allies after pushing for conditional obligations of military support. 
 This shows how different sources of reliability shapes alliance treaty negotiations. 
 
 
