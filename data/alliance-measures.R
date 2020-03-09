@@ -212,8 +212,10 @@ atop <- left_join(atop, all.fpsim.first)
 
 ### Generate a latent measure of depth for alliances with military support
 
-# Turn dummy indicators into factors in a separate dataset
+# Split military support data
 atop.milsup <- filter(atop, offense == 1 | defense == 1) 
+
+# Turn dummy indicators into factors in a separate dataset
 atop.depth <- select(atop.milsup,
                      intcom, compag.mil,  
                      milaid, milcon, base, 
@@ -225,9 +227,10 @@ for(i in 1:ncol(atop.depth)){
 
 # Use Murray BFA approach
 latent.depth <- bfa_copula(~ intcom + compag.mil + 
-                            milaid + milcon + base + 
-                            organ1, 
-                          data = atop.depth, num.factor = 1,
+                             milaid + milcon + base + 
+                             organ1 + contrib, 
+                           data = atop.depth, num.factor = 1,
+                           restrict = list(c("intcom", 1, ">0")),
                           factor.scales = FALSE,
                           keep.scores = TRUE, loading.prior = "gdp", 
                           px = TRUE, imh.iter = 1000, imh.burn = 1000,
@@ -344,7 +347,8 @@ ggplot(atop.milsup, aes(x = num.mem, y = latent.depth.mean)) +
   geom_point()
 
 
-# load data 
+# Add democracy data
+# load data: summary of key vars in start year
 alliance.democ <- read.csv("data/alliance-democ.csv")
 
 
@@ -366,5 +370,11 @@ table(atop.milsup$milinst)
 
 # add a variable splitting the democracy variable at 0
 summary(atop.milsup$avg.democ)
-atop.milsup$democ.pos <- ifelse(atop.milsup$avg.democ > 0, 1, 0)
+atop.milsup$democ.pos <- ifelse(atop.milsup$avg.democ > 1, 1, 0)
 table(atop.milsup$democ.pos)
+
+
+# Address max democ -Inf issue
+atop.milsup$max.democ[atop.milsup$max.democ == -Inf] <- NA
+atop.milsup$max.democ.weight[atop.milsup$max.democ.weight == -Inf] <- NA
+

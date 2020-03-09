@@ -4,6 +4,24 @@
 
 
 
+# descriptive statistics
+
+# average democracy: weighted or not
+summary(atop.milsup$avg.democ)
+ggplot(atop.milsup, aes(x = avg.democ)) + geom_histogram()
+summary(atop.milsup$avg.democ.weight)
+ggplot(atop.milsup, aes(x = avg.democ.weight)) + geom_histogram()
+ggplot(atop.milsup, aes(x = asinh(avg.democ.weight))) + geom_histogram()
+
+
+# max democracy: weighted or not
+summary(atop.milsup$max.democ)
+ggplot(atop.milsup, aes(x = max.democ)) + geom_histogram()
+summary(atop.milsup$max.democ.weight)
+ggplot(atop.milsup, aes(x = max.democ.weight)) + geom_histogram()
+ggplot(atop.milsup, aes(x = asinh(max.democ.weight))) + geom_histogram()
+
+
 # plot depth over time 
 depth.scatter <- ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
   geom_point() +
@@ -32,9 +50,13 @@ table(atop.milsup$uncond.milsup)
 t.test(atop.milsup$latent.depth.mean ~ atop.milsup$uncond.milsup)
 
 # correlation between avg democracy and depth
-cor.test(atop.milsup$max.democ, atop.milsup$latent.depth.mean, na.rm = TRUE)
+cor.test(atop.milsup$avg.democ, atop.milsup$latent.depth.mean, na.rm = TRUE)
 
 ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) + 
+  geom_point() + geom_smooth(method = "lm") +
+  theme_classic()
+
+ggplot(atop.milsup, aes(x = avg.democ.weight, y = latent.depth.mean)) + 
   geom_point() + geom_smooth(method = "lm") +
   theme_classic()
 
@@ -64,7 +86,8 @@ ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
   geom_violin() +  # add violin
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
-             aes(size = num.mem, color = avg.democ)) +
+             size = 2,
+             aes(color = avg.democ)) +
   scale_colour_viridis_c(option = "plasma") + # change color scale
   theme_classic()
 
@@ -134,8 +157,7 @@ atop.milsup %>% filter(bilat == 1) %>%
 ggplot(aes(x = begyr, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
-             aes(color = avg.democ, size = as.factor(uncond.milsup))) +
-  scale_colour_viridis_c(option = "plasma") + # change color scale
+             aes(size = avg.democ, color = as.factor(uncond.milsup))) +
   theme_classic()
 
 
@@ -150,8 +172,8 @@ atop.milsup %>% filter(bilat == 0) %>%
 
 
 
-# Plot depth against average democracy, shape by uncond milsup
-ggplot(atop.milsup, aes(x = max.democ, y = latent.depth.mean)) +
+# Plot depth against weighted avg democracy, shape by uncond milsup
+ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent,
              size = 2.5,
@@ -159,57 +181,75 @@ ggplot(atop.milsup, aes(x = max.democ, y = latent.depth.mean)) +
   scale_shape_manual(values = c(16, 17),
                       labels = c("Conditional", "Unconditional")) +
   geom_smooth(method = "lm") +
-  labs(x = "Maximum Democracy", y = "Latent Treaty Depth",
+  labs(x = "Average Democracy", y = "Latent Treaty Depth",
        shape = "Conditionality") +
   theme_bw()
-ggsave("figures/democ-combo.png", height = 6, width = 8)
 
 
 
-# TODO(Josh): think about the best descriptive plot 
+# split by uncond milsup
 ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
-  geom_boxplot() +
+  geom_boxplot(outlier.shape = NA) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent,
-             size = 2.5)  +
-  facet_wrap(vars(democ.pos)) +
+             size = 2.5,
+             aes(color = avg.democ))  +
+  scale_colour_viridis_c(option = "plasma") + # change color scale
   labs(x = "Unconditional", y = "Latent Treaty Depth",
        shape = "Conditionality") +
   theme_bw()
 
 
-ggplot(atop.milsup, aes(x = max.democ, y = latent.depth.mean)) +
-  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
-             alpha = 0.7,  # somewhat trasparent,
-             size = 2.5)  +
-  geom_smooth(method = "lm") +
-  facet_wrap(vars(uncond.milsup)) +
-  labs(x = "Maximum Democracy", y = "Latent Treaty Depth") +
+ggplot(atop.milsup, aes(x = avg.democ)) +
+  geom_histogram() +
+  facet_wrap(vars(uncond.milsup, deep.alliance)) +
+  labs(y = "Count", x = "Average Democracy (Weighted)") +
   theme_bw()
 
 
-ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
-  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
-             alpha = 0.7,  # somewhat trasparent
-             size = 2.5,
-             aes(color = as.factor(democ.pos), shape = as.factor(uncond.milsup))) +
-  scale_colour_manual(values = c("0" = "gray30", "1" = "red4"),
-                      labels = c("Negative Polity", "Positive Polity")) + # change color scale
-  scale_shape_manual(values = c(16, 17),
-                     labels = c("Conditional", "Unconditional")) + # shape scale
-  theme_classic()
 
 
-# make shape by bilateral/multilateral: too busy for paper
-ggplot(atop.milsup, aes(x = max.democ, y = latent.depth.mean)) +
-  geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
-             alpha = 0.7,  # somewhat trasparent,
-             size = 2.5,
-             aes(color = as.factor(uncond.milsup), shape = as.factor(bilat))) +
-  scale_colour_manual(values = c("0" = "gray30", "1" = "red4"),
-                      labels = c("Conditional", "Unconditional")) + # change color scale
-  scale_shape_manual(values = c(16, 17),
-                     labels = c("Multilateral", "Bilateral")) +
-  labs(x = "Maximum Democracy", y = "Latent Treaty Depth",
-       shape = "Size", color = "Conditionality") +
-  theme_bw()
+# summarize democracy by depth and uncond milsup 
+atop.democ.group <- atop.milsup %>%
+                    group_by(deep.alliance, uncond.milsup) %>%
+                     summarize(
+                       avg.democ.mean = mean(avg.democ, na.rm = TRUE),
+                       avg.democ.sd = sd(avg.democ, na.rm = TRUE),
+                       avg.democw.mean = mean(avg.democ.weight, na.rm = TRUE),
+                       avg.democw.sd = sd(avg.democ.weight, na.rm = TRUE),
+                       
+                       max.democ.mean = mean(max.democ, na.rm = TRUE),
+                       max.democ.sd = sd(max.democ, na.rm = TRUE),
+                       max.democw.mean = mean(max.democ.weight, na.rm = TRUE),
+                       max.democw.sd = sd(max.democ.weight, na.rm = TRUE)
+                      
+                     )
+
+
+# plot summary democracy scores
+ggplot(data = atop.democ.group, 
+                        aes(y = as.factor(deep.alliance), 
+                            x = as.factor(uncond.milsup), 
+                            fill = avg.democ.mean)) + 
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
+                       space = "Lab", 
+                       name = "Avg. Polity Score") +
+  labs(y = "Treaty Depth", x = "Military Support") +
+  scale_y_discrete(labels = c("Shallow Alliance", "Deep Alliance")) + 
+  scale_x_discrete(labels = c("Conditional", "Unconditional")) +
+  theme_bw() + coord_fixed() +
+  geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
+                label = round(avg.democ.mean, digits = 2)),
+            color = "black", size = 6) +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12))
+ggsave("figures/democ-combo.png", height = 6, width = 8)
+
+
+
+
+
+
+
+
