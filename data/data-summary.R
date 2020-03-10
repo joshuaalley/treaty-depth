@@ -6,6 +6,8 @@
 
 # descriptive statistics
 
+ggplot(atop.milsup, aes(dem.prop)) + geom_histogram()
+
 # average democracy: weighted or not
 summary(atop.milsup$avg.democ)
 ggplot(atop.milsup, aes(x = avg.democ)) + geom_histogram()
@@ -203,9 +205,14 @@ ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
 ggplot(atop.milsup, aes(x = avg.democ)) +
   geom_histogram() +
   facet_wrap(vars(uncond.milsup, deep.alliance)) +
-  labs(y = "Count", x = "Average Democracy (Weighted)") +
+  labs(y = "Count", x = "Average Democracy") +
   theme_bw()
 
+ggplot(atop.milsup, aes(x = dem.prop)) +
+  geom_histogram() +
+  facet_wrap(vars(uncond.milsup, deep.alliance)) +
+  labs(y = "Count", x = "Proportion of Democracies") +
+  theme_bw()
 
 
 
@@ -221,7 +228,9 @@ atop.democ.group <- atop.milsup %>%
                        max.democ.mean = mean(max.democ, na.rm = TRUE),
                        max.democ.sd = sd(max.democ, na.rm = TRUE),
                        max.democw.mean = mean(max.democ.weight, na.rm = TRUE),
-                       max.democw.sd = sd(max.democ.weight, na.rm = TRUE)
+                       max.democw.sd = sd(max.democ.weight, na.rm = TRUE),
+                       
+                       avg.dem.prop = mean(dem.prop, na.rm = TRUE)
                       
                      )
 
@@ -245,6 +254,26 @@ ggplot(data = atop.democ.group,
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12))
 ggsave("figures/democ-combo.png", height = 6, width = 8)
+
+
+# Same plot with average democratic proportion
+ggplot(data = atop.democ.group, 
+       aes(y = as.factor(deep.alliance), 
+           x = as.factor(uncond.milsup), 
+           fill = avg.dem.prop)) + 
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
+                       space = "Lab", 
+                       name = "Avg. Dem. Proportion") +
+  labs(y = "Treaty Depth", x = "Military Support") +
+  scale_y_discrete(labels = c("Shallow Alliance", "Deep Alliance")) + 
+  scale_x_discrete(labels = c("Conditional", "Unconditional")) +
+  theme_bw() + coord_fixed() +
+  geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
+                label = round(avg.dem.prop, digits = 2)),
+            color = "black", size = 6) +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12))
 
 
 
