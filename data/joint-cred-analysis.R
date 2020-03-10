@@ -5,17 +5,14 @@
 
 
 # Set up unique dataframe
-key.data <- select(atop.milsup, atopid, latent.depth.mean, avg.democ.weight, econagg.dum, uncond.milsup, 
+key.data <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
                    fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                   low.kap.sc, begyr, asymm.cap, mean.threat, max.democ.weight, avg.democ) %>%
+                   low.kap.sc, begyr, asymm.cap, mean.threat, 
+                   dem.prop, joint.democ, avg.democ, max.democ, avg.democ.weight, max.democ.weight) %>%
             drop_na()
 key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
 summary(key.data$latent.depth.mean.rs)
 
-# transform democracy variables so smooths are not dependent on limited support
-key.data$ihs.avg.democ <- asinh(key.data$avg.democ.weight)
-key.data$ihs.max.democ <- asinh(key.data$max.democ.weight)
-summary(key.data$ihs.max.democ)
 
 # glm model of unconditional military support
 uncond.glm <- glm(uncond.milsup ~ avg.democ +
@@ -119,67 +116,83 @@ plot(joint.gjrm, eq = 2, seWithMean = TRUE,
 
 
 
-### fit a model with maximum polity score
+### fit a model with democratic proportion
+
+
+# glm model of unconditional military support
+uncond.glm.joint <- glm(uncond.milsup ~ dem.prop +
+                    fp.conc.index + num.mem + wartime + asymm +
+                    asymm.cap + non.maj.only + mean.threat + 
+                    low.kap.sc + begyr,
+                  family = binomial(link = "probit"),
+                  data = key.data)
+summary(uncond.glm.joint)
+
+
+# glm model of economic issue linkages
+linkage.glm.joint <- glm(econagg.dum ~ dem.prop +
+                     fp.conc.index + num.mem + wartime + asymm +  
+                     asymm.cap + non.maj.only + mean.threat +
+                     low.kap.sc + begyr,
+                   family = binomial(link = "probit"),
+                   data = key.data)
+summary(linkage.glm.joint)
+
+
+# Use a beta regression with rescaled depth 
+beta.reg.depth.joint <- betareg(latent.depth.mean.rs ~ dem.prop +
+                            fp.conc.index + num.mem + wartime + asymm + 
+                            asymm.cap + non.maj.only + 
+                            mean.threat + low.kap.sc + begyr, data = key.data)
+summary(beta.reg.depth.joint)
+
+
+
+
+
 # set up model formulas 
-uncond.formula.max <- uncond.milsup ~ s(ihs.max.democ) + econagg.dum + 
+uncond.formula.prop <- uncond.milsup ~ dem.prop + econagg.dum + 
   fp.conc.index + num.mem + wartime + asymm + asymm.cap +
   s(mean.threat) + low.kap.sc + s(begyr)
 
 
-depth.formula.max <- latent.depth.mean.rs ~ s(ihs.max.democ) + econagg.dum +
+depth.formula.prop <- latent.depth.mean.rs ~ dem.prop + econagg.dum +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
 
 # Create a list of models
-gjrm.models.max <- vector(mode = "list", length = length(copulas))
+gjrm.models.prop <- vector(mode = "list", length = length(copulas))
 
 # Same model: probit and beta margins 
 for(i in 1:length(copulas)){
-  gjrm.models.max[[i]]  <- gjrm(list(uncond.formula.max, depth.formula.max,
+  gjrm.models.prop[[i]]  <- gjrm(list(uncond.formula.prop, depth.formula.prop,
                                      eq.sigma, theta.formula), data = key.data,
                                 margins = c("probit", "BE"),
                                 Model = "B",
                                 BivD = copulas[i]
   )
 }
-aic.gjrm.max <- lapply(gjrm.models.max, AIC)
-aic.gjrm.max
+aic.gjrm.prop <- lapply(gjrm.models.prop, AIC)
+aic.gjrm.prop
 
 # examine the results: 
-copulas[16] # PL copula minimizes AIC and has best convergence
-joint.gjrm.max <- gjrm.models.max[[16]] 
-conv.check(joint.gjrm.max)
-AIC(joint.gjrm.max)
-summary(joint.gjrm.max)
+copulas[14] # PL copula minimizes AIC and has best convergence
+joint.gjrm.prop <- gjrm.models.prop[[14]] 
+conv.check(joint.gjrm.prop)
+AIC(joint.gjrm.prop)
+summary(joint.gjrm.prop)
 
 
 # plot all smoothed terms 
-plot(joint.gjrm.max, eq = 1, seWithMean = TRUE,
+plot(joint.gjrm.prop, eq = 1, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.max, eq = 2, seWithMean = TRUE,
+plot(joint.gjrm.prop, eq = 2, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.max, eq = 4, seWithMean = TRUE,
+plot(joint.gjrm.prop, eq = 4, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
 
-# Democracy smooths
-# uncond milsup
-plot(joint.gjrm.max, eq = 1, seWithMean = TRUE,
-     shade = TRUE, select = 1,
-     xlab = "Maximum Democracy"
-)
 
-# Depth
-plot(joint.gjrm.max, eq = 2, seWithMean = TRUE,
-     shade = TRUE, select = 1,
-     xlab = "Maximum Democracy"
-)
-
-# errors
-plot(joint.gjrm.max, eq = 4, seWithMean = TRUE,
-     shade = TRUE, select = 1,
-     xlab = "Maximum Democracy"
-)
 
 
 
@@ -188,11 +201,11 @@ plot(joint.gjrm.max, eq = 4, seWithMean = TRUE,
 # Trivariate model is not fitting well: no variation with different copulas
 # and theta estimates are poor 
 # can only get it to fit with Cholesky method for covariance matrix
-depth.formula.tri <- deep.alliance ~ s(ihs.avg.democ) + 
+depth.formula.tri <- deep.alliance ~ s(avg.democ) + 
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
-linkage.formula <- econagg.dum ~ s(ihs.avg.democ) +
+linkage.formula <- econagg.dum ~ s(avg.democ) +
   fp.conc.index + num.mem + wartime + asymm +  asymm.cap +
   s(mean.threat) + low.kap.sc + s(begyr)
 

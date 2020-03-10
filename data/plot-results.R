@@ -207,63 +207,6 @@ ggsave("figures/results-error.png", results.error,
 
 ### Results for the Appendix
 
-# Maximum weighted democracy
-# build out predictions for smoothed terms 
-joint.pred.depth.max <- predict(joint.gjrm.max, eq = 2,
-                                type = "iterms", 
-                                se.fit = TRUE)
-
-pred.depth.max <- cbind.data.frame(joint.pred.depth.max$fit[, "s(ihs.max.democ)"], 
-                                   joint.pred.depth.max$se.fit[, "s(ihs.max.democ)"],
-                                   key.data$ihs.max.democ)
-colnames(pred.depth.max) <- c("pred", "se", "ihs.max.democ")
-
-plot.depth.max <- ggplot(pred.depth.max, aes(x = ihs.max.democ, y = pred)) +
-  geom_hline(yintercept = 0) +
-  geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
-  geom_line() +
-  geom_ribbon(aes(ymin = (pred - 2*se), 
-                  ymax = (pred + 2*se) 
-  ), alpha = .5
-  ) +
-  labs(x = "Maximum Democracy", y = "Predicted Change in Treaty Depth") +
-  ggtitle("Treaty Depth") +
-  theme_bw()
-plot.depth.max
-
-
-# unconditional military support 
-joint.pred.uncond.max <- predict(joint.gjrm.max, eq = 1,
-                                 type = "iterms", se.fit = TRUE)
-
-
-pred.uncond.max <- cbind.data.frame(joint.pred.uncond.max$fit[, "s(ihs.max.democ)"], 
-                                    joint.pred.uncond.max$se.fit[, "s(ihs.max.democ)"],
-                                    key.data$ihs.max.democ)
-colnames(pred.uncond.max) <- c("pred", "se", "ihs.max.democ")
-
-plot.uncond.max <- ggplot(pred.uncond.max, aes(x = ihs.max.democ, y = pred)) +
-  geom_hline(yintercept = 0) +
-  geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
-  geom_line() +
-  geom_ribbon(aes(ymin = (pred - 2*se), 
-                  ymax = (pred + 2*se) 
-  ), alpha = .5
-  ) +
-  labs(x = "Maximum Democracy", y = "Predicted Probability") +
-  ggtitle("Unconditional Military Support") +
-  theme_bw()
-plot.uncond.max
-
-
-# combine plots and export
-grid.arrange(plot.uncond.max, plot.depth.max,
-             ncol = 2)
-results.democ.max <- arrangeGrob(plot.uncond.max, plot.depth.max,
-                                 ncol = 2)
-ggsave("appendix/results-democ-max.png", results.democ.max, 
-       height = 6, width = 8) #save file
-
 
 
 # Summarize brms results with uncertainty
