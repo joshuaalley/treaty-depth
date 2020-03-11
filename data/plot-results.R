@@ -208,6 +208,57 @@ ggsave("figures/results-error.png", results.error,
 ### Results for the Appendix
 
 
+# build out predictions
+pred.depth.prop <- predict(joint.gjrm.prop, eq = 2,
+                            type = "iterms", 
+                            se.fit = TRUE)
+
+pred.depth.prop <- cbind.data.frame(pred.depth.prop$fit[, "s(dem.prop)"], 
+                                     pred.depth.prop$se.fit[, "s(dem.prop)"],
+                                     key.data$dem.prop)
+colnames(pred.depth.prop) <- c("pred", "se", "dem.prop")
+
+plot.depth.prop <- ggplot(pred.depth.prop, aes(x = dem.prop, y = pred)) +
+  geom_hline(yintercept = 0) +
+  geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
+  geom_line() +
+  geom_ribbon(aes(ymin = (pred - 2*se), 
+                  ymax = (pred + 2*se) 
+  ), alpha = .5
+  ) +
+  labs(x = "Proportion of Democracies", y = "Predicted Change in Treaty Depth") +
+  ggtitle("Treaty Depth") +
+  theme_bw()
+plot.depth.prop
+
+
+# unconditional military support 
+pred.uncond.prop <- predict(joint.gjrm.prop, eq = 1,
+                             type = "iterms", se.fit = TRUE)
+
+
+pred.uncond.prop <- cbind.data.frame(pred.uncond.prop$fit[, "s(dem.prop)"], 
+                                     pred.uncond.prop$se.fit[, "s(dem.prop)"],
+                                      key.data$dem.prop)
+colnames(pred.uncond.prop) <- c("pred", "se", "dem.prop")
+
+plot.uncond.prop <- ggplot(pred.uncond.prop, aes(x = dem.prop, y = pred)) +
+  geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
+  geom_line() +
+  geom_ribbon(aes(ymin = (pred - 2*se), 
+                  ymax = (pred + 2*se) 
+  ), alpha = .5
+  ) +
+  labs(x = "Proportion of Democracies", y = "Predicted Probability") +
+  ggtitle("Unconditional Military Support") +
+  theme_bw()
+plot.uncond.prop
+
+
+# combine plots and export
+grid.arrange(plot.uncond.prop, plot.depth.prop,
+             ncol = 2)
+
 
 # Summarize brms results with uncertainty
 summary.brms <- summary(brm.multivar.unc)

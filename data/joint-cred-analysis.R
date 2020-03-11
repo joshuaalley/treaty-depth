@@ -84,8 +84,8 @@ aic.gjrm <- lapply(gjrm.models, AIC)
 aic.gjrm
 
 # NB for interpretation: smoothed terms
-copulas[17] 
-joint.gjrm <- gjrm.models[[17]] 
+copulas[18] 
+joint.gjrm <- gjrm.models[[18]] 
 conv.check(joint.gjrm)
 
 AIC(joint.gjrm)
@@ -120,43 +120,43 @@ plot(joint.gjrm, eq = 2, seWithMean = TRUE,
 
 
 # glm model of unconditional military support
-uncond.glm.joint <- glm(uncond.milsup ~ dem.prop +
+uncond.glm.prop <- glm(uncond.milsup ~ dem.prop +
                     fp.conc.index + num.mem + wartime + asymm +
                     asymm.cap + non.maj.only + mean.threat + 
                     low.kap.sc + begyr,
                   family = binomial(link = "probit"),
                   data = key.data)
-summary(uncond.glm.joint)
+summary(uncond.glm.prop)
 
 
 # glm model of economic issue linkages
-linkage.glm.joint <- glm(econagg.dum ~ dem.prop +
+linkage.glm.prop <- glm(econagg.dum ~ dem.prop +
                      fp.conc.index + num.mem + wartime + asymm +  
                      asymm.cap + non.maj.only + mean.threat +
                      low.kap.sc + begyr,
                    family = binomial(link = "probit"),
                    data = key.data)
-summary(linkage.glm.joint)
+summary(linkage.glm.prop)
 
 
 # Use a beta regression with rescaled depth 
-beta.reg.depth.joint <- betareg(latent.depth.mean.rs ~ dem.prop +
+beta.reg.depth.prop <- betareg(latent.depth.mean.rs ~ dem.prop +
                             fp.conc.index + num.mem + wartime + asymm + 
                             asymm.cap + non.maj.only + 
                             mean.threat + low.kap.sc + begyr, data = key.data)
-summary(beta.reg.depth.joint)
+summary(beta.reg.depth.prop)
 
 
 
 
 
 # set up model formulas 
-uncond.formula.prop <- uncond.milsup ~ dem.prop + econagg.dum + 
+uncond.formula.prop <- uncond.milsup ~ s(dem.prop) + econagg.dum + 
   fp.conc.index + num.mem + wartime + asymm + asymm.cap +
   s(mean.threat) + low.kap.sc + s(begyr)
 
 
-depth.formula.prop <- latent.depth.mean.rs ~ dem.prop + econagg.dum +
+depth.formula.prop <- latent.depth.mean.rs ~ s(dem.prop) + econagg.dum +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
@@ -177,8 +177,8 @@ aic.gjrm.prop <- lapply(gjrm.models.prop, AIC)
 aic.gjrm.prop
 
 # examine the results: 
-copulas[14] # PL copula minimizes AIC and has best convergence
-joint.gjrm.prop <- gjrm.models.prop[[14]] 
+copulas[1] # copula that minimizes AIC and has best convergence
+joint.gjrm.prop <- gjrm.models.prop[[1]] 
 conv.check(joint.gjrm.prop)
 AIC(joint.gjrm.prop)
 summary(joint.gjrm.prop)
@@ -193,8 +193,20 @@ plot(joint.gjrm.prop, eq = 4, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
 
 
+# Democracy smooths
+# uncond milsup
+plot(joint.gjrm.prop, eq = 1, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Proportion Democracies"
+)
+abline(h = 0)
 
-
+# Depth
+plot(joint.gjrm.prop, eq = 2, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Proportion Democracies"
+)
+abline(h = 0)
 
 
 
