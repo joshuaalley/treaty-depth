@@ -274,7 +274,7 @@ ggplot(data = atop.democ.group,
             color = "black", size = 6) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12))
-
+ggsave("appendix/democ-prop-combo.png", height = 6, width = 8)
 
 
 

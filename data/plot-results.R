@@ -258,10 +258,10 @@ plot.uncond.prop
 # combine plots and export
 grid.arrange(plot.uncond.prop, plot.depth.prop,
              ncol = 2)
+results.prop <- arrangeGrob(plot.uncond.prop, plot.depth.prop,
+                            ncol = 2)
+ggsave("appendix/results-prop.png", results.prop,
+       height = 6, width = 8) #save file
 
-
-# Summarize brms results with uncertainty
-summary.brms <- summary(brm.multivar.unc)
-summary.brms
 
 

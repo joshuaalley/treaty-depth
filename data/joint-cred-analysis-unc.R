@@ -9,14 +9,16 @@
 # set up model formulas and priors
 # depth model
 bf.depth <- brmsformula(latent.depth.mean.rs ~ avg.democ + econagg.dum +
-                          fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                          fp.conc.index + num.mem + wartime + 
+                          asymm + asymm.cap + non.maj.only +
                           mean.threat + low.kap.sc + begyr,
                         center = TRUE) + Beta(link = "logit", link_phi = "log")
 depth.priors <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthmeanrs") 
 
 # Unconditional military support model  
 bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
-                           fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+                           fp.conc.index + num.mem + wartime + 
+                           asymm + asymm.cap + non.maj.only +
                            mean.threat + low.kap.sc + begyr,
                          center = TRUE) + bernoulli(link = "logit")
 uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
@@ -77,8 +79,9 @@ brms.data.unc.short <- sample(brms.data.unc.rs, size = 500, replace = FALSE)
 # uses priors and formula from earlier model
 
 # depth model: update formula
-bf.depth.unc <- brmsformula(latent.depth.rs ~ avg.democ + econagg.dum + uncond.milsup +
-                          fp.conc.index + num.mem + wartime + asymm + asymm.cap + mean.threat +
+bf.depth.unc <- brmsformula(latent.depth.rs ~ avg.democ + econagg.dum + 
+                          fp.conc.index + num.mem + wartime + asymm + 
+                            asymm.cap + non.maj.only + mean.threat +
                           low.kap.sc + begyr,
                         #+ (1 | p | gr(begyr, dist = "gaussian")),
                         center = TRUE) + Beta(link = "logit", link_phi = "log")
@@ -105,4 +108,8 @@ round(brm.multivar.unc$rhats, 2) # rhats are fine in the submodels
 summary(brm.multivar.unc$rhats) # summary by parameters
 max(brm.multivar.unc$rhats) # maximum rhat is not problematic
 
+
+# Summarize brms results with uncertainty
+summary.brms <- summary(brm.multivar.unc)
+summary.brms
 
