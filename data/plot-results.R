@@ -265,3 +265,57 @@ ggsave("appendix/results-prop.png", results.prop,
 
 
 
+### plot results for model with democracy of the most capable member
+# build out predictions
+pred.depth.mcap <- predict(joint.gjrm.mcap, eq = 2,
+                           type = "iterms", 
+                           se.fit = TRUE)
+
+pred.depth.mcap <- cbind.data.frame(pred.depth.mcap$fit[, "s(maxcap.democ)"], 
+                                    pred.depth.mcap$se.fit[, "s(maxcap.democ)"],
+                                    key.data$maxcap.democ)
+colnames(pred.depth.mcap) <- c("pred", "se", "maxcap.democ")
+
+plot.depth.mcap <- ggplot(pred.depth.mcap, aes(x = maxcap.democ, y = pred)) +
+  geom_hline(yintercept = 0) +
+  geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
+  geom_line() +
+  geom_ribbon(aes(ymin = (pred - 2*se), 
+                  ymax = (pred + 2*se) 
+  ), alpha = .5
+  ) +
+  labs(x = "Polity Score of Most Capable Alliance Member", y = "Predicted Change in Treaty Depth") +
+  ggtitle("Treaty Depth") +
+  theme_bw()
+plot.depth.mcap
+
+
+# unconditional military support 
+pred.uncond.mcap <- predict(joint.gjrm.mcap, eq = 1,
+                            type = "iterms", se.fit = TRUE)
+
+
+pred.uncond.mcap <- cbind.data.frame(pred.uncond.mcap$fit[, "s(maxcap.democ)"], 
+                                     pred.uncond.mcap$se.fit[, "s(maxcap.democ)"],
+                                     key.data$maxcap.democ)
+colnames(pred.uncond.mcap) <- c("pred", "se", "maxcap.democ")
+
+plot.uncond.mcap <- ggplot(pred.uncond.mcap, aes(x = maxcap.democ, y = pred)) +
+  geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
+  geom_line() +
+  geom_ribbon(aes(ymin = (pred - 2*se), 
+                  ymax = (pred + 2*se) 
+  ), alpha = .5
+  ) +
+  labs(x = "Polity Score of Most Capable Alliance Member", y = "Predicted Probability") +
+  ggtitle("Unconditional Military Support") +
+  theme_bw()
+plot.uncond.mcap
+
+
+# combine plots 
+grid.arrange(plot.uncond.mcap, plot.depth.mcap,
+             ncol = 2)
+
+
+

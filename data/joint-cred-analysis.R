@@ -7,7 +7,7 @@
 # Set up unique dataframe
 key.data <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
                    fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                   low.kap.sc, begyr, asymm.cap, mean.threat, 
+                   low.kap.sc, begyr, asymm.cap, mean.threat, maxcap.democ, 
                    dem.prop, joint.democ, avg.democ, max.democ, avg.democ.weight, max.democ.weight) %>%
             drop_na()
 key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
@@ -84,8 +84,8 @@ aic.gjrm <- lapply(gjrm.models, AIC)
 aic.gjrm
 
 # NB for interpretation: smoothed terms
-copulas[18] 
-joint.gjrm <- gjrm.models[[18]] 
+copulas[17] 
+joint.gjrm <- gjrm.models[[17]] 
 conv.check(joint.gjrm)
 
 AIC(joint.gjrm)
@@ -210,7 +210,71 @@ abline(h = 0)
 
 
 
-# Trivariate model is not fitting well: no variation with different copulas
+
+
+### Model process with polity score of most capable member
+
+uncond.formula.maxcap <- uncond.milsup ~ s(maxcap.democ) + econagg.dum + 
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
+  s(mean.threat) + low.kap.sc + s(begyr)
+
+depth.formula.maxcap <- latent.depth.mean.rs ~ s(maxcap.democ) + econagg.dum +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
+  s(mean.threat) + low.kap.sc + s(begyr)
+
+
+# Create a list of models
+gjrm.models.mcap <- vector(mode = "list", length = length(copulas))
+
+# FISK (log-logistic), inverse gaussian, Dagum and beta distributions are best
+# in terms of residual fit
+# Beta has the lowest AIC.
+for(i in 1:length(copulas)){
+  gjrm.models.mcap[[i]]  <- gjrm(list(uncond.formula.maxcap, depth.formula.maxcap,
+                                 eq.sigma, theta.formula), 
+                            data = key.data,
+                            margins = c("probit", "BE"),
+                            Model = "B",
+                            BivD = copulas[i]
+  )
+}
+aic.gjrm.mcap <- lapply(gjrm.models.mcap, AIC)
+aic.gjrm.mcap
+
+# NB for interpretation: smoothed terms
+copulas[17] 
+joint.gjrm.mcap <- gjrm.models.mcap[[17]] 
+conv.check(joint.gjrm.mcap)
+AIC(joint.gjrm.mcap)
+summary(joint.gjrm.mcap)
+
+
+# Plot smooths
+plot(joint.gjrm.mcap, eq = 1, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+plot(joint.gjrm.mcap, eq = 2, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+plot(joint.gjrm.mcap, eq = 4, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+
+# Democracy smooths
+# uncond milsup
+plot(joint.gjrm.mcap, eq = 1, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Average Democracy"
+)
+
+# Depth
+plot(joint.gjrm.mcap, eq = 2, seWithMean = TRUE,
+     shade = TRUE, select = 1,
+     xlab = "Average Democracy"
+)
+
+
+
+
+### Trivariate model with issue linkages
+# model is not fitting well: no variation with different copulas
 # and theta estimates are poor 
 # can only get it to fit with Cholesky method for covariance matrix
 depth.formula.tri <- deep.alliance ~ s(avg.democ) + 

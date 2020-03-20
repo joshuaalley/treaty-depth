@@ -230,7 +230,8 @@ atop.democ.group <- atop.milsup %>%
                        max.democw.mean = mean(max.democ.weight, na.rm = TRUE),
                        max.democw.sd = sd(max.democ.weight, na.rm = TRUE),
                        
-                       avg.dem.prop = mean(dem.prop, na.rm = TRUE)
+                       avg.dem.prop = mean(dem.prop, na.rm = TRUE),
+                       avg.maxcap.dem = mean(maxcap.democ, na.rm = TRUE)
                       
                      )
 
@@ -271,6 +272,28 @@ ggplot(data = atop.democ.group,
   theme_bw() + coord_fixed() +
   geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
                 label = round(avg.dem.prop, digits = 2)),
+            color = "black", size = 6) +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12))
+ggsave("appendix/democ-prop-combo.png", height = 6, width = 8)
+
+
+
+# Same plot with polity score of most capable member
+ggplot(data = atop.democ.group, 
+       aes(y = as.factor(deep.alliance), 
+           x = as.factor(uncond.milsup), 
+           fill = avg.maxcap.dem)) + 
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
+                       space = "Lab", 
+                       name = "Avg. Democ. of Most Capable State") +
+  labs(y = "Treaty Depth", x = "Military Support") +
+  scale_y_discrete(labels = c("Shallow Alliance", "Deep Alliance")) + 
+  scale_x_discrete(labels = c("Conditional", "Unconditional")) +
+  theme_bw() + coord_fixed() +
+  geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
+                label = round(avg.maxcap.dem, digits = 2)),
             color = "black", size = 6) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12))

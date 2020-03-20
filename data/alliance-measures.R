@@ -378,3 +378,18 @@ table(atop.milsup$democ.pos)
 atop.milsup$max.democ[atop.milsup$max.democ == -Inf] <- NA
 atop.milsup$max.democ.weight[atop.milsup$max.democ.weight == -Inf] <- NA
 
+
+# Clean up the maximum democracy by capability
+select(atop.milsup, atopid, maxcap.democ.max, maxcap.democ.min) %>% 
+  filter(maxcap.democ.max == maxcap.democ.min)
+atop.milsup$maxcap.democ.max[atop.milsup$maxcap.democ.max < 0] <- 0 # Maximum below 0
+atop.milsup$maxcap.democ.min[atop.milsup$maxcap.democ.min > 0] <- 0 # minimum above 0
+select(atop.milsup, atopid, maxcap.democ.max, maxcap.democ.min) %>% 
+  filter(maxcap.democ.max == maxcap.democ.min)
+
+# create measure with polity score of most capable 
+# Add zero in one column to max or min in the other 
+atop.milsup$maxcap.democ <- atop.milsup$maxcap.democ.min + atop.milsup$maxcap.democ.max
+
+summary(atop.milsup$maxcap.democ)
+ggplot(atop.milsup, aes(x = maxcap.democ)) + geom_histogram()
