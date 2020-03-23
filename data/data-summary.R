@@ -302,6 +302,80 @@ ggsave("appendix/democ-prop-combo.png", height = 6, width = 8)
 
 
 
+# Break out a quick look at GWF data 
+alliance.gwf.count <- filter(alliance.year, year >= 1946 & begyr == year) %>% 
+  select(c(atopid, democ.count, 
+           gwf.party.count, gwf.military.count,
+           gwf.monarchy.count, gwf.personal.count)) %>% 
+  left_join(atop.milsup) %>%
+  filter(offense == 1 | defense == 1) %>% 
+  select(atopid, deep.alliance, uncond.milsup, democ.count, 
+           gwf.party.count, gwf.military.count,
+           gwf.monarchy.count, gwf.personal.count)
+glimpse(alliance.gwf.count)
+
+# reshape long to get coutns 
+alliance.gwf.count <- alliance.gwf.count %>%
+                      group_by(deep.alliance, uncond.milsup) %>%
+                      summarize(
+                        democ.count = sum(democ.count, na.rm = TRUE), 
+                        gwf.party.count = sum(gwf.party.count, na.rm = TRUE), 
+                        gwf.military.count = sum(gwf.military.count, na.rm = TRUE),
+                        gwf.monarchy.count = sum(gwf.monarchy.count, na.rm = TRUE), 
+                        gwf.personal.count = sum(gwf.personal.count, na.rm = TRUE)
+                      ) %>%
+                 group_by() %>%
+                 pivot_longer(-c(deep.alliance, uncond.milsup), 
+                               names_to = "regime.type",
+                               values_to = "count")
+glimpse(alliance.gwf.count)
+
+# Bar plot of different regimes by alliance quadrant
+ggplot(alliance.gwf.count, aes(y = count, x = regime.type,
+                               fill = regime.type)) +
+  facet_wrap(~uncond.milsup + deep.alliance,
+     labeller = label_both) +
+  geom_bar(stat = "identity") +
+  ggtitle("Count of Regime Type Members by Alliance Treaty Design")
+
+#              labeller= labeller(uncond.milsup = c("Unconditional", "Conditional"),
+# deep.alliance = c("Deep", "Shallow")
 
 
 
+# Break out a quick look at GWF data w/ proportions
+alliance.gwf.prop <- filter(alliance.year, year >= 1946 & begyr == year) %>% 
+  select(atopid, dem.prop, party.prop,        
+           military.prop, monarchy.prop,     
+           personal.prop) %>% 
+  left_join(atop.milsup) %>%
+  filter(offense == 1 | defense == 1) %>%
+  select(atopid, dem.prop, uncond.milsup, deep.alliance,
+         party.prop, military.prop, monarchy.prop,     
+         personal.prop)
+glimpse(alliance.gwf.prop)
+
+# reshape long to get proportions by type
+# reshape long to get coutns 
+alliance.gwf.prop <- alliance.gwf.prop %>%
+  group_by(deep.alliance, uncond.milsup) %>%
+  summarize(
+    democ.prop = mean(dem.prop, na.rm = TRUE), 
+    party.prop = mean(party.prop, na.rm = TRUE), 
+    military.prop = mean(military.prop, na.rm = TRUE),
+    monarchy.prop = mean(monarchy.prop, na.rm = TRUE), 
+    personal.prop = mean(personal.prop, na.rm = TRUE)
+  ) %>%
+  group_by() %>%
+  pivot_longer(-c(deep.alliance, uncond.milsup), 
+               names_to = "regime.type",
+               values_to = "prop")
+glimpse(alliance.gwf.prop)
+
+# Bar plot of different regimes by alliance quadrant
+ggplot(alliance.gwf.prop, aes(y = prop, x = regime.type,
+                               fill = regime.type)) +
+  facet_wrap(~uncond.milsup + deep.alliance,
+             labeller = label_both) +
+  geom_bar(stat = "identity") +
+  ggtitle("Average Proportion of Regime Types by Alliance Treaty Design")
