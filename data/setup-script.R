@@ -7,6 +7,7 @@
 
 # load packages
 library(MASS)
+library(haven)
 library(tidyverse)
 library(coefplot)
 library(betareg)
