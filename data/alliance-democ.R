@@ -5,11 +5,123 @@
 # Load data
 # alliance-member year data 
 atop.cow.year <- read.csv("data/atop-cow-year.csv")
+# raw polity data
+polity <- read.csv("data/polity4v2015.csv")
 # geddes et al autocracy types
 gwf.data <- read_dta("data/GWF_AllPoliticalRegimes.dta")
 
 
-# Clean geddes et al data before merging
+
+# Clean the POLITY Data
+# source of code here: https://github.com/brentonk/merge-cow-polity
+# ensures state-year obs match atop-cow-year
+data_polity <- polity %>%
+  mutate_each(funs(ifelse(. %in% c(-66, -77, -88), NA, .)),
+              -(ccode:year)) %>%
+  mutate(country = str_trim(as.character(country))) %>%
+  select(-cyear,
+         -scode,
+         -flag,
+         -fragment,
+         -durable,
+         -(prior:regtrans))
+
+## ----head-clean-polity---------------------------------------------------
+head(data_polity)
+
+
+
+## ----overlap-function----------------------------------------------------
+find_overlap <- function(c1, c2) {
+  overlap_years <- with(data_polity,
+                        intersect(year[ccode == c1],
+                                  year[ccode == c2]))
+  data_polity %>% filter(year %in% overlap_years,
+                         ccode %in% c(c1, c2))
+}
+
+## ----colombia-overlap----------------------------------------------------
+find_overlap(99, 100)
+
+## ----recode-colombia-----------------------------------------------------
+data_polity <- data_polity %>%
+  filter(ccode != 99 | year != 1832) %>%
+  mutate(ccode = ifelse(ccode == 99, 100, ccode))
+
+## ----sardinia-overlap----------------------------------------------------
+find_overlap(324, 325)
+
+## ----recode-sardinia-----------------------------------------------------
+data_polity <- data_polity %>%
+  filter(ccode != 324 | year != 1861) %>%
+  mutate(ccode = ifelse(ccode == 324, 325, ccode))
+
+## ----serbia-overlap------------------------------------------------------
+find_overlap(342, 345)
+find_overlap(342, 347)
+find_overlap(345, 347)
+
+## ----recode-serbia-------------------------------------------------------
+data_polity <- data_polity %>%
+  filter(ccode != 347 | !(year %in% c(1991, 2006))) %>%
+  mutate(ccode = ifelse(ccode %in% c(342, 347), 345, ccode))
+
+## ----recode-montenegro---------------------------------------------------
+data_polity <- data_polity %>%
+  mutate(ccode = ifelse(ccode == 341, 347, ccode),
+         ccode = ifelse(ccode == 348, 341, ccode))
+
+## ----ussr-overlap--------------------------------------------------------
+find_overlap(364, 365)
+
+## ----recode-ussr---------------------------------------------------------
+data_polity <- data_polity %>%
+  filter(ccode != 364 | year != 1922) %>%
+  mutate(ccode = ifelse(ccode == 364, 365, ccode))
+
+## ----sudan-overlap-------------------------------------------------------
+find_overlap(625, 626)
+
+## ----recode-sudan--------------------------------------------------------
+data_polity <- data_polity %>%
+  filter(ccode != 626 | year != 2011) %>%
+  mutate(ccode = ifelse(ccode == 626, 625, ccode),
+         ccode = ifelse(ccode == 525, 626, ccode))
+
+## ----pakistan-overlap----------------------------------------------------
+find_overlap(769, 770)
+
+## ----recode-pakistan-----------------------------------------------------
+data_polity <- data_polity %>%
+  mutate(ccode = ifelse(ccode == 769, 770, ccode))
+
+## ----vietnam-overlap-----------------------------------------------------
+find_overlap(816, 818)
+
+## ----recode-vietnam------------------------------------------------------
+data_polity <- data_polity %>%
+  filter(ccode != 818 | year != 1976) %>%
+  mutate(ccode = ifelse(ccode == 818, 816, ccode))
+
+
+# Create indicators and select key variables
+data_polity <- data_polity %>%
+                group_by(ccode, year) %>%
+                select(ccode, year, 
+                       exrec, polcomp) %>%
+                mutate(
+                  open.rec = ifelse(exrec == 8, 1, 0),
+                  open.comp = ifelse(polcomp == 10, 1, 0),
+                  open.pol = open.rec + open.comp
+                )
+table(data_polity$open.pol)
+
+# Merge polity w/ atop-cow-year data
+atop.cow.year <- left_join(atop.cow.year, data_polity)
+
+
+
+###--Clean geddes et al data before merging------
 glimpse(gwf.data)
 table(gwf.data$gwf_nonautocracy)
 gwf.data <- select(gwf.data, cowcode, year, 
@@ -24,16 +136,25 @@ atop.cow.year$year <- as.numeric(atop.cow.year$year)
 atop.cow.year <- left_join(atop.cow.year, gwf.data)
 
 
-# The full dataset can be used to create an alliance characteristics-year dataset
+
+### Create alliance-year data by summarizing key state chararaceristics
+
 alliance.year <- atop.cow.year %>%
-  filter(atopid > 0) %>%
-  group_by(atopid, year) %>%
+  group_by(atopid) %>%
+  mutate(
+    begyr = min(year)
+  ) %>% # ID start year
+  filter(atopid > 0) %>% # remove no alliance obs
+  filter(begyr == year) %>% # retain start year
+  group_by(atopid, year) %>% # group and summarize
   mutate(
     most.cap = ifelse(cinc == max(cinc, na.rm = TRUE), 1, 0),
     maxcap.democ = ifelse(most.cap == 1, polity2, 0),
+    maxcap.open = ifelse(most.cap == 1, open.pol, 0),
     cinc.share = cinc / sum(cinc, na.rm = TRUE),
     democ.weight = polity2 * cinc.share,
-    democ = ifelse(polity2 > 5, 1, 0)
+    democ = ifelse(polity2 > 5, 1, 0),
+    open = ifelse(open.pol == 2, 1, 0)
   ) %>% 
   summarize(
     avg.democ = mean(polity2, na.rm = TRUE),
@@ -44,12 +165,22 @@ alliance.year <- atop.cow.year %>%
     joint.democ = ifelse(min.democ > 5, 1, 0), 
     democ.count = sum(democ, na.rm = TRUE),
     
+    
+    avg.open = mean(open.pol, na.rm = TRUE),
+    max.open = max(open.pol, na.rm = TRUE),
+    min.open = min(open.pol, na.rm = TRUE),
+    maxcap.open = max(maxcap.open, na.rm = TRUE),
+    joint.open = ifelse(min.open == 2, 1, 0), 
+    open.count = sum(open, na.rm = TRUE),
+    
+  
     total.cap = sum(cinc, na.rm = TRUE),
     total.expend = sum(ln.milex, na.rm = TRUE),
     total.gdp = sum(gdp, na.rm = TRUE),
     num.mem = n(),
     
     dem.prop = democ.count / num.mem,
+    open.prop = open.count / num.mem,
     avg.democ.weight = mean(democ.weight, na.rm = TRUE),
     max.democ.weight = max(democ.weight, na.rm = TRUE),
     min.democ.weight = min(democ.weight, na.rm = TRUE),
@@ -71,19 +202,15 @@ alliance.year <- atop.cow.year %>%
 alliance.year[order(alliance.year$atopid, alliance.year$year),] 
 
 
-# Merge mean democracy into alliance characteristics data
-# this is democracy at time of formation
-alliance.year <- alliance.year %>% 
-  group_by(atopid) %>%
-  mutate(
-    begyr = min(year)
-  )
-
-alliance.democ <- filter(alliance.year, begyr == year) %>% 
+# Create separate democracy data
+alliance.democ <- alliance.year %>% 
   select(c(atopid, dem.prop, joint.democ, avg.democ, max.democ, min.democ, 
            avg.democ.weight, max.democ.weight, min.democ.weight,
            max.threat, min.threat, mean.threat, 
-           maxcap.democ.min, maxcap.democ.max))
+           maxcap.democ.min, maxcap.democ.max,
+           avg.open, max.open, min.open,
+           maxcap.open, joint.open,
+           open.count, open.prop))
 write.csv(alliance.democ, "data/alliance-democ.csv",
           row.names = FALSE)
 

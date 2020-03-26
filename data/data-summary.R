@@ -231,7 +231,10 @@ atop.democ.group <- atop.milsup %>%
                        max.democw.sd = sd(max.democ.weight, na.rm = TRUE),
                        
                        avg.dem.prop = mean(dem.prop, na.rm = TRUE),
-                       avg.maxcap.dem = mean(maxcap.democ, na.rm = TRUE)
+                       avg.maxcap.dem = mean(maxcap.democ, na.rm = TRUE),
+                       
+                       avg.open.prop = mean(open.prop, na.rm = TRUE),
+                       avg.maxcap.open = mean(maxcap.open.max, na.rm = TRUE)
                       
                      )
 
@@ -283,7 +286,7 @@ ggsave("appendix/democ-prop-combo.png", height = 6, width = 8)
 ggplot(data = atop.democ.group, 
        aes(y = as.factor(deep.alliance), 
            x = as.factor(uncond.milsup), 
-           fill = avg.maxcap.dem)) + 
+           fill = avg.open.prop)) + 
   geom_tile(color = "white") +
   scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
                        space = "Lab", 
@@ -293,16 +296,34 @@ ggplot(data = atop.democ.group,
   scale_x_discrete(labels = c("Conditional", "Unconditional")) +
   theme_bw() + coord_fixed() +
   geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
-                label = round(avg.maxcap.dem, digits = 2)),
+                label = round(maxcap.open.max, digits = 2)),
             color = "black", size = 6) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12))
-ggsave("appendix/democ-prop-combo.png", height = 6, width = 8)
+
+
+# Use average openess of most capable state
+ggplot(data = atop.democ.group, 
+       aes(y = as.factor(deep.alliance), 
+           x = as.factor(uncond.milsup), 
+           fill = avg.maxcap.open)) + 
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
+                       space = "Lab", 
+                       name = "Avg. Openness of Most Capable State") +
+  labs(y = "Treaty Depth", x = "Military Support") +
+  scale_y_discrete(labels = c("Shallow Alliance", "Deep Alliance")) + 
+  scale_x_discrete(labels = c("Conditional", "Unconditional")) +
+  theme_bw() + coord_fixed() +
+  geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
+                label = round(avg.maxcap.open, digits = 2)),
+            color = "black", size = 6) +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12))
 
 
 
-
-# Break out a quick look at GWF data 
+### Break out a quick look at GWF data 
 alliance.gwf.count <- filter(alliance.year, year >= 1946 & begyr == year) %>% 
   select(c(atopid, democ.count, 
            gwf.party.count, gwf.military.count,

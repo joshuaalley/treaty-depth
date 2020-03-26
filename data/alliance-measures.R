@@ -377,6 +377,8 @@ table(atop.milsup$democ.pos)
 # Address max democ -Inf issue
 atop.milsup$max.democ[atop.milsup$max.democ == -Inf] <- NA
 atop.milsup$max.democ.weight[atop.milsup$max.democ.weight == -Inf] <- NA
+atop.milsup$max.open[atop.milsup$max.open == -Inf] <- NA
+atop.milsup$maxcap.open[atop.milsup$maxcap.open == -Inf] <- NA
 
 
 # Clean up the maximum democracy by capability

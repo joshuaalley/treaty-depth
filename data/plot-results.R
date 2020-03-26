@@ -201,7 +201,77 @@ ggsave("figures/results-error.png", results.error,
 
 
 
+### Plot predictions for openenss
 
+# set up new data
+sim.data <- cbind.data.frame(
+   x0 = rep(1, n = 3), # intercept
+   maxcap.open = c(0, 1, 2),
+   econagg.dum = rep(0, n = 3),
+   fp.conc.index = rep(0, n = 3), # no concessions
+   num.mem = rep(2, n = 3), # bilateral
+   wartime = rep(0, n = 3), # peacetime
+   asymm = rep(0, n = 3), # symmetric obligations
+   asymm.cap = rep(1, n = 3), # asymmetric cap
+   non.maj.only = rep(0, n = 3),
+   mean.threat = rep(median(key.data$mean.threat), n = 3),
+   low.kap.sc = rep(median(key.data$low.kap.sc), n = 3),
+   begyr = rep(median(key.data$begyr), n = 3)
+)
+glimpse(sim.data)
+
+# build out predictions for depth
+# Take these off the link function scale using linkinv from betareg package
+linkinv <- function(eta) pmax(pmin(exp(-exp(-eta)), 1 - .Machine$double.eps), .Machine$double.eps)
+
+pred.depth.open <- predict(joint.gjrm.open, eq = 2,
+                           type = "response", 
+                           se.fit = TRUE,
+                           newdata = sim.data)
+
+pred.depth.open <- cbind.data.frame(pred.depth.open$fit, 
+                                    pred.depth.open$se.fit,
+                                    sim.data$maxcap.open)
+colnames(pred.depth.open) <- c("pred", "se", "maxcap.open")
+
+# calculate lower and upper bounds of 95% CI
+pred.depth.open$lower <- pred.depth.open$pred - 2*pred.depth.open$se
+pred.depth.open$upper <- pred.depth.open$pred + 2*pred.depth.open$se
+
+# get predictions and unc back on response scale
+pred.depth.open$response <- linkinv(pred.depth.open$pred)
+pred.depth.open$lower.res <- linkinv(pred.depth.open$lower)
+pred.depth.open$upper.res <- linkinv(pred.depth.open$upper)
+
+
+ggplot(pred.depth.open, aes(x = as.factor(maxcap.open), y = response)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = lower.res,
+                ymax = upper.res),
+                width = .1, size = 1) +
+  labs(y = "Rescaled Latent Depth",
+       x = "Political Openess of Most Capable State") +
+  theme_bw()
+
+
+# predictions for unconditional military support
+pred.uncond.open <- predict(joint.gjrm.open, eq = 1,
+                           type = "response", 
+                           se.fit = TRUE,
+                           newdata = sim.data)
+
+pred.uncond.open <- cbind.data.frame(pred.uncond.open$fit, 
+                                    pred.uncond.open$se.fit,
+                                    sim.data$maxcap.open)
+colnames(pred.uncond.open) <- c("pred", "se", "maxcap.open")
+
+
+ggplot(pred.uncond.open, aes(x = as.factor(maxcap.open), y = pred)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = pred - 2*se,
+                    ymax = pred + 2*se),
+                width = .1, size = 1) +
+  theme_bw()
 
 
 

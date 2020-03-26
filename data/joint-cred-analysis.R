@@ -8,7 +8,8 @@
 key.data <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
                    fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
                    low.kap.sc, begyr, asymm.cap, mean.threat, maxcap.democ, 
-                   dem.prop, joint.democ, avg.democ, max.democ, avg.democ.weight, max.democ.weight) %>%
+                   dem.prop, joint.democ, avg.democ, max.democ,
+                   maxcap.open, open.prop) %>%
             drop_na()
 key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
 summary(key.data$latent.depth.mean.rs)
@@ -40,7 +41,7 @@ beta.reg.depth <- betareg(latent.depth.mean.rs ~ avg.democ +
                             asymm.cap + non.maj.only + 
                             mean.threat + low.kap.sc + begyr, data = key.data)
 summary(beta.reg.depth)
-
+predict(beta.reg.depth, type = "response")
 
 
 ### Joint analysis of unconditional military support and depth
@@ -269,6 +270,54 @@ plot(joint.gjrm.mcap, eq = 2, seWithMean = TRUE,
      shade = TRUE, select = 1,
      xlab = "Average Democracy"
 )
+
+
+
+### Model process with political openess of largest state
+
+uncond.formula.open <- uncond.milsup ~ maxcap.open + econagg.dum + 
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
+  s(mean.threat) + low.kap.sc + s(begyr)
+
+depth.formula.open <- latent.depth.mean.rs ~ maxcap.open + econagg.dum +
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
+  s(mean.threat) + low.kap.sc + s(begyr)
+
+
+# Create a list of models
+gjrm.models.open <- vector(mode = "list", length = length(copulas))
+
+# FISK (log-logistic), inverse gaussian, Dagum and beta distributions are best
+# in terms of residual fit
+# Beta has the lowest AIC.
+for(i in 1:length(copulas)){
+  gjrm.models.open[[i]]  <- gjrm(list(uncond.formula.open, depth.formula.open,
+                                      eq.sigma, theta.formula), 
+                                 data = key.data,
+                                 margins = c("probit", "BE"),
+                                 Model = "B",
+                                 BivD = copulas[i]
+  )
+}
+aic.gjrm.open <- lapply(gjrm.models.open, AIC)
+aic.gjrm.open
+
+# NB for interpretation: smoothed terms
+copulas[18] 
+joint.gjrm.open <- gjrm.models.open[[18]] 
+conv.check(joint.gjrm.open)
+AIC(joint.gjrm.open)
+summary(joint.gjrm.open)
+
+
+# Plot smooths
+plot(joint.gjrm.open, eq = 1, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+plot(joint.gjrm.open, eq = 2, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+plot(joint.gjrm.open, eq = 4, seWithMean = TRUE,
+     shade = TRUE, pages = 1) # smoothed terms 
+
 
 
 
