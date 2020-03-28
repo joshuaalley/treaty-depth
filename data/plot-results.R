@@ -24,7 +24,7 @@ stargazer(list(beta.reg.depth, uncond.glm),
 
 
 
-# results with max democracy in alliance
+# results with average democracy in alliance
 # tabulate the results 
 summary.depth.gjrm <- summary(joint.gjrm)
 summary.depth.gjrm[["tableP1"]] # uncond milsup
@@ -71,7 +71,7 @@ print(
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
                      The treaty depth model is a beta regression. 
-                     The error correlation between the two processes is modeled with a Plackett copula."),
+                     I model the error correlation between the two processes with a Plackett copula."),
          label = c("tab:gjrm-res"), auto = TRUE),
   add.to.row = head.xtab, 
   include.rownames = FALSE)
@@ -201,12 +201,76 @@ ggsave("figures/results-error.png", results.error,
 
 
 
-### Plot predictions for openenss
+### Tablulate split models
+# results with average democracy in alliance
+# tabulate the results 
+summary.depth.split <- summary(joint.gjrm.split)
+
+
+# Combine all the results in a single table. 
+# Start with unconditional table
+uncond.tab.split <- as.data.frame(rbind(summary.depth.split[["tableP1"]][, 1:2],
+                                  summary.depth.split[["tableNP1"]][, c(1, 3)]
+))
+uncond.tab.split$variable <- c("(Intercept)", 
+                         "Competitive Elections", "Political Competition",
+                         "Executive Constraints",
+                         "Economic Issue Linkage", 
+                         "FP Concessions", "Number of Members", 
+                         "Wartime Alliances", "Asymmetric Obligations",
+                         "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
+                         "s(Mean Threat)", "s(Start Year)")
+
+
+# table for treaty depth
+depth.tab.split <- as.data.frame(rbind(summary.depth.split[["tableP2"]][, 1:2],
+                                 summary.depth.split[["tableNP2"]][, c(1, 3)]
+))
+depth.tab.split$variable <- c("(Intercept)", 
+                        "Competitive Elections", "Political Competition",
+                        "Executive Constraints",
+                        "Economic Issue Linkage", 
+                        "FP Concessions", "Number of Members", 
+                        "Wartime Alliances", "Asymmetric Obligations",
+                        "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
+                        "s(Mean Threat)", "s(Start Year)")
+
+joint.tab.split <- full_join(uncond.tab.split, depth.tab.split, by = "variable")
+joint.tab.split <- as.data.frame(joint.tab.split[, c(3, 1, 2, 4, 5)])
+
+
+# Tabulate all the equations together
+# create a header
+head.xtab <- list()
+head.xtab$pos <- list(-1)
+head.xtab$command <- paste0(paste0('& \\multicolumn{2}{c}{Uncond. Mil. Support} & \\multicolumn{2}{c}{Latent Depth}',
+                                   collapse=''), '\\\\')
+
+
+
+print(
+  xtable(joint.tab.split, 
+         caption = c("Results from joint generalized regression model of treaty depth and unconditional military support. 
+                     All smoothed terms report the effective degrees of freedom and the chi-squared term. 
+                     The unconditional military support model is a binomial GLM with a probit link function. 
+                     The treaty depth model is a beta regression. 
+                     I model the error correlation between the two processes with a T copula."),
+         label = c("tab:gjrm-res-split"), auto = TRUE),
+  add.to.row = head.xtab, 
+  include.rownames = FALSE)
+
+
+
+### Plot predictions with split POLITY components
+# proportion of states with maximal democ
 
 # set up new data
+# TODO(JOSH): get all the different combinations
 sim.data <- cbind.data.frame(
    x0 = rep(1, n = 3), # intercept
-   maxcap.open = c(0, 1, 2),
+   prop.rec = c(0, .5, 1),
+   prop.comp = c(0, .5, 1),
+   prop.cons = c(0, .5, 1),
    econagg.dum = rep(0, n = 3),
    fp.conc.index = rep(0, n = 3), # no concessions
    num.mem = rep(2, n = 3), # bilateral
@@ -224,33 +288,46 @@ glimpse(sim.data)
 # Take these off the link function scale using linkinv from betareg package
 linkinv <- function(eta) pmax(pmin(exp(-exp(-eta)), 1 - .Machine$double.eps), .Machine$double.eps)
 
-pred.depth.open <- predict(joint.gjrm.open, eq = 2,
+pred.depth.split <- predict(joint.gjrm.split, eq = 2,
                            type = "response", 
                            se.fit = TRUE,
                            newdata = sim.data)
 
-pred.depth.open <- cbind.data.frame(pred.depth.open$fit, 
-                                    pred.depth.open$se.fit,
-                                    sim.data$maxcap.open)
-colnames(pred.depth.open) <- c("pred", "se", "maxcap.open")
+pred.depth.split <- cbind.data.frame(pred.depth.split$fit, 
+                                    pred.depth.split$se.fit,
+                                    sim.data$prop.rec,
+                                    sim.data$prop.comp,
+                                    sim.data$prop.cons)
+colnames(pred.depth.split) <- c("pred", "se", "prop.rec",
+                               "prop.comp", "prop.cons")
 
 # calculate lower and upper bounds of 95% CI
-pred.depth.open$lower <- pred.depth.open$pred - 2*pred.depth.open$se
-pred.depth.open$upper <- pred.depth.open$pred + 2*pred.depth.open$se
+pred.depth.split$lower <- pred.depth.split$pred - 2*pred.depth.split$se
+pred.depth.split$upper <- pred.depth.split$pred + 2*pred.depth.split$se
 
 # get predictions and unc back on response scale
-pred.depth.open$response <- linkinv(pred.depth.open$pred)
-pred.depth.open$lower.res <- linkinv(pred.depth.open$lower)
-pred.depth.open$upper.res <- linkinv(pred.depth.open$upper)
+pred.depth.split$response <- linkinv(pred.depth.split$pred)
+pred.depth.split$lower.res <- linkinv(pred.depth.split$lower)
+pred.depth.split$upper.res <- linkinv(pred.depth.split$upper)
 
 
-ggplot(pred.depth.open, aes(x = as.factor(maxcap.open), y = response)) +
+ggplot(pred.depth.split, aes(x = prop.rec, y = response)) +
   geom_point(size = 2) +
   geom_errorbar(aes(ymin = lower.res,
                 ymax = upper.res),
                 width = .1, size = 1) +
   labs(y = "Rescaled Latent Depth",
-       x = "Political Openess of Most Capable State") +
+       x = "Proportion of States with Competitive Elections") +
+  theme_bw()
+
+
+ggplot(pred.depth.split, aes(x = prop.comp, y = response)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = lower.res,
+                    ymax = upper.res),
+                width = .1, size = 1) +
+  labs(y = "Rescaled Latent Depth",
+       x = "Proportion of States with Competitive Elections") +
   theme_bw()
 
 
@@ -262,11 +339,11 @@ pred.uncond.open <- predict(joint.gjrm.open, eq = 1,
 
 pred.uncond.open <- cbind.data.frame(pred.uncond.open$fit, 
                                     pred.uncond.open$se.fit,
-                                    sim.data$maxcap.open)
-colnames(pred.uncond.open) <- c("pred", "se", "maxcap.open")
+                                    sim.data$open.prop)
+colnames(pred.uncond.open) <- c("pred", "se", "open.prop")
 
 
-ggplot(pred.uncond.open, aes(x = as.factor(maxcap.open), y = pred)) +
+ggplot(pred.uncond.open, aes(x = open.prop, y = pred)) +
   geom_point(size = 2) +
   geom_errorbar(aes(ymin = pred - 2*se,
                     ymax = pred + 2*se),

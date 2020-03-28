@@ -395,3 +395,8 @@ atop.milsup$maxcap.democ <- atop.milsup$maxcap.democ.min + atop.milsup$maxcap.de
 
 summary(atop.milsup$maxcap.democ)
 ggplot(atop.milsup, aes(x = maxcap.democ)) + geom_histogram()
+
+
+summary(atop.milsup$prop.rec)
+summary(atop.milsup$prop.comp)
+summary(atop.milsup$prop.cons)

@@ -275,47 +275,58 @@ plot(joint.gjrm.mcap, eq = 2, seWithMean = TRUE,
 
 ### Model process with political openess of largest state
 
-uncond.formula.open <- uncond.milsup ~ maxcap.open + econagg.dum + 
+# Set up unique dataframe
+key.data.split <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
+                        fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
+                        low.kap.sc, begyr, mean.threat, asymm.cap, 
+                        prop.rec, prop.comp, prop.cons) %>%
+  drop_na()
+key.data.split$latent.depth.mean.rs <- (key.data.split$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
+summary(key.data.split$latent.depth.mean.rs)
+
+uncond.formula.split <- uncond.milsup ~ prop.rec + prop.comp + prop.cons +
+  econagg.dum + 
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
-depth.formula.open <- latent.depth.mean.rs ~ maxcap.open + econagg.dum +
+depth.formula.split <- latent.depth.mean.rs ~ prop.rec + prop.comp + prop.cons + 
+  econagg.dum +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
 
 # Create a list of models
-gjrm.models.open <- vector(mode = "list", length = length(copulas))
+gjrm.models.split <- vector(mode = "list", length = length(copulas))
 
 # FISK (log-logistic), inverse gaussian, Dagum and beta distributions are best
 # in terms of residual fit
 # Beta has the lowest AIC.
 for(i in 1:length(copulas)){
-  gjrm.models.open[[i]]  <- gjrm(list(uncond.formula.open, depth.formula.open,
+  gjrm.models.split[[i]]  <- gjrm(list(uncond.formula.split, depth.formula.split,
                                       eq.sigma, theta.formula), 
-                                 data = key.data,
+                                 data = key.data.split,
                                  margins = c("probit", "BE"),
                                  Model = "B",
                                  BivD = copulas[i]
   )
 }
-aic.gjrm.open <- lapply(gjrm.models.open, AIC)
-aic.gjrm.open
+aic.gjrm.split <- lapply(gjrm.models.split, AIC)
+aic.gjrm.split
 
 # NB for interpretation: smoothed terms
-copulas[18] 
-joint.gjrm.open <- gjrm.models.open[[18]] 
-conv.check(joint.gjrm.open)
-AIC(joint.gjrm.open)
-summary(joint.gjrm.open)
+copulas[17] 
+joint.gjrm.split <- gjrm.models.split[[17]] 
+conv.check(joint.gjrm.split)
+AIC(joint.gjrm.split)
+summary(joint.gjrm.split)
 
 
 # Plot smooths
-plot(joint.gjrm.open, eq = 1, seWithMean = TRUE,
+plot(joint.gjrm.split, eq = 1, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.open, eq = 2, seWithMean = TRUE,
+plot(joint.gjrm.split, eq = 2, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.open, eq = 4, seWithMean = TRUE,
+plot(joint.gjrm.split, eq = 4, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
 
 

@@ -32,18 +32,6 @@ depth.scatter <- ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
   theme_bw()
 depth.scatter
 
-# plot results from first paper
-depth.res <- read.csv("data/depth-res.csv")
-depth.res.min <- ggplot(depth.res, aes(x = latent.depth.mean, y = lambda)) +
-  geom_hline(yintercept = 0) +
-  geom_point() +
-  geom_smooth(method = "lm") + theme_bw() +
-  labs(x = "Latent Treaty Depth", y = "Effect of Alliance Participation") +
-  ggtitle("Treaty Depth and the Impact of Alliance on Non-Major Power Military Spending: 1816-2007")
-depth.res.min
-ggsave("figures/depth-motive.png", height = 6, width = 8)
-
-
 
 # Run some correlations, t-tests and scatterplots 
 

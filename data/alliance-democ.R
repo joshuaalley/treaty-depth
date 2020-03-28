@@ -108,10 +108,11 @@ data_polity <- data_polity %>%
 data_polity <- data_polity %>%
                 group_by(ccode, year) %>%
                 select(ccode, year, 
-                       exrec, polcomp) %>%
+                       exrec, polcomp, xconst) %>%
                 mutate(
                   open.rec = ifelse(exrec == 8, 1, 0),
                   open.comp = ifelse(polcomp == 10, 1, 0),
+                  exec.cons = ifelse(xconst == 7, 1, 0),
                   open.pol = open.rec + open.comp
                 )
 table(data_polity$open.pol)
@@ -164,6 +165,11 @@ alliance.year <- atop.cow.year %>%
     maxcap.democ.min = min(maxcap.democ, na.rm = TRUE),
     joint.democ = ifelse(min.democ > 5, 1, 0), 
     democ.count = sum(democ, na.rm = TRUE),
+
+    # means of dummies: functionally proportions    
+    prop.comp = mean(open.comp, na.rm = TRUE),
+    prop.rec = mean(open.rec, na.rm = TRUE),
+    prop.cons = mean(exec.cons, na.rm = TRUE),
     
     
     avg.open = mean(open.pol, na.rm = TRUE),
@@ -208,7 +214,7 @@ alliance.democ <- alliance.year %>%
            avg.democ.weight, max.democ.weight, min.democ.weight,
            max.threat, min.threat, mean.threat, 
            maxcap.democ.min, maxcap.democ.max,
-           avg.open, max.open, min.open,
+           avg.open, prop.comp, prop.rec, prop.cons,
            maxcap.open, joint.open,
            open.count, open.prop))
 write.csv(alliance.democ, "data/alliance-democ.csv",

@@ -267,12 +267,7 @@ More democratic membership will increase the likelihood of deep alliances with c
 
 % Both these mechanisms work through open political competition
 Democracies use treaty depth to reassure partners because it increases the perceived reliability of their alliances while shielding them from domestic audience costs. 
-Audience costs for democratic leaders are the result of open political competition for leadership through contested elections. 
-Open recruitment of leaders and open political competition for office allow opposition groups to hold leaders to account for foreign policy shortcomings. 
-For leaders to fear replacement, there must be a group with some chance of organizing and throwing them out of office. 
-Therefore, violating international promises can have audience costs. 
-
-
+Violating international promises can have audience costs for democratic leaders, who face replacement in elections and constraints on executive action. 
 Audience costs do not apply to all international commitments, however. 
 Two characteristics of audience costs in democracies encourage them to use treaty depth in alliance commitments.  
 First, democratic leaders face high audience costs over promises of military support.
@@ -451,6 +446,18 @@ First, it translates better to multilateral alliances.
 Moreover, joint democracy is a slightly different concept, and I expect that domestic regimes affect alliances between democracies and non-democracies, even if such alliances are unusual \citep{Leeds1999}.
 Finally, the average measure allows me to make inferences about highly democratic, highly autocratic, and mixed alliances. 
 
+
+To further examine the process linking domestic politics and alliance treaty design, I break up the polity measure into three components in the second phase of the statistical analysis. 
+Existing literature identifies open political competition for leadership, contested elections and legal constraints on executive action as three possible sources of audience. 
+Open recruitment of leaders and open political competition for office allow opposition groups to hold leaders to account for foreign policy shortcomings. 
+For leaders to fear replacement, there must be a group with some chance of organizing and throwing them out of office.
+Democratic leaders also face legal constraints on their foreign policy autonomy, and violating these restraints could generate audience costs. 
+
+ 
+The POLITY measure combines executive recruitment, political competition and executive restraints. 
+To examine each separately, I created three dummy variables, one for each. 
+The dummies are equal to one if POLITY codes a state as having unfettered recruitment, open competition and executive parity/subordination, respectively. 
+After presenting the average democracy results, I will show inferences from a GJRM model with these three dummy variables in place of the smoothed average democracy term.  
 
 
 \subsection{Estimation Strategy}
@@ -672,11 +679,71 @@ In general, the magnitude and direction of estimated correlation between depth a
 Again, correlations between unobserved factors are responsible for differences in results between the joint model and the separate models. 
 After accounting for correlations in the error terms of the unconditional military support and treaty depth models, I find little connection between political regimes and the probability of unconditional military support. 
 Existing findings are sensitive to confounding from unobserved factors, which may be connected to shifts in the international context over time. 
- 
+
+\subsection{Components of Democracy}
+
+With these aggregate analyses of average alliance POLITY scores in hand, I now turn to a model that distinguishes between the different parts of the POLITY index. 
+The key independent variables in this model are the proportion of states with competitive elections, open political competition, and executive constraints that lead to parity or subordination.\footnote{I do not use smooth terms because large parts of the distribution of these variables do not have adequate support.}
+All three of these factors may contribute to audience costs by exposing leaders to adverse reactions to foreign policy actions. 
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrr}
+  & \multicolumn{2}{c}{Uncond. Mil. Support} & \multicolumn{2}{c}{Latent Depth}\\ \hline
+variable & Estimate & Std. Error & Estimate & Std. Error \\ 
+  \hline
+  Competitive Elections & -0.9436937 & 0.5504850 & 1.4488325 & 0.4212418 \\ 
+  Political Competition & -0.2100546 & 0.3799796 & -0.3704129 & 0.3123067 \\ 
+  Executive Constraints & 0.9130370 & 0.3772573 & -0.5672276 & 0.3171916 \\ 
+  Economic Issue Linkage & 0.1173482 & 0.2059973 & 0.0133120 & 0.1454153 \\ 
+  FP Concessions & -0.1261985 & 0.1270411 & -0.0606152 & 0.0796279 \\ 
+  Number of Members & -0.0853994 & 0.0281995 & 0.0238585 & 0.0137353 \\ 
+  Wartime Alliances & -0.9615978 & 0.2374039 & 0.1179639 & 0.1718834 \\ 
+  Asymmetric Obligations & 0.0699467 & 0.2357975 & 0.2073011 & 0.1656403 \\ 
+  Asymmetric Capability & 1.1828873 & 0.3860168 & 0.2964982 & 0.2196114 \\ 
+  Non-Major Only & 1.9845892 & 0.4031008 & -0.0461521 & 0.2421288 \\ 
+  FP Disagreement & 0.1578447 & 0.2978860 & 0.4112991 & 0.2118153 \\ 
+  s(Mean Threat) & 7.2472672 & 50.4339722 & 1.0000010 & 23.0163958 \\ 
+  s(Start Year) & 5.1320581 & 50.2716187 & 8.4329340 & 66.1243389 \\
+  (Intercept) & -1.3132739 & 0.4188497 & -1.2483006 & 0.2660455 \\  
+   \hline
+\end{tabular}
+\caption{Results from joint generalized regression model of treaty depth and unconditional military support, that breaks the POLITY variable into its three primary concepts.  
+                     All smoothed terms report the effective degrees of freedom and the chi-squared term. 
+                     The unconditional military support model is a binomial GLM with a probit link function. 
+                     The treaty depth model is a beta regression. 
+                    I model the error correlation between the two processes with  a T copula.} 
+\label{tab:gjrm-res-split}
+\end{table}
+
+
+I find that the three components of democracy have different consequences for alliance treaty design.\footnote{All these inferences hold the other components of democracy constant, which is an important change in interpretation.}
+First, as the proportion of states that select leaders with competitive elections rises, the probability of unconditional military support falls, but treaty depth increases.
+This matches the audience costs mechanism--- if leaders can be removed from office by popular election, they are more likely to use treaty depth to increase alliance credibility, but avoid the potential audience costs of treaty depth. 
+Second, there is not a clear association between the share of states in the alliance with open political competition and either form of alliance reassurance.
+The political competition coefficient is negative for depth and unconditional military support, but it has substantial uncertainty.
+
+
+Last, the executive constraints results are interesting and somewhat unexpected. 
+As more alliance members have domestic institutions with executive parity or subordination, the probability of unconditional military support rises. 
+There is also a weaker negative relationship between the prevalence of constrained executives and treaty depth. 
+Executive constraints has the opposite effect of electoral competition. 
+Attempts to precommit successors with different foreign policy preferences to the alliance may explain the constraints estimates \cite{Mattes2012a}. 
+By making a strong unconditional promise of military support, leaders generate higher audience costs for successor governments to break the alliance. 
+This holds because military support promises can become a salient issue in domestic politics. 
+Treaty depth may be constrained by other political elites that check the executive, or a desire to avoid excessive foreign entanglement.  
+
+
+Taken together, the results in \autoref{tab:gjrm-res-split} help explain the results from the aggregate measures in \autoref{fig:results-democ-avg}. 
+The large positive effect of competitive elections of leaders drives the overall positive association between democracy and treaty depth, as it overwhelms the smaller negative effect of executive constraints. 
+The effect of competitive elections decreases the probability of unconditional military support, but executive constraints can also make unconditional support an attractive way to precommit future leaders to the alliance. 
+Because these competing effects cancel each other out, there is no association between democratic alliance membership and the probability of unconditional military support. 
+
 
 The aggregate patterns in these statistical results give mixed evidence for the argument. 
 They do not track the process of alliance treaty negotiation, however. 
-To corroborate my theoretical claim that democracies prefer depth to unconditional support, I now offer a brief case study of the alliance negotiations behind NATO. 
+To corroborate my theoretical claim that democracies often use treaty depth to reassure, but are less prone to offer unconditional support, I now offer a brief case study of the alliance negotiations behind NATO. 
 
 
 \subsection{Case Study: NATO}
