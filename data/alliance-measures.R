@@ -38,17 +38,16 @@ atop.mem.full <- atop.mem.full %>%
     mutate(
       off.cond.count = offcoadv + offcoloc + offcocon + offconum + offcodem,
       def.cond.count = defcoadv + defcoloc + defcocon + defconum + defcodem + defconpr,
-      neu.cond.count = neucoadv + neucoloc + neucocon + neuconum + neucodem + neuconpr,
-      con.cond.count = concoadv + concoloc + concocon + concoreq,
-      milsup.cond = off.cond.count + def.cond.count,
-      total.cond = off.cond.count + def.cond.count + neu.cond.count + con.cond.count, 
+      adv.cond = ifelse(offcoadv == 1 | defcoadv == 1, 1, 0),
+      con.cond = ifelse(offcocon == 1 | defcocon == 1, 1, 0),
+      num.cond = ifelse(offconum == 1 | defconum == 1, 1, 0),
+      dem.cond = ifelse(offcodem == 1 | defcodem == 1, 1, 0),
+      milsup.cond = adv.cond + con.cond + num.cond + dem.cond + defconpr,
       mil.support = ifelse(offense == 1 | defense == 1, 1, 0)
     )
 
 ggplot(filter(atop.mem.full, offense == 1), aes(x = off.cond.count)) + geom_bar() # offensive conditions
 ggplot(filter(atop.mem.full, defense == 1), aes(x = def.cond.count)) + geom_bar() # defensive conditions
-ggplot(filter(atop.mem.full, neutral == 1), aes(x = neu.cond.count)) + geom_bar() # neutrality conditions
-ggplot(filter(atop.mem.full, consul == 1), aes(x = con.cond.count)) + geom_bar() # consultation conditions
 
 ggplot(filter(atop.mem.full, mil.support == 1), aes(x = milsup.cond)) + geom_bar() # total conditions on military support
 ggplot(atop.mem.full, aes(x = total.cond)) + geom_bar() # total conditions on any kind of support
@@ -57,6 +56,17 @@ ggplot(atop.mem.full, aes(x = total.cond)) + geom_bar() # total conditions on an
 table(atop.mem.full$def.cond.count, atop.mem.full$defense)
 table(atop.mem.full$off.cond.count, atop.mem.full$offense)
 
+# summarize conditional variables
+atop.cond.count <- atop.mem.full %>% 
+                    group_by(atopid) %>%
+                     filter(mil.support == 1) %>%
+                      summarize(
+                        conditions = max(milsup.cond, na.rm = TRUE)
+                      ) %>%
+                      mutate(
+                        uncond.oblig = 3 - conditions
+                      )
+glimpse(atop.cond.count)
 
 # Generate an unconditional variable for defense and offense
 # Generate other dummy indicators to produce a cumulative indicator of alliance scope
@@ -354,6 +364,8 @@ alliance.democ <- read.csv("data/alliance-democ.csv")
 
 # combine alliance democ and ATOP milsup data 
 atop.milsup <- left_join(atop.milsup, alliance.democ)
+# also add count of conditions and unconditional obligations
+atop.milsup <- left_join(atop.milsup, atop.cond.count)
 
 # Create a deep alliance dummy
 atop.milsup$deep.alliance <- ifelse(atop.milsup$latent.depth.mean > median(atop.milsup$latent.depth.mean),
