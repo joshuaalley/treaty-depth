@@ -21,8 +21,9 @@ bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum +
                            asymm + asymm.cap + non.maj.only +
                            mean.threat + low.kap.sc + begyr,
                          center = TRUE) + bernoulli(link = "logit")
-uncond.priors <-  set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup") 
+uncond.priors <- set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmilsup")
 
+               
 # Fit the model
 full.priors <- depth.priors + uncond.priors
 brm.multivar <- brm(bf.depth + bf.uncond +
@@ -35,7 +36,7 @@ pp_check(brm.multivar, resp = "latentdepthmeanrs")
 summary(brm.multivar)
 
 # Plot marginal effects of average democracy
-plot(marginal_effects(brm.multivar,
+plot(conditional_effects(brm.multivar,
                         effects = "avg.democ",
                         method = "fitted",
                         theme = "bw"),
@@ -72,7 +73,7 @@ for(i in 1:length(brms.data.unc.rs)){
   colnames(brms.data.unc.rs[[i]])[12] <- "latent.depth.rs"
 }
 
-# sample 10 at random for an initial run
+# sample 500 at random for an initial run
 brms.data.unc.short <- sample(brms.data.unc.rs, size = 500, replace = FALSE)
 
 ### run model: brm_multiple
@@ -113,3 +114,4 @@ max(brm.multivar.unc$rhats) # maximum rhat is not problematic
 summary.brms <- summary(brm.multivar.unc)
 summary.brms
 
+# 

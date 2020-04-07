@@ -29,7 +29,8 @@
 
 This appendix contains a series of robustness checks for the findings in the manuscript. 
 In the first section, I examine results with an alternative measure of democracy when the alliance formed: the proportion of democracies in the alliance. 
-Then I look at results from two altnerative measures of treaty depth.  
+Then I look at results from two alternative measures of treaty depth.
+In the third section, I use hurdle models to   
 Last, I consider how uncertainty in the latent treaty depth measure affects my inferences. 
 
 
@@ -99,7 +100,68 @@ Findings about the association between treaty depth and Benson and Clinton's mea
 The relationship is highly non-linear, and high average democracy is not positively correlated with Benson and Clinton's measure of depth. 
 
 
-\section{Uncertainty in Treaty Depth} 
+
+\section{Adjusting for Alliance Formation}
+
+
+Observed alliances are the result of negotiations between potential members. 
+Some alliance negotiations fail, however, so the set of observed alliances is not a random sample \citep{Poast2019a}. 
+In this section, I account for alliance formation, and show that a hurdle model of alliance treaty depth and conditions on military support produces similar inferences. 
+
+
+My research design for this robustness check follows existing procedures for dealing with selection into alliances and treaty design. 
+To construct the dataset, I followed the process of \citet{Poast2010} for dealing with k-adic data, because alliances can have more than two members. 
+First I constructed a random sample of groups of states that could have formed an alliance in each year, but did not \citep{FordhamPoast2014}.
+I then took a stratified sample of the non-allied k-ads to include five times as many non-allied observations as alliance observations for each observed value of alliance size. 
+For example, there are 215 bilateral alliances, so I included 1075 non-allied bilateral groups. 
+There is only one alliance with 34 members, so I include five non-alled k-ads with 34 members. 
+Finally, I summarized the characteristics of these non-allied k-ads and merged them with the observed alliance data. 
+
+
+To model this process, I built on the research design of \citet{Chibaetal2015}. 
+They used a hurdle model to assess whether after accounting for non-random selection into alliances, democracies were more likely to offer conditional obligations.
+Hurdle models have two stages or parts.
+A first stage model predicts which observations clear the hurdle to a second stage where the outcome is observed. 
+Unlike a sample selection model, the second stage in a hurdle model is logically undefined, which is how alliance treaty design works.\footnote{Hurdle models also do not require an exclusion restriction.} 
+After overcoming the barriers to alliance formation, states then specify treaty content. 
+
+
+Unlike \citet{Chibaetal2015} 
+Therefore, I jointly estimate two hurdle models- one for the depth and the other for unconditional military support. 
+To have zero values for the outcome at the hurdle stage, I adjusted the outcomes in these models. 
+First, I rescaled latent depth by adding one, which shifted the distribution onto uniformly positive values. 
+I then applied a gamma hurdle model to this shifted depth outcome and used the same covariates as the main model in the manuscript to predict depth. 
+For unconditional military support, I replaced the dummy indicator in the manuscript with an ordinal indicator.
+This ordinal variable is captures the relative strength of the military support promise in the alliance. 
+ATOP alliances can be conditional on four things: adversaries, locations, a particular conflict, the number of opponents, a specific demand or non-provocation in the case of defense treaties. 
+The maximum number of observed conditions in an alliance is four, which is the most conditional and limited alliance in the data. 
+I therefore invert the number of conditions and assign unconditional alliances a value of four. 
+Essentially, the measure then captures the number of circumstances where an alliance could have applied conditions but did not. 
+To avoid including zeros in the measure, I add one to it, because promising military support adds some baseline strength to any alliance \citep{Morrow2000}. 
+Thus, the final measure of military support commitment strength ranges between 1 and 5 for observed alliances, but is zero for non-alliances. 
+In both models, I use average democracy, mean threat, asymmetric capability and wartime variables in the hurdle equation. 
+
+
+I then estimate the two hurdle models simultaneously using the BRMS package for R, which employs STAN for fully Bayesian inference \citep{Buerkner2017}. 
+Unlike the GJRM models in the manuscripts, there is no correlation between the residuals of the separate hurdle models, but Instead, I connect the two models with a correlated set of year varying intercepts. 
+The complexity of this joint hurdle model and limited sample size in the second stage means results should be treated with caution.\footnote{I do find similar results with separate hurdle models for depth and conditions on military support.} 
+
+
+Even after accounting for non-random alliance formation with the joint hurdle model, I find similar results to the appendix. 
+\autoref{fig:results-prop} plots the results of the joint hurdle model. 
+As in the sample with only observed alliances, greater democracy among alliance members has no clear relationship with conditionality, but increases treaty depth. 
+
+
+\begin{figure}
+\includegraphics[width=.95\textwidth]{results-joint-hurdle.png}  
+\caption{Predicted strength and predicted changes in treaty depth by the the average POLITY score alliance members when the treaty formed based on a joint hurdle model of alliances. The line marks predicted values, and the shaded areas encapsulate the 90\% credible interval. The rug plot on the x-axis marks observed values of allied democracy. Predictions holding all other variables.}
+\label{fig:results-joint-hurdle}
+\end{figure}
+
+
+
+\section{Uncertainty in Latent Treaty Depth} 
+
 
 In a separate model, I consider how measurement uncertainty shapes inferences about the connection between non-major power alliances and treaty depth. 
 The latent measure of treaty depth has some uncertainty. 

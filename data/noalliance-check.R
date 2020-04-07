@@ -180,12 +180,14 @@ hurdle.depth <- brm(
   family = hurdle_gamma,
   prior = c(
     set_prior("normal(0, 5)", class = "b"),
+    set_prior("normal(0, 5)", class = "b", dpar = "hu"),
     set_prior("cauchy(0, 1)", class = "sd")
   ),
   data = alldata.comb,
   control = list(adapt_delta = .9)
 )
 
+pp_check(hurdle.depth)
 summary(hurdle.depth)
 
 # plot conditional effects: 90% intervals
@@ -218,6 +220,7 @@ hurdle.cond <- brm(
   family = hurdle_poisson,
   prior = c(
     set_prior("normal(0, 5)", class = "b"),
+    set_prior("normal(0, 5)", class = "b", dpar = "hu"),
     set_prior("cauchy(0, 1)", class = "sd")
   ),
   data = alldata.comb,
@@ -233,3 +236,78 @@ plot(conditional_effects(hurdle.cond, probs = c(0.05, 0.95)),
 
 
 # set up formulas for the joint hurdle
+# better luck without setting the priors
+# depth 
+depth.formula.hurdle <- brmsformula(
+    latent.depth.hurdle ~ 1 + avg.democ + size + mean.threat +
+      non.maj.only + asymm.cap + fp.conc.index + 
+      wartime + (1 | p | begyr), 
+    hu ~ 1 + avg.democ + mean.threat + asymm.cap + 
+      wartime 
+  ) + hurdle_gamma(link = "log", link_shape = "log", link_hu = "logit")
+depth.priors.hurdle <- c(set_prior("normal(0, 10)", class = "b", resp = "latentdepthhurdle"),
+                         set_prior("normal(0, 5)", class = "b", dpar = "hu", resp = "latentdepthhurdle"),
+                        set_prior("cauchy(0, 1)", class = "sd", resp = "latentdepthhurdle")
+                           )
+
+
+# conditional str
+cond.formula.hurdle <- brmsformula(
+    oblig.str ~ 1 + avg.democ + size + mean.threat +
+      non.maj.only + asymm.cap + fp.conc.index + 
+      wartime + (1 | p | begyr), 
+    hu ~ 1 + avg.democ + mean.threat + asymm.cap + 
+      wartime 
+     ) + hurdle_poisson(link = "log")
+cond.priors.hurdle <- c(set_prior("normal(0, 10)", class = "b", resp = "obligstr"),
+                        set_prior("normal(0, 5)", class = "b", dpar = "hu", resp = "obligstr"),                         
+                        set_prior("cauchy(0, 1)", class = "sd", resp = "obligstr")
+          )
+
+
+# Run the joint model 
+priors.hurdle <- depth.priors.hurdle + cond.priors.hurdle
+system.time(
+joint.hurdle <- brm(depth.formula.hurdle + cond.formula.hurdle +
+                      set_rescor(FALSE), 
+                    data = alldata.comb,
+                    control = list(adapt_delta = .9),
+                    iter = 2000, warmup = 1000,
+                    chains = 4, cores = 4)
+)
+summary(joint.hurdle)
+
+
+# Pull and plot joint results
+ce.democ.joint <- conditional_effects(joint.hurdle, probs = c(0.05, 0.95),
+                                effects = "avg.democ")
+ce.plot.joint <- plot(ce.democ.joint,
+                ask = FALSE,
+                line_args = (aes(color = "black")),
+                 rug = TRUE)
+
+# Obligations
+oblig.joint.plot <- ce.plot.joint$obligstr.obligstr_avg.democ +
+  scale_color_grey() +
+  scale_fill_grey() +
+  theme_bw() +
+  labs(x = "Average Democracy",
+       y = "Strength of Military Support Conditions")
+oblig.joint.plot
+
+# latent depth 
+depth.joint.plot <- ce.plot.joint$latentdepthhurdle.latentdepthhurdle_avg.democ +
+                      scale_color_grey() +
+                      scale_fill_grey() +
+                      theme_bw() + 
+                      labs(x = "Average Democracy",
+                       y = "Latent Depth (shifted)")
+depth.joint.plot
+
+# combine plots and export
+grid.arrange(oblig.joint.plot, depth.joint.plot,
+             ncol = 2)
+results.joint.hurdle <- arrangeGrob(oblig.joint.plot, depth.joint.plot,
+                            ncol = 2)
+ggsave("appendix/results-joint-hurdle.png", results.joint.hurdle,
+       height = 6, width = 8) #save file

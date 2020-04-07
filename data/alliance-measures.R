@@ -38,11 +38,12 @@ atop.mem.full <- atop.mem.full %>%
     mutate(
       off.cond.count = offcoadv + offcoloc + offcocon + offconum + offcodem,
       def.cond.count = defcoadv + defcoloc + defcocon + defconum + defcodem + defconpr,
+      loc.cond = ifelse(offcoloc == 1 | defcoloc == 1, 1, 0),
       adv.cond = ifelse(offcoadv == 1 | defcoadv == 1, 1, 0),
       con.cond = ifelse(offcocon == 1 | defcocon == 1, 1, 0),
       num.cond = ifelse(offconum == 1 | defconum == 1, 1, 0),
       dem.cond = ifelse(offcodem == 1 | defcodem == 1, 1, 0),
-      milsup.cond = adv.cond + con.cond + num.cond + dem.cond + defconpr,
+      milsup.cond = loc.cond + adv.cond + con.cond + num.cond + dem.cond + defconpr,
       mil.support = ifelse(offense == 1 | defense == 1, 1, 0)
     )
 
@@ -61,10 +62,10 @@ atop.cond.count <- atop.mem.full %>%
                     group_by(atopid) %>%
                      filter(mil.support == 1) %>%
                       summarize(
-                        conditions = max(milsup.cond, na.rm = TRUE)
+                        conditions = min(milsup.cond, na.rm = TRUE)
                       ) %>%
                       mutate(
-                        uncond.oblig = 3 - conditions
+                        uncond.oblig = 4 - conditions
                       )
 glimpse(atop.cond.count)
 
