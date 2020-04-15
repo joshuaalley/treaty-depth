@@ -8,7 +8,7 @@
 # Use brms
 # set up model formulas and priors
 # depth model
-bf.depth <- brmsformula(latent.depth.mean.rs ~ avg.democ + econagg.dum +
+bf.depth <- brmsformula(latent.depth.mean.rs ~ maxcap.democ +  econagg.dum +
                           fp.conc.index + num.mem + wartime + 
                           asymm + asymm.cap + non.maj.only +
                           mean.threat + low.kap.sc + begyr,
@@ -16,7 +16,7 @@ bf.depth <- brmsformula(latent.depth.mean.rs ~ avg.democ + econagg.dum +
 depth.priors <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthmeanrs") 
 
 # Unconditional military support model  
-bf.uncond <- brmsformula(uncond.milsup ~ avg.democ + econagg.dum + 
+bf.uncond <- brmsformula(uncond.milsup ~ maxcap.democ + econagg.dum + 
                            fp.conc.index + num.mem + wartime + 
                            asymm + asymm.cap + non.maj.only +
                            mean.threat + low.kap.sc + begyr,
@@ -35,9 +35,10 @@ brm.multivar <- brm(bf.depth + bf.uncond +
 pp_check(brm.multivar, resp = "latentdepthmeanrs")
 summary(brm.multivar)
 
+
 # Plot marginal effects of average democracy
 plot(conditional_effects(brm.multivar,
-                        effects = "avg.democ",
+                        effects = "maxcap.democ",
                         method = "fitted",
                         theme = "bw"),
                      ask = FALSE)

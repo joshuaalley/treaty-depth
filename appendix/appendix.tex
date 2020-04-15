@@ -37,11 +37,9 @@ Last, I consider how uncertainty in the latent treaty depth measure affects my i
 \section{Proportion of Democracies}
 
 
-In the paper, I use the average polity score of all alliance members when the treaty as the key independent variable. 
 The proportion of democracies in the alliance is an alternative measure of how much heft democracies have in negotiations \cite{Chibaetal2015}.  
-Rather than average the POLITY scores of alliance members, this variable is the share of alliance members with a POLITY score greater than 5, which is a common threshold for democracy. 
-My argument anticipates that the proportion measure should lead to similar inferences about the connection between democracy and alliance treaty depth.
-
+Rather than the POLITY scores of the most capable alliance member, this variable is the share of alliance members with a POLITY score greater than 5, which is a common threshold for democracy. 
+I expect that the proportion measure should lead to similar inferences about the connection between democracy and alliance treaty depth.
 
 First, the descriptive statistics for the proportion of democracies across treaty depth and unconditional military support are as expected. 
 \autoref{fig:democ-prop-combo} shows the average proportion of democracies in four types of alliances. 
@@ -55,7 +53,56 @@ Deep, conditional alliances have the highest average proportion of democratic me
 \end{figure}
 
 
-Results from a generalized joint regression model of treaty depth and unconditional military support match the findings in the paper.
+In \autoref{tab:separate-models-prop}, I summarize the results of separate models, which find weak associations for depth and unconditional military support. 
+These results are weaker than expected, which may reflect differences in influence, or the competing effects of democratic institutions I identified in the paper. 
+
+
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{tab:separate-models-prop} 
+\begin{tabular}{@{\extracolsep{5pt}}lcc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-3} 
+\\[-1.8ex] & Latent Depth (rescaled) & Unconditional Military Support \\ 
+\\[-1.8ex] & \textit{beta} & \textit{probit} \\ 
+\\[-1.8ex] & (1) & (2)\\ 
+\hline \\[-1.8ex] 
+ Proportion of Democracies & 0.125 & $-$0.516 \\ 
+  & ($-$0.334, 0.583) & ($-$1.176, 0.145) \\ 
+  Foreign Policy Concessions & $-$0.092 & 0.006 \\ 
+  & ($-$0.246, 0.061) & ($-$0.214, 0.227) \\ 
+  Number of Members & 0.024$^{}$ & $-$0.031 \\ 
+  & ($-$0.002, 0.050) & ($-$0.077, 0.015) \\ 
+  Wartime Alliance & $-$0.275 & $-$0.980$^{}$ \\ 
+  & ($-$0.624, 0.074) & ($-$1.597, $-$0.363) \\ 
+  Asymmetric Obligations & 0.283$^{}$ & 0.038 \\ 
+  & ($-$0.053, 0.619) & ($-$0.456, 0.532) \\ 
+  Asymmetric Capability & 0.346 & 0.600 \\ 
+  & ($-$0.123, 0.815) & ($-$0.269, 1.468) \\ 
+  Non-Major Only & 0.253 & 1.093$^{}$ \\ 
+  & ($-$0.254, 0.760) & (0.209, 1.977) \\ 
+  Average Threat & 1.101$^{}$ & 1.645$^{}$ \\ 
+  & (0.238, 1.965) & (0.328, 2.961) \\ 
+  Foreign Policy Disagreement & 0.117 & 0.384 \\ 
+  & ($-$0.339, 0.573) & ($-$0.312, 1.079) \\ 
+  Start Year & 0.004$^{}$ & 0.015$^{}$ \\ 
+  & (0.001, 0.008) & (0.010, 0.021) \\ 
+  Constant & $-$9.468$^{}$ & $-$31.466$^{}$ \\ 
+  & ($-$16.269, $-$2.668) & ($-$42.952, $-$19.979) \\ 
+ \hline \\[-1.8ex] 
+Observations & 277 & 277 \\ 
+Log Likelihood & 52.250 & $-$132.053 \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{2}{r}{95\% Confidence Intervals in Parentheses.} \\ 
+\end{tabular} 
+\end{table} 
+
+
+
+Results from a generalized joint regression model of treaty depth and unconditional military support as a function of the proportion of democracies match the findings in the paper.
 In \autoref{fig:results-prop}, there is a no substantive association between the proportion of democracies in an alliance and the probability of unconditional military support. 
 Alliances between democracies are more likely to have high treaty depth, however. 
 Therefore, I find little evidence that democracies are more likely to form alliances with conditional obligations, but I do find a positive relationship between democratic alliance membership and treaty depth. 
@@ -67,6 +114,33 @@ Therefore, I find little evidence that democracies are more likely to form allia
 \label{fig:results-prop}
 \end{figure}
 
+
+
+Differences between the joint and separate models of democratic proportion and alliance design are driven by correlations in the error terms of the depth and unconditional support models.  
+Kendall's $\tau$ measures the strength of the correlation between the errors, and is a function of a parameter $\theta$ that I modeled in the third GJRM equation.
+I used the start year of the alliance to predict differences in $\theta$, which affects correlations in unobservables between depth and unconditional military support. 
+\autoref{fig:results-error} plots the smoothed term I used to predict the correlation in the error terms between treaty depth and unconditional military support. 
+The predicted values in the top panel of \autoref{fig:results-error} are on the scale of $\theta$. 
+In the bottom panel, I plot predicted $\tau$ values against the start year of the alliance. 
+
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/results-error.png}
+\caption{Predicted association between the errors of the unconditional military support and treaty depth equations in a generalized joint regression model by the start year of the alliance. There is limited alliance data before 1850, which dramatically increases uncertainty in the smoothed term. To make the plot more legible I present predictions from after 1850. The rug plot on the x-axis in the top row marks the distribution of alliances. Each point in the bottom row is an estimated $\tau$, one for each of the 277 observations.}
+\label{fig:results-error}
+\end{figure}
+
+
+As \autoref{fig:results-error} shows, the association between the errors varies heavily by year. 
+Most error correlations are positive between 1850 and 1900, before turning more negative between 1900 and 1950. 
+During World War II depth and unconditional military support errors are positively associated. 
+In general, the magnitude and direction of estimated correlation between depth and unconditional military support in unobserved factors $\tau$ changes dramatically over time.  
+
+
+Again, correlations between unobserved factors are responsible for differences in results between the joint model and the separate models. 
+After accounting for correlations in the error terms of the unconditional military support and treaty depth models, I find little connection between democracy and the probability of unconditional military support. 
+Existing findings are sensitive to confounding from unobserved factors, which depth on shifts in the international context. 
 
 
 
@@ -157,6 +231,8 @@ As in the sample with only observed alliances, greater democracy among alliance 
 \caption{Predicted strength and predicted changes in treaty depth by the the average POLITY score alliance members when the treaty formed based on a joint hurdle model of alliances. The line marks predicted values, and the shaded areas encapsulate the 90\% credible interval. The rug plot on the x-axis marks observed values of allied democracy. Predictions holding all other variables.}
 \label{fig:results-joint-hurdle}
 \end{figure}
+
+
 
 
 

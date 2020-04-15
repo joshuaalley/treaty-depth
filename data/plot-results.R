@@ -8,7 +8,7 @@ stargazer(list(beta.reg.depth, uncond.glm),
           style = "all2",
           dep.var.labels=c("Latent Depth (rescaled)","Unconditional Military Support"),
           covariate.labels=c(
-            "Average Polity Score",
+            "Polity Score of Most Capable Member",
             "Foreign Policy Concessions", "Number of Members",
             "Wartime Alliance", "Asymmetric Obligations",
             "Asymmetric Capability", "Non-Major Only",
@@ -35,22 +35,22 @@ summary.depth.gjrm[["tableP2"]] # depth
 uncond.tab <- as.data.frame(rbind(summary.depth.gjrm[["tableP1"]][, 1:2],
                                   summary.depth.gjrm[["tableNP1"]][, c(1, 3)]
 ))
-uncond.tab$variable <- c("(Intercept)", "Economic Issue Linkage", 
+uncond.tab$variable <- c("(Intercept)",  "Most Capable POLITY", "Economic Issue Linkage", 
                          "FP Concessions", "Number of Members", 
                          "Wartime Alliances", "Asymmetric Obligations",
                          "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
-                         "s(Avg. Polity Score)", "s(Mean Threat)", "s(Start Year)")
+                         "s(Mean Threat)", "s(Start Year)")
 
 
 # table for treaty depth
 depth.tab <- as.data.frame(rbind(summary.depth.gjrm[["tableP2"]][, 1:2],
                                  summary.depth.gjrm[["tableNP2"]][, c(1, 3)]
 ))
-depth.tab$variable <- c("(Intercept)", "Economic Issue Linkage",
+depth.tab$variable <- c("(Intercept)", "Most Capable POLITY", "Economic Issue Linkage",
                         "FP Concessions", "Number of Members", 
                         "Wartime Alliances", "Asymmetric Obligations",
                         "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
-                        "s(Avg. Polity Score)", "s(Mean Threat)", "s(Start Year)")
+                        "s(Mean Threat)", "s(Start Year)")
 
 joint.tab <- full_join(uncond.tab, depth.tab, by = "variable")
 joint.tab <- as.data.frame(joint.tab[, c(3, 1, 2, 4, 5)])
@@ -71,138 +71,172 @@ print(
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
                      The treaty depth model is a beta regression. 
-                     I model the error correlation between the two processes with a Plackett copula."),
+                     I model the error correlation between the two processes with a T copula."),
          label = c("tab:gjrm-res"), auto = TRUE),
   add.to.row = head.xtab, 
   include.rownames = FALSE)
 
 
 
-### Predictions from model with average democracy
+### Predictions from model with polity of most capable state
 
-# build out predictions
-joint.pred.depth <- predict(joint.gjrm, eq = 2,
-                                     type = "iterms", 
-                            se.fit = TRUE)
+sim.data.mcap <- cbind.data.frame(
+  x0 = rep(1, n = 2), # intercept
+  maxcap.democ = c(-10, 0, 10),
+  econagg.dum = rep(0, n = 3),
+  fp.conc.index = rep(0, n = 3), # no concessions
+  num.mem = rep(2, n = 3), # bilateral
+  wartime = rep(0, n = 3), # peacetime
+  asymm = rep(0, n = 3), # symmetric obligations
+  asymm.cap = rep(1, n = 3), # asymmetric cap
+  non.maj.only = rep(0, n = 3),
+  mean.threat = rep(median(key.data$mean.threat), n = 3),
+  low.kap.sc = rep(median(key.data$low.kap.sc), n = 3),
+  begyr = rep(median(key.data$begyr), n = 3)
+)
+glimpse(sim.data.mcap)
 
-pred.depth.democ <- cbind.data.frame(joint.pred.depth$fit[, "s(avg.democ)"], 
-                          joint.pred.depth$se.fit[, "s(avg.democ)"],
-                          key.data$avg.democ)
-colnames(pred.depth.democ) <- c("pred", "se", "avg.democ")
 
-plot.depth <- ggplot(pred.depth.democ, aes(x = avg.democ, y = pred)) +
-                   geom_hline(yintercept = 0) +
-                   geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
+# substantive predictions from single-equation model
+margins.beta <- ggeffect(beta.reg.depth, terms = c("maxcap.democ"),
+                          interval = "confidence")
+plot.depth.sep <- ggplot(margins.beta, aes(x = x, y = predicted)) +
                    geom_line() +
-                   geom_ribbon(aes(ymin = (pred - 2*se), 
-                              ymax = (pred + 2*se) 
-                               ), alpha = .5
-                       ) +
-               labs(x = "Average Polity Score", y = "Predicted Change in Treaty Depth") +
-               ggtitle("Treaty Depth") +
+                   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
+                               alpha = .1) +
+                  labs(x = "Alliance Leader Democracy",
+                       y = "Predicted Marginal Effect on Treaty Depth") +
+                   theme_bw()
+plot.depth.sep
+
+
+# marginal effects from uncond glm
+margins.uncond <- ggeffect(uncond.glm, terms = c("maxcap.democ"),
+                           interval = "confidence")
+plot.uncond.sep <- ggplot(margins.uncond, aes(x = x, y = predicted)) +
+                    geom_line() +
+                    geom_ribbon(aes(ymin = conf.low, ymax = conf.high),
+                                alpha = .1) +
+                    labs(x = "Alliance Leader Democracy",
+                    y = "Predicted Marginal Effect on Pr(Unconditional Support)") +
+                    theme_bw()
+plot.uncond.sep
+
+# combine plots and export
+grid.arrange(plot.uncond.sep, plot.depth.sep,
+             ncol = 2)
+results.democ <- arrangeGrob(plot.uncond.sep, plot.depth.sep,
+                             ncol = 2)
+ggsave("figures/results-democ-max.png", results.democ, 
+       height = 6, width = 8) #save file
+
+
+# build out predictions for depth from the joint model ()
+# Take these off the link function scale using linkinv from betareg package
+linkinv <- function(eta) pmax(pmin(exp(-exp(-eta)), 1 - .Machine$double.eps), .Machine$double.eps)
+
+pred.depth.mcap <- predict(joint.gjrm, eq = 2,
+                            type = "response", 
+                            se.fit = TRUE,
+                            newdata = sim.data.mcap)
+
+pred.depth.mcap <- cbind.data.frame(pred.depth.mcap$fit, 
+                                     pred.depth.mcap$se.fit,
+                                     sim.data.mcap$maxcap.democ)
+colnames(pred.depth.mcap) <- c("pred", "se", "maxcap.democ")
+
+# calculate lower and upper bounds of 95% CI
+pred.depth.mcap$lower <- pred.depth.mcap$pred - 2*pred.depth.mcap$se
+pred.depth.mcap$upper <- pred.depth.mcap$pred + 2*pred.depth.mcap$se
+
+# get predictions and unc back on response scale
+pred.depth.mcap$response <- linkinv(pred.depth.mcap$pred)
+pred.depth.mcap$lower.res <- linkinv(pred.depth.mcap$lower)
+pred.depth.mcap$upper.res <- linkinv(pred.depth.mcap$upper)
+
+
+# plot predicted depth values
+plot.depth <- ggplot(pred.depth.mcap, aes(x = maxcap.democ, y = response)) +
+                geom_point(size = 2) +
+                geom_errorbar(aes(ymin = lower.res,
+                    ymax = upper.res),
+                    width = .1, size = 1) +
+               labs(y = "Rescaled Latent Depth",
+                    x = "POLITY Score: Most Capable State") +
                theme_bw()
 plot.depth
 
 
-# unconditional military support 
-joint.pred.uncond <- predict(joint.gjrm, eq = 1,
-                                      type = "iterms", se.fit = TRUE)
+# Plot for unconditional military support 
+pred.uncond.mcap <- predict(joint.gjrm, eq = 1,
+                           type = "response", 
+                           se.fit = TRUE,
+                           newdata = sim.data.mcap)
+
+pred.uncond.mcap <- cbind.data.frame(pred.uncond.mcap$fit, 
+                                    pred.uncond.mcap$se.fit,
+                                    sim.data.mcap$maxcap.democ)
+colnames(pred.uncond.mcap) <- c("pred", "se", "maxcap.democ")
+
+# calculate lower and upper bounds of 95% CI
+pred.uncond.mcap$lower <- pred.uncond.mcap$pred - 2*pred.uncond.mcap$se
+pred.uncond.mcap$upper <- pred.uncond.mcap$pred + 2*pred.uncond.mcap$se
+
+# get predictions and unc back on response scale
+pred.uncond.mcap$response <- linkinv(pred.uncond.mcap$pred)
+pred.uncond.mcap$lower.res <- linkinv(pred.uncond.mcap$lower)
+pred.uncond.mcap$upper.res <- linkinv(pred.uncond.mcap$upper)
 
 
-pred.uncond.democ <- cbind.data.frame(joint.pred.uncond$fit[, "s(avg.democ)"], 
-                                     joint.pred.uncond$se.fit[, "s(avg.democ)"],
-                                     key.data$avg.democ)
-colnames(pred.uncond.democ) <- c("pred", "se", "avg.democ")
-
-plot.uncond <- ggplot(pred.uncond.democ, aes(x = avg.democ, y = pred)) +
-                     geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
-                     geom_line() +
-                     geom_ribbon(aes(ymin = (pred - 2*se), 
-                       ymax = (pred + 2*se) 
-                       ), alpha = .5
-                     ) +
-                labs(x = "Average Polity Score", y = "Predicted Probability") +
-                ggtitle("Unconditional Military Support") +
-                theme_bw()
+# plot predicted probability of unconditional military support
+plot.uncond <- ggplot(pred.uncond.mcap, aes(x = maxcap.democ, y = response)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = lower.res,
+                    ymax = upper.res),
+                width = .1, size = 1) +
+  labs(y = "Predicted Probability of Unconditional Military Support",
+       x = "POLITY Score: Most Capable State") +
+  theme_bw()
 plot.uncond
 
 
-# combine plots and export
-grid.arrange(plot.uncond, plot.depth,
-             ncol = 2)
-results.democ <- arrangeGrob(plot.uncond, plot.depth,
-                             ncol = 2)
-ggsave("figures/results-democ-avg.png", results.democ, 
-       height = 6, width = 8) #save file
 
-
-# Predicted error correlations
-joint.pred.error <- predict(joint.gjrm, eq = 4,
-                                type = "iterms", se.fit = TRUE)
-
-
-# plot by year 
-pred.error.year <- cbind.data.frame(joint.pred.error$fit[, "s(begyr)"], 
-                                    joint.pred.error$se.fit[, "s(begyr)"],
-                                    key.data$begyr)
-colnames(pred.error.year) <- c("pred", "se", "begyr")
-
-plot.error.year <- filter(pred.error.year, begyr >= 1850) %>% # filter out crazy predictions
-        ggplot( aes(x = begyr, y = pred)) +
-        geom_hline(yintercept = 0) +
-        geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
-        geom_line() +
-        geom_ribbon(aes(ymin = (pred - 2*se), 
-                        ymax = (pred + 2*se) 
-        ), alpha = .5
-        ) +
-        labs(x = "Start Year of the Alliance", y = expression(hat(theta))) +
-        ggtitle("Start Year of the Alliance: Smoothed Term") +
-        theme_bw()
-plot.error.year
-
-
-# plot tau: estimated corrlated between the two equations
-boxplot(joint.gjrm.max$tau, ylim=c(-1, 1), 
-        main = expression(hat(tau)))
-
-
-# Look at differences in tau
-# set-up dataframe
-tau.data <- cbind.data.frame(select(key.data, atopid, avg.democ, begyr), joint.gjrm$tau)
-colnames(tau.data) <- c("atopid", "avg.democ", "begyr", "tau")
-
-
-# plot tau against democracy
-plot.tau <-  ggplot(tau.data, aes(x= avg.democ, y = tau)) +
-        geom_jitter() +
-        labs(x = "Average Polity Score", y = expression(hat(tau)))  +
-        ggtitle("Avg. Democracy: Predicted Error Correlations") +
-        theme_bw()
-plot.tau
-
-# plot tau against start year 
-plot.tau.year <- filter(tau.data, begyr >= 1850) %>%
-        ggplot(aes(x= begyr, y = tau)) +
-        geom_jitter() +
-        labs(x = "Start Year of the Alliance", y = expression(hat(tau))) +
-        ggtitle("Start Year: Predicted Error Correlations") +
-        theme_bw()
-plot.tau.year
-
-
-# plot the two together
-grid.arrange(plot.error.year, plot.tau.year,
-             nrow = 2)
-results.error <- arrangeGrob(plot.error.year, plot.tau.year,
-                             nrow = 2)
-ggsave("figures/results-error.png", results.error,
-       height = 6, width = 8) #save file
 
 
 
 ### Tablulate split models
-# results with average democracy in alliance
+
+
+
+
+# substantive predictions from single-equation model
+margins.beta.split <- ggeffect(beta.reg.depth.split, 
+                         terms = ~ maxcap.rec + maxcap.comp + maxcap.cons)
+margins.beta.split
+ggplot(margins.beta.split, aes(x = x, y = predicted, colour = group)) +
+  stat_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~facet, ncol = 2) +
+  labs(
+    y = get_y_title(margins.beta.split),
+    x = get_x_title(margins.beta.split),
+    colour = get_legend_title(margins.beta.split)
+  )
+
+# marginal effects of unconditional military support
+margins.uncond.split <- ggpredict(uncond.glm.split, 
+                               terms = ~ maxcap.rec + maxcap.comp + maxcap.cons)
+margins.uncond.split
+ggplot(margins.uncond.split, aes(x = x, y = predicted, colour = group)) +
+  stat_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~facet, ncol = 2) +
+  labs(
+    y = get_y_title(margins.beta.split),
+    x = get_x_title(margins.beta.split),
+    colour = get_legend_title(margins.beta.split)
+  )
+
+
+
 # tabulate the results 
 summary.depth.split <- summary(joint.gjrm.split)
 
@@ -265,22 +299,21 @@ print(
 # proportion of states with maximal democ
 
 # set up new data
-# TODO(JOSH): get all the different combinations
 sim.data <- cbind.data.frame(
-   x0 = rep(1, n = 3), # intercept
-   prop.rec = c(0, .5, 1),
-   prop.comp = c(0, .5, 1),
-   prop.cons = c(0, .5, 1),
-   econagg.dum = rep(0, n = 3),
-   fp.conc.index = rep(0, n = 3), # no concessions
-   num.mem = rep(2, n = 3), # bilateral
-   wartime = rep(0, n = 3), # peacetime
-   asymm = rep(0, n = 3), # symmetric obligations
-   asymm.cap = rep(1, n = 3), # asymmetric cap
-   non.maj.only = rep(0, n = 3),
-   mean.threat = rep(median(key.data$mean.threat), n = 3),
-   low.kap.sc = rep(median(key.data$low.kap.sc), n = 3),
-   begyr = rep(median(key.data$begyr), n = 3)
+   x0 = rep(1, n = 5), # intercept
+   maxcap.rec = c(0, 1, 1, 1, 1),
+   maxcap.comp = c(0, 0, 1, 0, 1),
+   maxcap.cons = c(0, 0, 0, 1, 1),
+   econagg.dum = rep(0, n = 5),
+   fp.conc.index = rep(0, n = 5), # no concessions
+   num.mem = rep(2, n = 5), # bilateral
+   wartime = rep(0, n = 5), # peacetime
+   asymm = rep(0, n = 5), # symmetric obligations
+   asymm.cap = rep(1, n = 5), # asymmetric cap
+   non.maj.only = rep(0, n = 5),
+   mean.threat = rep(median(key.data$mean.threat), n = 5),
+   low.kap.sc = rep(median(key.data$low.kap.sc), n = 5),
+   begyr = rep(median(key.data$begyr), n = 5)
 )
 glimpse(sim.data)
 
@@ -295,11 +328,14 @@ pred.depth.split <- predict(joint.gjrm.split, eq = 2,
 
 pred.depth.split <- cbind.data.frame(pred.depth.split$fit, 
                                     pred.depth.split$se.fit,
-                                    sim.data$prop.rec,
-                                    sim.data$prop.comp,
-                                    sim.data$prop.cons)
-colnames(pred.depth.split) <- c("pred", "se", "prop.rec",
-                               "prop.comp", "prop.cons")
+                                    sim.data$maxcap.rec,
+                                    sim.data$maxcap.comp,
+                                    sim.data$maxcap.cons,
+                                    factor(seq(1:5))
+                                    )
+colnames(pred.depth.split) <- c("pred", "se", "maxcap.rec",
+                               "maxcap.comp", "maxcap.cons",
+                               "scenario")
 
 # calculate lower and upper bounds of 95% CI
 pred.depth.split$lower <- pred.depth.split$pred - 2*pred.depth.split$se
@@ -311,43 +347,57 @@ pred.depth.split$lower.res <- linkinv(pred.depth.split$lower)
 pred.depth.split$upper.res <- linkinv(pred.depth.split$upper)
 
 
-ggplot(pred.depth.split, aes(x = prop.rec, y = response)) +
+ggplot(pred.depth.split, aes(x = scenario, y = response)) +
   geom_point(size = 2) +
   geom_errorbar(aes(ymin = lower.res,
                 ymax = upper.res),
                 width = .1, size = 1) +
+  scale_x_discrete(breaks=c("1", "2", "3", "4", "5"), 
+                   labels=c("None","Election", "Election & Comp.",
+                            "Election & Const.", "All")) +
   labs(y = "Rescaled Latent Depth",
-       x = "Proportion of States with Competitive Elections") +
+       x = "Democracy Components") +
   theme_bw()
 
 
-ggplot(pred.depth.split, aes(x = prop.comp, y = response)) +
+
+# repeat the process for unconditional military support
+pred.uncond.split <- predict(joint.gjrm.split, eq = 1,
+                            type = "response", 
+                            se.fit = TRUE,
+                            newdata = sim.data)
+
+pred.uncond.split <- cbind.data.frame(pred.uncond.split$fit, 
+                                     pred.uncond.split$se.fit,
+                                     sim.data$maxcap.rec,
+                                     sim.data$maxcap.comp,
+                                     sim.data$maxcap.cons,
+                                     factor(seq(1:5))
+)
+colnames(pred.uncond.split) <- c("pred", "se", "maxcap.rec",
+                                "maxcap.comp", "maxcap.cons",
+                                "scenario")
+
+# calculate lower and upper bounds of 95% CI
+pred.uncond.split$lower <- pred.uncond.split$pred - 2*pred.uncond.split$se
+pred.uncond.split$upper <- pred.uncond.split$pred + 2*pred.uncond.split$se
+
+# get predictions and unc back on response scale
+pred.uncond.split$response <- linkinv(pred.uncond.split$pred)
+pred.uncond.split$lower.res <- linkinv(pred.uncond.split$lower)
+pred.uncond.split$upper.res <- linkinv(pred.uncond.split$upper)
+
+
+ggplot(pred.uncond.split, aes(x = scenario, y = response)) +
   geom_point(size = 2) +
   geom_errorbar(aes(ymin = lower.res,
                     ymax = upper.res),
                 width = .1, size = 1) +
-  labs(y = "Rescaled Latent Depth",
-       x = "Proportion of States with Competitive Elections") +
-  theme_bw()
-
-
-# predictions for unconditional military support
-pred.uncond.open <- predict(joint.gjrm.open, eq = 1,
-                           type = "response", 
-                           se.fit = TRUE,
-                           newdata = sim.data)
-
-pred.uncond.open <- cbind.data.frame(pred.uncond.open$fit, 
-                                    pred.uncond.open$se.fit,
-                                    sim.data$open.prop)
-colnames(pred.uncond.open) <- c("pred", "se", "open.prop")
-
-
-ggplot(pred.uncond.open, aes(x = open.prop, y = pred)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = pred - 2*se,
-                    ymax = pred + 2*se),
-                width = .1, size = 1) +
+  scale_x_discrete(breaks=c("1", "2", "3", "4", "5"), 
+                   labels=c("None","Election", "Election & Comp",
+                            "Election & Const", "All")) +
+  labs(y = "Probability of Unconditional Military Support",
+       x = "Democracy Components") +
   theme_bw()
 
 
@@ -355,7 +405,27 @@ ggplot(pred.uncond.open, aes(x = open.prop, y = pred)) +
 ### Results for the Appendix
 
 
-# build out predictions
+# split models with proportion of democracies
+stargazer(list(beta.reg.depth.prop, uncond.glm.prop),
+          style = "all2",
+          dep.var.labels=c("Latent Depth (rescaled)","Unconditional Military Support"),
+          covariate.labels=c(
+            "Proportion of Democracies",
+            "Foreign Policy Concessions", "Number of Members",
+            "Wartime Alliance", "Asymmetric Obligations",
+            "Asymmetric Capability", "Non-Major Only",
+            "Average Threat",
+            "Foreign Policy Disagreement", "Start Year"
+          ),
+          keep.stat = c("n","ll"), ci=TRUE, 
+          star.char = c("", "", ""),
+          notes = "95\\% Confidence Intervals in Parentheses.", 
+          notes.append = FALSE,
+          label = c("tab:separate-models-prop")
+)
+
+
+# build out predictions from joint model
 pred.depth.prop <- predict(joint.gjrm.prop, eq = 2,
                             type = "iterms", 
                             se.fit = TRUE)
@@ -410,20 +480,19 @@ results.prop <- arrangeGrob(plot.uncond.prop, plot.depth.prop,
 ggsave("appendix/results-prop.png", results.prop,
        height = 6, width = 8) #save file
 
+# Predicted error correlations
+joint.pred.error <- predict(joint.gjrm.prop, eq = 4,
+                            type = "iterms", se.fit = TRUE)
 
 
-### plot results for model with democracy of the most capable member
-# build out predictions
-pred.depth.mcap <- predict(joint.gjrm.mcap, eq = 2,
-                           type = "iterms", 
-                           se.fit = TRUE)
+# plot by year 
+pred.error.year <- cbind.data.frame(joint.pred.error$fit[, "s(begyr)"], 
+                                    joint.pred.error$se.fit[, "s(begyr)"],
+                                    key.data$begyr)
+colnames(pred.error.year) <- c("pred", "se", "begyr")
 
-pred.depth.mcap <- cbind.data.frame(pred.depth.mcap$fit[, "s(maxcap.democ)"], 
-                                    pred.depth.mcap$se.fit[, "s(maxcap.democ)"],
-                                    key.data$maxcap.democ)
-colnames(pred.depth.mcap) <- c("pred", "se", "maxcap.democ")
-
-plot.depth.mcap <- ggplot(pred.depth.mcap, aes(x = maxcap.democ, y = pred)) +
+plot.error.year <- filter(pred.error.year, begyr >= 1850) %>% # filter out crazy predictions
+  ggplot( aes(x = begyr, y = pred)) +
   geom_hline(yintercept = 0) +
   geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
   geom_line() +
@@ -431,38 +500,36 @@ plot.depth.mcap <- ggplot(pred.depth.mcap, aes(x = maxcap.democ, y = pred)) +
                   ymax = (pred + 2*se) 
   ), alpha = .5
   ) +
-  labs(x = "Polity Score of Most Capable Alliance Member", y = "Predicted Change in Treaty Depth") +
-  ggtitle("Treaty Depth") +
+  labs(x = "Start Year of the Alliance", y = expression(hat(theta))) +
+  ggtitle("Start Year of the Alliance: Smoothed Term") +
   theme_bw()
-plot.depth.mcap
+plot.error.year
 
 
-# unconditional military support 
-pred.uncond.mcap <- predict(joint.gjrm.mcap, eq = 1,
-                            type = "iterms", se.fit = TRUE)
+
+# Look at differences in tau
+# set-up dataframe
+tau.data <- cbind.data.frame(select(key.data, atopid, begyr), joint.gjrm$tau)
+colnames(tau.data) <- c("atopid", "begyr", "tau")
 
 
-pred.uncond.mcap <- cbind.data.frame(pred.uncond.mcap$fit[, "s(maxcap.democ)"], 
-                                     pred.uncond.mcap$se.fit[, "s(maxcap.democ)"],
-                                     key.data$maxcap.democ)
-colnames(pred.uncond.mcap) <- c("pred", "se", "maxcap.democ")
 
-plot.uncond.mcap <- ggplot(pred.uncond.mcap, aes(x = maxcap.democ, y = pred)) +
-  geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
-  geom_line() +
-  geom_ribbon(aes(ymin = (pred - 2*se), 
-                  ymax = (pred + 2*se) 
-  ), alpha = .5
-  ) +
-  labs(x = "Polity Score of Most Capable Alliance Member", y = "Predicted Probability") +
-  ggtitle("Unconditional Military Support") +
+# plot tau against start year 
+plot.tau.year <- filter(tau.data, begyr >= 1850) %>%
+  ggplot(aes(x = begyr, y = tau)) +
+  geom_jitter() +
+  labs(x = "Start Year of the Alliance", y = expression(hat(tau))) +
+  ggtitle("Start Year: Predicted Error Correlations") +
   theme_bw()
-plot.uncond.mcap
+plot.tau.year
 
 
-# combine plots 
-grid.arrange(plot.uncond.mcap, plot.depth.mcap,
-             ncol = 2)
-
+# plot the two together
+grid.arrange(plot.error.year, plot.tau.year,
+             nrow = 2)
+results.error <- arrangeGrob(plot.error.year, plot.tau.year,
+                             nrow = 2)
+ggsave("appendix/results-error.png", results.error,
+       height = 6, width = 8) #save file
 
 

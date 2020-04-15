@@ -8,20 +8,10 @@
 
 ggplot(atop.milsup, aes(dem.prop)) + geom_histogram()
 
-# average democracy: weighted or not
-summary(atop.milsup$avg.democ)
-ggplot(atop.milsup, aes(x = avg.democ)) + geom_histogram()
-summary(atop.milsup$avg.democ.weight)
-ggplot(atop.milsup, aes(x = avg.democ.weight)) + geom_histogram()
-ggplot(atop.milsup, aes(x = asinh(avg.democ.weight))) + geom_histogram()
+# democracy of the most capable state: weighted or not
+summary(atop.milsup$maxcap.democ)
+ggplot(atop.milsup, aes(x = maxcap.democ)) + geom_histogram()
 
-
-# max democracy: weighted or not
-summary(atop.milsup$max.democ)
-ggplot(atop.milsup, aes(x = max.democ)) + geom_histogram()
-summary(atop.milsup$max.democ.weight)
-ggplot(atop.milsup, aes(x = max.democ.weight)) + geom_histogram()
-ggplot(atop.milsup, aes(x = asinh(max.democ.weight))) + geom_histogram()
 
 
 # plot depth over time 
@@ -37,18 +27,15 @@ depth.scatter
 
 # Uncoditional military support
 table(atop.milsup$uncond.milsup)
-t.test(atop.milsup$latent.depth.mean ~ atop.milsup$uncond.milsup)
+t.test(atop.milsup$maxcap.democ ~ atop.milsup$uncond.milsup)
 
-# correlation between avg democracy and depth
-cor.test(atop.milsup$avg.democ, atop.milsup$latent.depth.mean, na.rm = TRUE)
+# correlation between democracy and depth
+cor.test(atop.milsup$maxcap.democ, atop.milsup$latent.depth.mean, na.rm = TRUE)
 
-ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) + 
+ggplot(atop.milsup, aes(x = maxcap.democ, y = latent.depth.mean)) + 
   geom_point() + geom_smooth(method = "lm") +
   theme_classic()
 
-ggplot(atop.milsup, aes(x = avg.democ.weight, y = latent.depth.mean)) + 
-  geom_point() + geom_smooth(method = "lm") +
-  theme_classic()
 
 # Look at correlation between FP similarity and depth
 cor.test(atop.milsup$mean.kap.sc, atop.milsup$latent.depth.mean)
@@ -69,7 +56,7 @@ ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
   geom_violin() +  # add violin
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.5,  # somewhat trasparent
-             aes(size = avg.democ)) + theme_classic()
+             aes(size = maxcap.democ)) + theme_classic()
 
 # Combine unconditional, size and depth 
 ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
@@ -77,12 +64,12 @@ ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
              size = 2,
-             aes(color = avg.democ)) +
+             aes(color = maxcap.democ)) +
   scale_colour_viridis_c(option = "plasma") + # change color scale
   theme_classic()
 
 # Switch x-axis variables
-ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
+ggplot(atop.milsup, aes(x = maxcap.democ, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
              aes(size = num.mem, color = as.factor(uncond.milsup))) +
@@ -113,7 +100,7 @@ ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
   geom_point(size = 3,
              position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
-             aes(color = avg.democ)) +
+             aes(color = maxcap.democ)) +
   scale_colour_viridis_c(option = "plasma") + # change color scale
   theme_classic()
 
@@ -122,48 +109,48 @@ ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
 ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
-             aes(color = avg.democ, size = as.factor(uncond.milsup))) +
+             aes(color = maxcap.democ, size = as.factor(uncond.milsup))) +
   scale_colour_viridis_c(option = "plasma") + # change color scale
   theme_classic()
 
 # series of pairwise correlations and t-tests
-t.test(atop.milsup$avg.democ ~ atop.milsup$uncond.milsup) # uncond milsup alliances are less democratic
+t.test(atop.milsup$maxcap.democ ~ atop.milsup$uncond.milsup) # uncond milsup alliances are less democratic
 t.test(atop.milsup$begyr ~ atop.milsup$uncond.milsup) # uncond milsup is more common in modern era
 t.test(atop.milsup$num.mem ~ atop.milsup$uncond.milsup) # less clear difference in conditionality by size
-cor.test(atop.milsup$avg.democ, atop.milsup$begyr) # democracy and start year are positively correlated
-cor.test(atop.milsup$avg.democ, atop.milsup$num.mem) # democracy and alliance size are positively correlated 
+cor.test(atop.milsup$maxcap.democ, atop.milsup$begyr) # democracy and start year are positively correlated
+cor.test(atop.milsup$maxcap.democ, atop.milsup$num.mem) # democracy and alliance size are positively correlated 
 
 
 # Start year, democracy and alliance size
 ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
-             aes(color = avg.democ, size = num.mem)) +
+             aes(color = maxcap.democ, size = num.mem)) +
   scale_colour_viridis_c(option = "plasma") + # change color scale
   theme_classic()
 
-# Start year, avg democ and unconditional military support in bilateral treaties
+# Start year, maxcap democ and unconditional military support in bilateral treaties
 atop.milsup %>% filter(bilat == 1) %>% 
 ggplot(aes(x = begyr, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
-             aes(size = avg.democ, color = as.factor(uncond.milsup))) +
+             aes(size = maxcap.democ, color = as.factor(uncond.milsup))) +
   theme_classic()
 
 
-# Start year, avg democ and unconditional military support in multilateral treaties
+# Start year, maxcap democ and unconditional military support in multilateral treaties
 atop.milsup %>% filter(bilat == 0) %>% 
   ggplot(aes(x = begyr, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent
-             aes(color = avg.democ, size = as.factor(uncond.milsup))) +
+             aes(color = maxcap.democ, size = as.factor(uncond.milsup))) +
   scale_colour_viridis_c(option = "plasma") + # change color scale
   theme_classic()
 
 
 
 # Plot depth against weighted avg democracy, shape by uncond milsup
-ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
+ggplot(atop.milsup, aes(x = maxcap.democ, y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent,
              size = 2.5,
@@ -171,7 +158,7 @@ ggplot(atop.milsup, aes(x = avg.democ, y = latent.depth.mean)) +
   scale_shape_manual(values = c(16, 17),
                       labels = c("Conditional", "Unconditional")) +
   geom_smooth(method = "lm") +
-  labs(x = "Average Democracy", y = "Latent Treaty Depth",
+  labs(x = "Democracy of Most Capable Member", y = "Latent Treaty Depth",
        shape = "Conditionality") +
   theme_bw()
 
@@ -183,14 +170,14 @@ ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
   geom_point(position = position_jitter(width = 0.1),  # jitter points to prevent overlap
              alpha = 0.7,  # somewhat trasparent,
              size = 2.5,
-             aes(color = avg.democ))  +
+             aes(color = maxcap.democ))  +
   scale_colour_viridis_c(option = "plasma") + # change color scale
   labs(x = "Unconditional", y = "Latent Treaty Depth",
        shape = "Conditionality") +
   theme_bw()
 
 
-ggplot(atop.milsup, aes(x = avg.democ)) +
+ggplot(atop.milsup, aes(x = maxcap.democ)) +
   geom_histogram() +
   facet_wrap(vars(uncond.milsup, deep.alliance)) +
   labs(y = "Count", x = "Average Democracy") +
@@ -208,21 +195,8 @@ ggplot(atop.milsup, aes(x = dem.prop)) +
 atop.democ.group <- atop.milsup %>%
                     group_by(deep.alliance, uncond.milsup) %>%
                      summarize(
-                       avg.democ.mean = mean(avg.democ, na.rm = TRUE),
-                       avg.democ.sd = sd(avg.democ, na.rm = TRUE),
-                       avg.democw.mean = mean(avg.democ.weight, na.rm = TRUE),
-                       avg.democw.sd = sd(avg.democ.weight, na.rm = TRUE),
-                       
-                       max.democ.mean = mean(max.democ, na.rm = TRUE),
-                       max.democ.sd = sd(max.democ, na.rm = TRUE),
-                       max.democw.mean = mean(max.democ.weight, na.rm = TRUE),
-                       max.democw.sd = sd(max.democ.weight, na.rm = TRUE),
-                       
                        avg.dem.prop = mean(dem.prop, na.rm = TRUE),
                        avg.maxcap.dem = mean(maxcap.democ, na.rm = TRUE),
-                       
-                       avg.open.prop = mean(open.prop, na.rm = TRUE),
-                       avg.maxcap.open = mean(maxcap.open.max, na.rm = TRUE)
                       
                      )
 
@@ -231,7 +205,7 @@ atop.democ.group <- atop.milsup %>%
 ggplot(data = atop.democ.group, 
                         aes(y = as.factor(deep.alliance), 
                             x = as.factor(uncond.milsup), 
-                            fill = avg.democ.mean)) + 
+                            fill = avg.maxcap.dem)) + 
   geom_tile(color = "white") +
   scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
                        space = "Lab", 
@@ -241,7 +215,7 @@ ggplot(data = atop.democ.group,
   scale_x_discrete(labels = c("Conditional", "Unconditional")) +
   theme_bw() + coord_fixed() +
   geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
-                label = round(avg.democ.mean, digits = 2)),
+                label = round(avg.maxcap.dem, digits = 2)),
             color = "black", size = 6) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12))
@@ -270,49 +244,8 @@ ggsave("appendix/democ-prop-combo.png", height = 6, width = 8)
 
 
 
-# Same plot with polity score of most capable member
-ggplot(data = atop.democ.group, 
-       aes(y = as.factor(deep.alliance), 
-           x = as.factor(uncond.milsup), 
-           fill = avg.open.prop)) + 
-  geom_tile(color = "white") +
-  scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
-                       space = "Lab", 
-                       name = "Avg. Democ. of Most Capable State") +
-  labs(y = "Treaty Depth", x = "Military Support") +
-  scale_y_discrete(labels = c("Shallow Alliance", "Deep Alliance")) + 
-  scale_x_discrete(labels = c("Conditional", "Unconditional")) +
-  theme_bw() + coord_fixed() +
-  geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
-                label = round(maxcap.open.max, digits = 2)),
-            color = "black", size = 6) +
-  theme(axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 12))
-
-
-# Use average openess of most capable state
-ggplot(data = atop.democ.group, 
-       aes(y = as.factor(deep.alliance), 
-           x = as.factor(uncond.milsup), 
-           fill = avg.maxcap.open)) + 
-  geom_tile(color = "white") +
-  scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
-                       space = "Lab", 
-                       name = "Avg. Openness of Most Capable State") +
-  labs(y = "Treaty Depth", x = "Military Support") +
-  scale_y_discrete(labels = c("Shallow Alliance", "Deep Alliance")) + 
-  scale_x_discrete(labels = c("Conditional", "Unconditional")) +
-  theme_bw() + coord_fixed() +
-  geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
-                label = round(avg.maxcap.open, digits = 2)),
-            color = "black", size = 6) +
-  theme(axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 12))
-
-
-
 ### Break out a quick look at GWF data 
-alliance.gwf.count <- filter(alliance.year, year >= 1946 & begyr == year) %>% 
+alliance.gwf.count <- filter(alliance.year, year >= 1946) %>% 
   select(c(atopid, democ.count, 
            gwf.party.count, gwf.military.count,
            gwf.monarchy.count, gwf.personal.count)) %>% 
@@ -323,7 +256,7 @@ alliance.gwf.count <- filter(alliance.year, year >= 1946 & begyr == year) %>%
            gwf.monarchy.count, gwf.personal.count)
 glimpse(alliance.gwf.count)
 
-# reshape long to get coutns 
+# reshape long to get counts 
 alliance.gwf.count <- alliance.gwf.count %>%
                       group_by(deep.alliance, uncond.milsup) %>%
                       summarize(

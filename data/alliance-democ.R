@@ -151,7 +151,9 @@ alliance.year <- atop.cow.year %>%
   mutate(
     most.cap = ifelse(cinc == max(cinc, na.rm = TRUE), 1, 0),
     maxcap.democ = ifelse(most.cap == 1, polity2, 0),
-    maxcap.open = ifelse(most.cap == 1, open.pol, 0),
+    maxcap.rec = ifelse(most.cap == 1, open.rec, 0),
+    maxcap.comp = ifelse(most.cap == 1, open.comp, 0),
+    maxcap.cons = ifelse(most.cap == 1, exec.cons, 0),
     cinc.share = cinc / sum(cinc, na.rm = TRUE),
     democ.weight = polity2 * cinc.share,
     democ = ifelse(polity2 > 5, 1, 0),
@@ -172,11 +174,9 @@ alliance.year <- atop.cow.year %>%
     prop.cons = mean(exec.cons, na.rm = TRUE),
     
     
-    avg.open = mean(open.pol, na.rm = TRUE),
-    max.open = max(open.pol, na.rm = TRUE),
-    min.open = min(open.pol, na.rm = TRUE),
-    maxcap.open = max(maxcap.open, na.rm = TRUE),
-    joint.open = ifelse(min.open == 2, 1, 0), 
+    maxcap.rec = max(maxcap.rec, na.rm = TRUE),
+    maxcap.comp = max(maxcap.comp, na.rm = TRUE),
+    maxcap.cons = max(maxcap.cons, na.rm = TRUE),
     open.count = sum(open, na.rm = TRUE),
     
   
@@ -214,9 +214,8 @@ alliance.democ <- alliance.year %>%
            avg.democ.weight, max.democ.weight, min.democ.weight,
            max.threat, min.threat, mean.threat, 
            maxcap.democ.min, maxcap.democ.max,
-           avg.open, prop.comp, prop.rec, prop.cons,
-           maxcap.open, joint.open,
-           open.count, open.prop))
+           prop.comp, prop.rec, prop.cons,
+           maxcap.cons, maxcap.rec, maxcap.comp))
 write.csv(alliance.democ, "data/alliance-democ.csv",
           row.names = FALSE)
 

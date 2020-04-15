@@ -410,6 +410,9 @@ summary(atop.milsup$maxcap.democ)
 ggplot(atop.milsup, aes(x = maxcap.democ)) + geom_histogram()
 
 
-summary(atop.milsup$prop.rec)
-summary(atop.milsup$prop.comp)
-summary(atop.milsup$prop.cons)
+summary(atop.milsup$maxcap.rec)
+atop.milsup$maxcap.rec[atop.milsup$maxcap.rec == -Inf] <- 0
+summary(atop.milsup$maxcap.comp)
+atop.milsup$maxcap.comp[atop.milsup$maxcap.comp == -Inf] <- 0
+summary(atop.milsup$maxcap.cons)
+atop.milsup$maxcap.cons[atop.milsup$maxcap.cons == -Inf] <- 0
