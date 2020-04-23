@@ -51,27 +51,28 @@ plot(conditional_effects(brm.multivar,
 
 
 # create an empty list of dataframes with all the variables
-brms.data.key <- select(atop.milsup, avg.democ, econagg.dum, uncond.milsup, 
+brms.data.key <- select(atop.milsup, maxcap.democ, econagg.dum, uncond.milsup, 
                                      fp.conc.index, num.mem, wartime, asymm,
+                                     asymm.cap, non.maj.only,
                                      low.kap.sc, begyr, mean.threat) 
 
-# Create a list of dataframes 
+# Create a list of dataframes and bind them to alliance vars
 brms.data.unc <- vector(mode = "list", length = ncol(post.score[1, , ]))
 
 for(i in 1:ncol(post.score[1, , ])){
   brms.data.unc[[i]] <- cbind.data.frame(brms.data.key, post.score[1, , i]) 
-  colnames(brms.data.unc[[i]])[11] <- "latent.depth"
+  colnames(brms.data.unc[[i]])[13] <- "latent.depth"
 }
 
 # rescale depth column:
 brms.data.unc.rs <- lapply(brms.data.unc, function(data){
-  cbind.data.frame(data, (data[, 11] + 10) / (10 + max(data[, 11]) + .01))
+  cbind.data.frame(data, (data[, 13] + 10) / (10 + max(data[, 13]) + .01))
 }
 )
 
 # rename depth column
 for(i in 1:length(brms.data.unc.rs)){
-  colnames(brms.data.unc.rs[[i]])[12] <- "latent.depth.rs"
+  colnames(brms.data.unc.rs[[i]])[14] <- "latent.depth.rs"
 }
 
 # sample 500 at random for an initial run
@@ -81,7 +82,7 @@ brms.data.unc.short <- sample(brms.data.unc.rs, size = 500, replace = FALSE)
 # uses priors and formula from earlier model
 
 # depth model: update formula
-bf.depth.unc <- brmsformula(latent.depth.rs ~ avg.democ + econagg.dum + 
+bf.depth.unc <- brmsformula(latent.depth.rs ~ maxcap.democ + econagg.dum + 
                           fp.conc.index + num.mem + wartime + asymm + 
                             asymm.cap + non.maj.only + mean.threat +
                           low.kap.sc + begyr,
@@ -115,4 +116,23 @@ max(brm.multivar.unc$rhats) # maximum rhat is not problematic
 summary.brms <- summary(brm.multivar.unc)
 summary.brms
 
-# 
+
+# Plot key intervals
+color_scheme_set(scheme = "gray")
+intervals.unc <- mcmc_areas(brm.multivar.unc,
+                                pars = c("b_latentdepthrs_maxcap.democ",
+                                         "b_uncondmilsup_maxcap.democ"),
+                                prob = .9,
+                                point_est = "median"
+                                )
+intervals.unc +
+  vline_0(linetype = 2) + 
+  scale_x_continuous(limits = c(-.1, .05)) +
+  scale_y_discrete(
+    labels = c(b_latentdepthrs_maxcap.democ = "Latent Depth", 
+            b_uncondmilsup_maxcap.democ = "Unconditional Support")
+    ) +
+  ggtitle("Effect of Alliance Leader Polity") +
+  labs(x = "Estimate", y = "") +
+  theme_bw()
+ggsave("appendix/results-unc-depth.png", height = 6, width = 8)

@@ -132,9 +132,6 @@ ggsave("figures/results-democ-max.png", results.democ,
 
 
 # build out predictions for depth from the joint model ()
-# Take these off the link function scale using linkinv from betareg package
-linkinv <- function(eta) pmax(pmin(exp(-exp(-eta)), 1 - .Machine$double.eps), .Machine$double.eps)
-
 pred.depth.mcap <- predict(joint.gjrm, eq = 2,
                             type = "response", 
                             se.fit = TRUE,

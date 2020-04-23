@@ -154,6 +154,12 @@ alliance.year <- atop.cow.year %>%
     maxcap.rec = ifelse(most.cap == 1, open.rec, 0),
     maxcap.comp = ifelse(most.cap == 1, open.comp, 0),
     maxcap.cons = ifelse(most.cap == 1, exec.cons, 0),
+    
+    maxcap.party = ifelse(most.cap == 1, gwf_party, 0),
+    maxcap.military = ifelse(most.cap == 1, gwf_military, 0),
+    maxcap.personal = ifelse(most.cap == 1, gwf_personal, 0),
+    maxcap.monarchy = ifelse(most.cap == 1, gwf_monarchy, 0),
+    
     cinc.share = cinc / sum(cinc, na.rm = TRUE),
     democ.weight = polity2 * cinc.share,
     democ = ifelse(polity2 > 5, 1, 0),
@@ -188,8 +194,12 @@ alliance.year <- atop.cow.year %>%
     dem.prop = democ.count / num.mem,
     open.prop = open.count / num.mem,
     avg.democ.weight = mean(democ.weight, na.rm = TRUE),
-    max.democ.weight = max(democ.weight, na.rm = TRUE),
-    min.democ.weight = min(democ.weight, na.rm = TRUE),
+    
+    # types of autocracies 
+    maxcap.party = max(maxcap.party, na.rm = TRUE),
+    maxcap.military = max(maxcap.military, na.rm = TRUE),
+    maxcap.personal = max(maxcap.personal, na.rm = TRUE),
+    maxcap.monarchy = max(maxcap.monarchy, na.rm = TRUE),
     
     gwf.party.count = sum(gwf_party, na.rm = TRUE),
     party.prop = gwf.party.count / num.mem,
@@ -211,10 +221,9 @@ alliance.year[order(alliance.year$atopid, alliance.year$year),]
 # Create separate democracy data
 alliance.democ <- alliance.year %>% 
   select(c(atopid, dem.prop, joint.democ, avg.democ, max.democ, min.democ, 
-           avg.democ.weight, max.democ.weight, min.democ.weight,
+           avg.democ.weight, 
            max.threat, min.threat, mean.threat, 
            maxcap.democ.min, maxcap.democ.max,
-           prop.comp, prop.rec, prop.cons,
            maxcap.cons, maxcap.rec, maxcap.comp))
 write.csv(alliance.democ, "data/alliance-democ.csv",
           row.names = FALSE)

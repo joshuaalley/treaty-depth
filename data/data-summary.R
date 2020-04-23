@@ -246,25 +246,26 @@ ggsave("appendix/democ-prop-combo.png", height = 6, width = 8)
 
 ### Break out a quick look at GWF data 
 alliance.gwf.count <- filter(alliance.year, year >= 1946) %>% 
-  select(c(atopid, democ.count, 
-           gwf.party.count, gwf.military.count,
-           gwf.monarchy.count, gwf.personal.count)) %>% 
+  select(c(atopid,  
+           maxcap.party, maxcap.personal,
+           maxcap.military, maxcap.monarchy)) %>% 
   left_join(atop.milsup) %>%
   filter(offense == 1 | defense == 1) %>% 
-  select(atopid, deep.alliance, uncond.milsup, democ.count, 
-           gwf.party.count, gwf.military.count,
-           gwf.monarchy.count, gwf.personal.count)
+  select(atopid, deep.alliance, uncond.milsup, maxcap.democ, 
+           maxcap.party, maxcap.personal,
+           maxcap.military, maxcap.monarchy) %>%
+  mutate(maxcap.democ = ifelse(maxcap.democ >= 6, 1, 0)) 
 glimpse(alliance.gwf.count)
 
-# reshape long to get counts 
+# reshape long to get counts of most capable members 
 alliance.gwf.count <- alliance.gwf.count %>%
                       group_by(deep.alliance, uncond.milsup) %>%
                       summarize(
-                        democ.count = sum(democ.count, na.rm = TRUE), 
-                        gwf.party.count = sum(gwf.party.count, na.rm = TRUE), 
-                        gwf.military.count = sum(gwf.military.count, na.rm = TRUE),
-                        gwf.monarchy.count = sum(gwf.monarchy.count, na.rm = TRUE), 
-                        gwf.personal.count = sum(gwf.personal.count, na.rm = TRUE)
+                        democ.count = sum(maxcap.democ, na.rm = TRUE), 
+                        gwf.party.count = sum(maxcap.party, na.rm = TRUE), 
+                        gwf.military.count = sum(maxcap.military, na.rm = TRUE),
+                        gwf.monarchy.count = sum(maxcap.monarchy, na.rm = TRUE), 
+                        gwf.personal.count = sum(maxcap.personal, na.rm = TRUE)
                       ) %>%
                  group_by() %>%
                  pivot_longer(-c(deep.alliance, uncond.milsup), 

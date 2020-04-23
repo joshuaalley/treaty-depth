@@ -16,7 +16,7 @@ summary(key.data$latent.depth.mean.rs)
 
 
 # glm model of unconditional military support
-uncond.glm <- glm(uncond.milsup ~ maxcap.democ +
+uncond.glm <- glm(uncond.milsup ~ maxcap.democ + 
                        fp.conc.index + num.mem + wartime + asymm +
                        asymm.cap + non.maj.only + mean.threat + 
                        low.kap.sc + begyr,
