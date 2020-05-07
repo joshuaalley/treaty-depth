@@ -136,3 +136,8 @@ intervals.unc +
   labs(x = "Estimate", y = "") +
   theme_bw()
 ggsave("appendix/results-unc-depth.png", height = 6, width = 8)
+
+
+# Save model elsewhere: takes up a ton of space
+saveRDS(brm.multivar.unc, "data/brm-multivar-unc.rds")
+rm(brm.multivar.unc)
