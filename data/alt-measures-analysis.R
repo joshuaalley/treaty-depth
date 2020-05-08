@@ -257,7 +257,7 @@ plot.milinst <- ggplot(pred.milinst.democ, aes(x = maxcap.democ, y = response)) 
                     ymax = upper.res),
                 width = .1, size = 1) +
   labs(y = "Pr(High Military Institutionalization)",
-       x = "POLITY Score: Most Capable State") +
+       x = "Alliance Leader Polity Score") +
   ggtitle("Military Institutionalization") +
   theme_bw()
 plot.milinst

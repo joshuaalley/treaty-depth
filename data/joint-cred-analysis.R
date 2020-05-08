@@ -297,6 +297,10 @@ depth.formula.tri <- deep.alliance ~ maxcap.democ +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
   s(mean.threat) + low.kap.sc + s(begyr)
 
+uncond.formula.tri <- uncond.milsup ~ maxcap.democ + 
+  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
+  s(mean.threat) + low.kap.sc + s(begyr)
+
 linkage.formula <- econagg.dum ~ maxcap.democ +
   fp.conc.index + num.mem + wartime + asymm +  asymm.cap + non.maj.only +
   s(mean.threat) + low.kap.sc + s(begyr)
@@ -305,9 +309,9 @@ linkage.formula <- econagg.dum ~ maxcap.democ +
 gjrm.models.tri <- vector(mode = "list", length = length(copulas))
 
 for(i in 1:length(copulas)){
-  gjrm.models.tri[[i]]  <- gjrm(list(uncond.formula, depth.formula.tri, linkage.formula), data = key.data,
+  gjrm.models.tri[[i]]  <- gjrm(list(uncond.formula.tri, depth.formula.tri, linkage.formula), data = key.data,
                                 margins = c("probit", "probit", "probit"),
-                                Model = "T", Chol = TRUE, penCor = "lasso",
+                                Model = "T", 
                                 BivD = copulas[i]
   )
 }
@@ -353,3 +357,4 @@ plot(joint.gjrm.tri, eq = 3, seWithMean = TRUE,
 
 # switch off gjrm plots 
 dev.off()
+

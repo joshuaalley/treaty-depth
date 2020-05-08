@@ -277,7 +277,10 @@ glimpse(alliance.gwf.count)
 ggplot(alliance.gwf.count, aes(y = count, x = regime.type,
                                fill = regime.type)) +
   facet_wrap(~uncond.milsup + deep.alliance,
-     labeller = label_both) +
+     labeller = labeller(uncond.milsup = c("1" = "Unconditional", 
+                                           "0" = "Conditional"),
+                    deep.alliance = c("1" = "Deep", "0" = "Shallow"))
+     ) +
   geom_bar(stat = "identity") +
   ggtitle("Count of Regime Type Members by Alliance Treaty Design")
 
@@ -319,6 +322,9 @@ glimpse(alliance.gwf.prop)
 ggplot(alliance.gwf.prop, aes(y = prop, x = regime.type,
                                fill = regime.type)) +
   facet_wrap(~uncond.milsup + deep.alliance,
-             labeller = label_both) +
+             labeller = labeller(uncond.milsup = c("1" = "Unconditional", 
+                                                   "0" = "Conditional"),
+                                 deep.alliance = c("1" = "Deep", "0" = "Shallow"))
+  ) +
   geom_bar(stat = "identity") +
   ggtitle("Average Proportion of Regime Types by Alliance Treaty Design")

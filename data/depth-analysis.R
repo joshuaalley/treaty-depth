@@ -124,7 +124,7 @@ stargazer(list(depth.reg, depth.reg.rob, depth.reg.post19, depth.glm),
           style = "all2",
           dep.var.labels=c("Latent Depth", "Deep Alliance Dummy"),
           covariate.labels=c(
-            "Alliance Leader POLITY",
+            "Alliance Leader Polity",
             "Foreign Policy Concessions", "Number of Members",
             "Wartime Alliance", "Asymmetric Obligations",
             "Asymmetric Capability", "Non-Major Only",

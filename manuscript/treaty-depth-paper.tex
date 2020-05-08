@@ -378,23 +378,23 @@ Using ATOP's information on whether defensive or offensive promises are conditio
 
 
 The key independent variable is the democracy score of the most capable alliance members when the treaty formed. 
-I use the POLITY measure of political institutions to measure democracy, and code the alliance leader as the state with the largest CINC score \citep{SingerCINC1988}.
+I use the Polity measure of political institutions to measure democracy, and code the alliance leader as the state with the largest CINC score \citep{SingerCINC1988}.
 This measure captures domestic institution and potential sensitivity of the leading state in the alliance to audience costs and entrapment.
 It also emphasizes the influence of the most capable alliance member.\footnote{I find similar results with a model that uses the proportion of democracies as the key independent variable, which I report in the appendix. The proportion of democracies measures the prevalence of democratic membership, and it has a strong positive correlation with the democracy of the most capable member.}    
 
 
 % Justify this approach
-A common alternative measure of allied democracy is a dummy variable which is equal to one if all alliance members have a polity score greater than five.\footnote{Only 25 of the 285 alliances in my data clear this joint democracy threshold.}
+A common alternative measure of allied democracy is a dummy variable which is equal to one if all alliance members have a Polity score greater than five.\footnote{Only 25 of the 285 alliances in my data clear this joint democracy threshold.}
 I prefer the leading alliance member democracy score to this dummy for two reasons.
 First, it translates better to multilateral alliances. 
 Moreover, though alliance leader democracy and joint democracy are correlated, joint democracy is a slightly different concept. 
 I expect that domestic regimes affect alliances between democracies and non-democracies, even if such alliances are unusual \citep{Leeds1999}.
 
 
-After estimating the association between overall POLITY scores and alliance treaty design, I break the democracy measure into three components to identify the effects of different institutional features of democracy.  
-The POLITY measure combines executive recruitment, political competition and executive restraints. 
+After estimating the association between overall Polity scores and alliance treaty design, I break the democracy measure into three components to identify the effects of different institutional features of democracy.  
+The Polity measure combines executive recruitment, political competition and executive restraints. 
 To examine each separately, I created three dummy variables, one for each concept. 
-The first dummy is equal to one if POLITY codes the most capable state as having competitive elections for leadership.
+The first dummy is equal to one if Polity codes the most capable state as having competitive elections for leadership.
 The second dummy equals one if the most capable state has open political competition and the third dummy codes alliances where the most capable state has executive parity/subordination with one. 
 After presenting the aggregate democracy results, I show inferences from a model with these three dummies as the key independent variables.
 
@@ -457,24 +457,24 @@ I fund that executive constraints increase the probability of unconditional mili
 
 
 Descriptive statistics are consistent with the two hypotheses.
-On average, unconditional alliance leaders have lower polity scores.
-The average alliance leader polity score among alliances with unconditional military support is -2.55. 
-The average leader polity score in alliances with conditional obligations is -.24.\footnote{Based on a t-test, the difference between these values is statistically significant.} 
-There is also a modest positive correlation between alliance leader polity scores at the time of formation and treaty depth. 
+On average, unconditional alliance leaders have lower Polity scores.
+The average alliance leader Polity score among alliances with unconditional military support is -2.55. 
+The average leader Polity score in alliances with conditional obligations is -.24.\footnote{Based on a t-test, the difference between these values is statistically significant.} 
+There is also a modest positive correlation between alliance leader Polity scores at the time of formation and treaty depth. 
 
 
 % plot averages by group
-\autoref{fig:democ-combo} shows how the average polity score of the most capable member when the alliance formed differs across conditions on military support and treaty depth.
+\autoref{fig:democ-combo} shows how the average Polity score of the most capable member when the alliance formed differs across conditions on military support and treaty depth.
 In \autoref{fig:democ-combo}, each quadrant corresponds to a combination of treaty depth and conditionality. 
 To divide the latent depth measure, I classified deep alliances as treaties with a latent depth score above the median value. 
-The leading members of deep and conditional alliances have higher polity scores. 
-Conversely, unconditional alliances with little depth have the lowest average polity scores. 
+The leading members of deep and conditional alliances have higher Polity scores. 
+Conversely, unconditional alliances with little depth have the lowest average Polity scores. 
 
 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.95\textwidth]{../figures/democ-combo.png}
-\caption{Average of the most capable alliance member's polity score when the alliance formed in four groups of alliance from 1816 to 2016. Divisions between alliances based on unconditional military support and treaty depth. Darker quadrants mark a higher average democracy score for that group of alliances, and the text in each box gives the precise value.}
+\caption{Average of the most capable alliance member's Polity score when the alliance formed in four groups of alliance from 1816 to 2016. Divisions between alliances based on unconditional military support and treaty depth. Darker quadrants mark a higher average democracy score for that group of alliances, and the text in each box gives the precise value.}
 \label{fig:democ-combo}
 \end{figure}
 
@@ -499,7 +499,7 @@ For unconditional military support, the parameter estimate is negative, but the 
 \\[-1.8ex] & \textit{beta} & \textit{probit} \\ 
 \\[-1.8ex] & (1) & (2)\\ 
 \hline \\[-1.8ex] 
-  Most Capable Member POLITY & 0.023$^{}$ & $-$0.018 \\ 
+  Alliance Leader Polity & 0.023$^{}$ & $-$0.018 \\ 
   & (0.002, 0.043) & ($-$0.047, 0.011) \\ 
   Foreign Policy Concessions & $-$0.057 & 0.021 \\ 
   & ($-$0.209, 0.096) & ($-$0.197, 0.239) \\ 
@@ -532,7 +532,7 @@ Log Likelihood & 54.349 & $-$132.467 \\
 
 
 Based on the coefficient estimates in \autoref{tab:separate-models}, I assess the substantive impact of allied democracy in \autoref{fig:results-democ-max}.
-This figure plots the estimated marginal effect of the alliance leader's polity score on both outcomes. 
+This figure plots the estimated marginal effect of the alliance leader's Polity score on both outcomes. 
 The left-hand plot of \autoref{fig:results-democ-max} shows the association between the democracy of the most capable alliance member and the predicted probability of unconditional military support. 
 This relationship is weaker than expected.  
 These results diverge from previous findings that democratic alliance membership leads to limited obligations \citep{Mattes2012, Chibaetal2015}.
@@ -571,7 +571,7 @@ Last, threat and the year of alliance formation increase unconditional military 
   & \multicolumn{2}{c}{Uncond. Mil. Support} & \multicolumn{2}{c}{Latent Depth}\\ \hline
   & Estimate & Std. Error & Estimate & Std. Error \\ 
   \hline
-  Most Capable POLITY & -0.0173979 & 0.0158094 & 0.0262429 & 0.0097732 \\ 
+  Alliance Leader Polity & -0.0173979 & 0.0158094 & 0.0262429 & 0.0097732 \\ 
   Economic Issue Linkage & 0.2232389 & 0.2006227 & -0.0060972 & 0.1458203 \\ 
   FP Concessions & -0.1468542 & 0.1214414 & -0.0339923 & 0.0845875 \\ 
   Number of Members & -0.0994788 & 0.0264666 & 0.0179032 & 0.0129499 \\ 
@@ -596,13 +596,13 @@ Last, threat and the year of alliance formation increase unconditional military 
 
 I make similar inferences about democracy and treaty design with univariate and bivariate models.
 Inferences about the control variables vary somewhat across the two models, so accounting for correlated errors is worthwhile.   
-I find that the polity score of the most capable alliance member is positively correlated with treaty depth, and has a slight negative association with unconditional military support.
+I find that the Polity score of the most capable alliance member is positively correlated with treaty depth, and has a slight negative association with unconditional military support.
 
 
 \subsection{Elections, Political Competition and Executive Constraints} 
 
 
-Having analyzed cumulative democracy scores, I now turn to a model that distinguishes between the different parts of the POLITY index. 
+Having analyzed cumulative democracy scores, I now turn to a model that distinguishes between the different parts of the Polity index. 
 The key independent variables in this model are dummy indicators of competitive elections, open political competition, and executive constraint through parity or subordination to other actors. 
 All three of these factors could contribute to audience costs by exposing leaders to adverse reactions to foreign policy actions. 
 I use a bivariate GJRM model to assess this relationship.\footnote{A T copula has the best model fit and AIC.} 

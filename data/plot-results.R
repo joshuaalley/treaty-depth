@@ -8,7 +8,7 @@ stargazer(list(beta.reg.depth, uncond.glm),
           style = "all2",
           dep.var.labels=c("Latent Depth (rescaled)","Unconditional Military Support"),
           covariate.labels=c(
-            "Polity Score of Most Capable Member",
+            "Alliance Leader Polity Score",
             "Foreign Policy Concessions", "Number of Members",
             "Wartime Alliance", "Asymmetric Obligations",
             "Asymmetric Capability", "Non-Major Only",
@@ -35,7 +35,7 @@ summary.depth.gjrm[["tableP2"]] # depth
 uncond.tab <- as.data.frame(rbind(summary.depth.gjrm[["tableP1"]][, 1:2],
                                   summary.depth.gjrm[["tableNP1"]][, c(1, 3)]
 ))
-uncond.tab$variable <- c("(Intercept)",  "Most Capable POLITY", "Economic Issue Linkage", 
+uncond.tab$variable <- c("(Intercept)",  "Alliance Leader Polity", "Economic Issue Linkage", 
                          "FP Concessions", "Number of Members", 
                          "Wartime Alliances", "Asymmetric Obligations",
                          "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
@@ -46,7 +46,7 @@ uncond.tab$variable <- c("(Intercept)",  "Most Capable POLITY", "Economic Issue 
 depth.tab <- as.data.frame(rbind(summary.depth.gjrm[["tableP2"]][, 1:2],
                                  summary.depth.gjrm[["tableNP2"]][, c(1, 3)]
 ))
-depth.tab$variable <- c("(Intercept)", "Most Capable POLITY", "Economic Issue Linkage",
+depth.tab$variable <- c("(Intercept)", "Alliance Leader POLITY", "Economic Issue Linkage",
                         "FP Concessions", "Number of Members", 
                         "Wartime Alliances", "Asymmetric Obligations",
                         "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
@@ -81,18 +81,18 @@ print(
 ### Predictions from model with polity of most capable state
 
 sim.data.mcap <- cbind.data.frame(
-  x0 = rep(1, n = 2), # intercept
-  maxcap.democ = c(-10, 0, 10),
-  econagg.dum = rep(0, n = 3),
-  fp.conc.index = rep(0, n = 3), # no concessions
-  num.mem = rep(2, n = 3), # bilateral
-  wartime = rep(0, n = 3), # peacetime
-  asymm = rep(0, n = 3), # symmetric obligations
-  asymm.cap = rep(1, n = 3), # asymmetric cap
-  non.maj.only = rep(0, n = 3),
-  mean.threat = rep(median(key.data$mean.threat), n = 3),
-  low.kap.sc = rep(median(key.data$low.kap.sc), n = 3),
-  begyr = rep(median(key.data$begyr), n = 3)
+  x0 = rep(1, n = 21), # intercept
+  maxcap.democ = seq(-10, 10, by = 1),
+  econagg.dum = rep(0, n = 21),
+  fp.conc.index = rep(0, n = 21), # no concessions
+  num.mem = rep(2, n = 21), # bilateral
+  wartime = rep(0, n = 21), # peacetime
+  asymm = rep(0, n = 21), # symmetric obligations
+  asymm.cap = rep(1, n = 21), # asymmetric cap
+  non.maj.only = rep(0, n = 21),
+  mean.threat = rep(median(key.data$mean.threat), n = 21),
+  low.kap.sc = rep(median(key.data$low.kap.sc), n = 21),
+  begyr = rep(median(key.data$begyr), n = 21)
 )
 glimpse(sim.data.mcap)
 
@@ -159,7 +159,7 @@ plot.depth <- ggplot(pred.depth.mcap, aes(x = maxcap.democ, y = response)) +
                     ymax = upper.res),
                     width = .1, size = 1) +
                labs(y = "Rescaled Latent Depth",
-                    x = "POLITY Score: Most Capable State") +
+                    x = "Alliance Leader Polity") +
                theme_bw()
 plot.depth
 
@@ -191,8 +191,8 @@ plot.uncond <- ggplot(pred.uncond.mcap, aes(x = maxcap.democ, y = response)) +
   geom_errorbar(aes(ymin = lower.res,
                     ymax = upper.res),
                 width = .1, size = 1) +
-  labs(y = "Predicted Probability of Unconditional Military Support",
-       x = "POLITY Score: Most Capable State") +
+  labs(y = "Predicted Pr(Unconditional Military Support)",
+       x = "Alliance Leader Polity") +
   theme_bw()
 plot.uncond
 
@@ -530,3 +530,126 @@ ggsave("appendix/results-error.png", results.error,
        height = 6, width = 8) #save file
 
 
+
+### summarize results from a trivariate model
+
+# new data for simulation
+sim.data.tri <- cbind.data.frame(
+  x0 = rep(1, n = 21), # intercept
+  maxcap.democ = seq(-10, 10, by = 1),
+  fp.conc.index = rep(0, n = 21), # no concessions
+  num.mem = rep(2, n = 21), # bilateral
+  wartime = rep(0, n = 21), # peacetime
+  asymm = rep(0, n = 21), # symmetric obligations
+  asymm.cap = rep(1, n = 21), # asymmetric cap
+  non.maj.only = rep(0, n = 21),
+  mean.threat = rep(median(key.data$mean.threat), n = 21),
+  low.kap.sc = rep(median(key.data$low.kap.sc), n = 21),
+  begyr = rep(median(key.data$begyr), n = 21)
+)
+
+# start with treaty depth
+pred.depth.tri <- predict(joint.gjrm.tri, eq = 2,
+                            type = "response", 
+                            se.fit = TRUE,
+                            newdata = sim.data.tri)
+
+pred.depth.tri <- cbind.data.frame(pred.depth.tri$fit, 
+                                     pred.depth.tri$se.fit,
+                                     sim.data.tri$maxcap.democ)
+colnames(pred.depth.tri) <- c("pred", "se", "maxcap.democ")
+
+# calculate lower and upper bounds of 95% CI
+pred.depth.tri$lower <- pred.depth.tri$pred - 2*pred.depth.tri$se
+pred.depth.tri$upper <- pred.depth.tri$pred + 2*pred.depth.tri$se
+
+# get predictions and unc back on response scale
+pred.depth.tri$response <- linkinv(pred.depth.tri$pred)
+pred.depth.tri$lower.res <- linkinv(pred.depth.tri$lower)
+pred.depth.tri$upper.res <- linkinv(pred.depth.tri$upper)
+
+
+depth.plot.tri <- ggplot(pred.depth.tri, aes(x = maxcap.democ, y = response)) +
+                     geom_point(size = 2) +
+                     geom_errorbar(aes(ymin = lower.res,
+                      ymax = upper.res),
+                      width = .1, size = 1) +
+                     labs(y = "",
+                       x = "Alliance Leader Polity") +
+                     ggtitle("Deep Alliance") +
+                     theme_bw()
+depth.plot.tri
+
+
+# Now for unconditional military support
+pred.uncond.tri <- predict(joint.gjrm.tri, eq = 1,
+                          type = "response", 
+                          se.fit = TRUE,
+                          newdata = sim.data.tri)
+
+pred.uncond.tri <- cbind.data.frame(pred.uncond.tri$fit, 
+                                   pred.uncond.tri$se.fit,
+                                   sim.data.tri$maxcap.democ)
+colnames(pred.uncond.tri) <- c("pred", "se", "maxcap.democ")
+
+# calculate lower and upper bounds of 95% CI
+pred.uncond.tri$lower <- pred.uncond.tri$pred - 2*pred.uncond.tri$se
+pred.uncond.tri$upper <- pred.uncond.tri$pred + 2*pred.uncond.tri$se
+
+# get predictions and unc back on response scale
+pred.uncond.tri$response <- linkinv(pred.uncond.tri$pred)
+pred.uncond.tri$lower.res <- linkinv(pred.uncond.tri$lower)
+pred.uncond.tri$upper.res <- linkinv(pred.uncond.tri$upper)
+
+
+uncond.plot.tri <- ggplot(pred.uncond.tri, aes(x = maxcap.democ, y = response)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = lower.res,
+                    ymax = upper.res),
+                width = .1, size = 1) +
+  labs(y = "",
+       x = "Alliance Leader Polity") +
+  ggtitle("Uncond. Support") +
+  theme_bw()
+uncond.plot.tri
+
+
+# Last, issue linkages
+pred.issue.tri <- predict(joint.gjrm.tri, eq = 3,
+                           type = "response", 
+                           se.fit = TRUE,
+                           newdata = sim.data.tri)
+
+pred.issue.tri <- cbind.data.frame(pred.issue.tri$fit, 
+                                    pred.issue.tri$se.fit,
+                                    sim.data.tri$maxcap.democ)
+colnames(pred.issue.tri) <- c("pred", "se", "maxcap.democ")
+
+# calculate lower and upper bounds of 95% CI
+pred.issue.tri$lower <- pred.issue.tri$pred - 2*pred.issue.tri$se
+pred.issue.tri$upper <- pred.issue.tri$pred + 2*pred.issue.tri$se
+
+# get predictions and unc back on response scale
+pred.issue.tri$response <- linkinv(pred.issue.tri$pred)
+pred.issue.tri$lower.res <- linkinv(pred.issue.tri$lower)
+pred.issue.tri$upper.res <- linkinv(pred.issue.tri$upper)
+
+
+issue.plot.tri <- ggplot(pred.issue.tri, aes(x = maxcap.democ, y = response)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = lower.res,
+                    ymax = upper.res),
+                width = .1, size = 1) +
+  labs(y = "",
+       x = "Alliance Leader Polity") +
+  ggtitle("Issue Linkage") +
+  theme_bw()
+issue.plot.tri
+
+# joint.plot
+grid.arrange(depth.plot.tri, uncond.plot.tri, issue.plot.tri,
+             ncol = 3)
+results.tri <- arrangeGrob(depth.plot.tri, uncond.plot.tri, issue.plot.tri,
+                             ncol = 3)
+ggsave("appendix/pred-trivar.png", results.tri,
+       height = 6, width = 8) #save file
