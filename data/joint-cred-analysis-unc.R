@@ -138,6 +138,14 @@ intervals.unc +
 ggsave("appendix/results-unc-depth.png", height = 6, width = 8)
 
 
+# Calculate posterior probabilities
+coefs.unc <- extract(brm.multivar.unc$fit, pars = 
+                       c("b_latentdepthrs_maxcap.democ",
+                         "b_uncondmilsup_maxcap.democ"))
+
+mean(coefs.unc$b_latentdepthrs_maxcap.democ > 0)
+mean(coefs.unc$b_uncondmilsup_maxcap.democ < 0)
+
 # Save model elsewhere: takes up a ton of space
 saveRDS(brm.multivar.unc, "data/brm-multivar-unc.rds")
 rm(brm.multivar.unc)

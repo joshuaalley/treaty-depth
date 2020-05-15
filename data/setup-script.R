@@ -15,6 +15,7 @@ library(coefplot)
 library(betareg)
 library(brms)
 library(bayesplot)
+library(rstan)
 library(sjstats)
 library(arm)
 library(bfa)
@@ -53,9 +54,9 @@ conflict_prefer("lmList", "nlme")
 conflict_prefer("s", "mgcv") 
 conflict_prefer("combine", "dplyr")
 conflict_prefer("ar", "brms")
+conflict_prefer("extract", "rstan")
 
 # Set up RSTAN guidelines
-rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 
