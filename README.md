@@ -1,3 +1,5 @@
 # treaty-depth
 
-This repository contains data and the manuscript for an in-progress manuscript on the sources of depth in alliance treaties. In this paper, I build on [another paper](https://github.com/joshuaalley/arms-allies) showing how depth modifies the impact of alliance participation on military spending. 
+This repository contains data and the manuscript for an in-progress manuscript on the sources of depth in alliance treaties. I argue that states use depth to manage entrapment risk while still adding credibility to their alliance obligations. To understand depth better, I compare it with unconditional military support, which tends to raise entrapment and audience costs. Because democracies have more audience cost concerns, I expect that they will design deep alliances with conditional promises of military support. A wide range of models finds consistent evidence that democracies design deeper alliances, along with mixed evidence about democracy and conditional obligations. 
+
+The folder contains multiple scripts, which only work in the context of a project. Start with `setup-script.R` then run `alliance-democ.R`, followed by `alliance-measures.R`. These three scripts create the dataset for analysis. After this, run any of the analysis scripts as needed, but only run `plot-results.R` after running the analysis scripts. 
