@@ -105,7 +105,7 @@ plot.depth.sep <- ggplot(margins.beta, aes(x = x, y = predicted)) +
                    geom_ribbon(aes(ymin = conf.low, ymax = conf.high), 
                                alpha = .1) +
                   labs(x = "Alliance Leader Democracy",
-                       y = "Predicted Marginal Effect on Treaty Depth") +
+                       y = "Predicted Treaty Depth") +
                    theme_bw()
 plot.depth.sep
 
@@ -118,7 +118,7 @@ plot.uncond.sep <- ggplot(margins.uncond, aes(x = x, y = predicted)) +
                     geom_ribbon(aes(ymin = conf.low, ymax = conf.high),
                                 alpha = .1) +
                     labs(x = "Alliance Leader Democracy",
-                    y = "Predicted Marginal Effect on Pr(Unconditional Support)") +
+                    y = "Predicted Probability of Unconditional Support") +
                     theme_bw()
 plot.uncond.sep
 
@@ -463,7 +463,7 @@ plot.uncond.prop <- ggplot(pred.uncond.prop, aes(x = dem.prop, y = pred)) +
                   ymax = (pred + 2*se) 
   ), alpha = .5
   ) +
-  labs(x = "Proportion of Democracies", y = "Predicted Probability") +
+  labs(x = "Proportion of Democracies", y = "Change in Predicted Probability") +
   ggtitle("Unconditional Military Support") +
   theme_bw()
 plot.uncond.prop

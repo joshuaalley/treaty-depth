@@ -284,9 +284,6 @@ ggplot(alliance.gwf.count, aes(y = count, x = regime.type,
   geom_bar(stat = "identity") +
   ggtitle("Count of Regime Type Members by Alliance Treaty Design")
 
-#              labeller= labeller(uncond.milsup = c("Unconditional", "Conditional"),
-# deep.alliance = c("Deep", "Shallow")
-
 
 
 # Break out a quick look at GWF data w/ proportions
