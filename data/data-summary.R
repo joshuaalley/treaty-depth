@@ -1,5 +1,4 @@
-# Joshua Alley
-# Texas A&M University 
+# Joshua Alley & Matthew Fuhrmann
 # Exploratory plots 
 
 
@@ -27,10 +26,10 @@ depth.scatter
 
 # Uncoditional military support
 table(atop.milsup$uncond.milsup)
-t.test(atop.milsup$maxcap.democ ~ atop.milsup$uncond.milsup)
+table(atop.milsup$maxcap.rec, atop.milsup$uncond.milsup)
 
 # correlation between democracy and depth
-cor.test(atop.milsup$maxcap.democ, atop.milsup$latent.depth.mean, na.rm = TRUE)
+t.test(atop.milsup$latent.depth.mean ~ atop.milsup$maxcap.rec, na.rm = TRUE)
 
 ggplot(atop.milsup, aes(x = maxcap.democ, y = latent.depth.mean)) + 
   geom_point() + geom_smooth(method = "lm") +
@@ -195,9 +194,8 @@ ggplot(atop.milsup, aes(x = dem.prop)) +
 atop.democ.group <- atop.milsup %>%
                     group_by(deep.alliance, uncond.milsup) %>%
                      summarize(
-                       avg.dem.prop = mean(dem.prop, na.rm = TRUE),
-                       avg.maxcap.dem = mean(maxcap.democ, na.rm = TRUE),
-                      
+                       avg.prop.open = mean(prop.open, na.rm = TRUE),
+                       avg.open = mean(maxcap.open, na.rm = TRUE)
                      )
 
 
@@ -205,17 +203,18 @@ atop.democ.group <- atop.milsup %>%
 ggplot(data = atop.democ.group, 
                         aes(y = as.factor(deep.alliance), 
                             x = as.factor(uncond.milsup), 
-                            fill = avg.maxcap.dem)) + 
+                            fill = avg.open)) + 
   geom_tile(color = "white") +
   scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
                        space = "Lab", 
-                       name = "Avg. Polity Score") +
+                       name = "Average \n Alliance Leader \n Electoral Competition"
+                    ) +
   labs(y = "Treaty Depth", x = "Military Support") +
   scale_y_discrete(labels = c("Shallow Alliance", "Deep Alliance")) + 
   scale_x_discrete(labels = c("Conditional", "Unconditional")) +
   theme_bw() + coord_fixed() +
   geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
-                label = round(avg.maxcap.dem, digits = 2)),
+                label = round(avg.open, digits = 2)),
             color = "black", size = 6) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12))
@@ -226,17 +225,17 @@ ggsave("figures/democ-combo.png", height = 6, width = 8)
 ggplot(data = atop.democ.group, 
        aes(y = as.factor(deep.alliance), 
            x = as.factor(uncond.milsup), 
-           fill = avg.dem.prop)) + 
+           fill = avg.prop.open)) + 
   geom_tile(color = "white") +
   scale_fill_gradient2(low = "#FFFFFF", mid = "#999999", high = "#333333", 
                        space = "Lab", 
-                       name = "Avg. Dem. Proportion") +
+                       name = "Avg. Share of Members \n with Open Electoral\n Competition") +
   labs(y = "Treaty Depth", x = "Military Support") +
   scale_y_discrete(labels = c("Shallow Alliance", "Deep Alliance")) + 
   scale_x_discrete(labels = c("Conditional", "Unconditional")) +
   theme_bw() + coord_fixed() +
   geom_text(aes(y = as.factor(deep.alliance), x = as.factor(uncond.milsup), 
-                label = round(avg.dem.prop, digits = 2)),
+                label = round(avg.prop.open, digits = 2)),
             color = "black", size = 6) +
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12))

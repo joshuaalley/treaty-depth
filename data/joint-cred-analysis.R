@@ -7,57 +7,78 @@
 # Set up unique dataframe
 key.data <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
                    fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                   low.kap.sc, begyr, asymm.cap, mean.threat, maxcap.democ, 
-                   dem.prop, joint.democ, avg.democ, maxcap.democ,
-                   maxcap.rec, maxcap.comp, maxcap.cons) %>%
+                   low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.democ, 
+                   dem.prop, joint.democ, avg.democ, maxcap.democ, maxcap.open,
+                   maxcap.rec, maxcap.comp, maxcap.cons, us.mem) %>%
             drop_na()
 key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
 summary(key.data$latent.depth.mean.rs)
-
+table(key.data$maxcap.open)
+table(key.data$maxcap.rec, key.data$maxcap.comp)
+table(key.data$maxcap.rec, key.data$maxcap.cons)
+table(key.data$maxcap.cons, key.data$maxcap.comp)
 
 # glm model of unconditional military support
-uncond.glm <- glm(uncond.milsup ~ maxcap.democ + 
+# full democ
+uncond.glm.dem <- glm(uncond.milsup ~ 
+                    maxcap.democ + econagg.dum + 
+                    fp.conc.index + num.mem + wartime + asymm +
+                    asymm.cap + non.maj.only + mean.threat + 
+                    low.kap.sc + post45,
+                  family = binomial(link = "probit"),
+                  data = key.data)
+summary(uncond.glm.dem)
+
+# glm model of unconditional military support
+uncond.glm <- glm(uncond.milsup ~ 
+                       maxcap.cons + maxcap.open + 
+                       econagg.dum + 
                        fp.conc.index + num.mem + wartime + asymm +
                        asymm.cap + non.maj.only + mean.threat + 
-                       low.kap.sc + begyr,
+                       low.kap.sc + post45,
                      family = binomial(link = "probit"),
                      data = key.data)
 summary(uncond.glm)
 
 
 # glm model of economic issue linkages
-linkage.glm <- glm(econagg.dum ~ maxcap.democ +
+linkage.glm <- glm(econagg.dum ~ 
+                     maxcap.cons + maxcap.open +
                     fp.conc.index + num.mem + wartime + asymm +  
                      asymm.cap + non.maj.only + mean.threat +
-                    low.kap.sc + begyr,
+                    low.kap.sc + post45,
                   family = binomial(link = "probit"),
                   data = key.data)
 summary(linkage.glm)
 
 
 # Use a beta regression with rescaled depth 
-beta.reg.depth <- betareg(latent.depth.mean.rs ~ maxcap.democ + 
+beta.reg.depth <- betareg(latent.depth.mean.rs ~ 
+                            maxcap.cons + maxcap.open +
+                            econagg.dum + 
                             fp.conc.index + num.mem + wartime + asymm + 
                             asymm.cap + non.maj.only + 
-                            mean.threat + low.kap.sc + begyr, data = key.data)
+                            mean.threat + low.kap.sc + post45, data = key.data)
 summary(beta.reg.depth)
 
 
 ### Joint analysis of unconditional military support and depth
 # use GJRM, as it allows for correlated errors
 
-### Fit a model with democracy scores of most capable member
+### Fit a model with democratic instituions of most capable member
 
-uncond.formula <- uncond.milsup ~ maxcap.democ + econagg.dum + 
+uncond.formula <- uncond.milsup ~ maxcap.cons + maxcap.open +
+  econagg.dum + 
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
-depth.formula <- latent.depth.mean.rs ~ maxcap.democ + econagg.dum +
+depth.formula <- latent.depth.mean.rs ~ maxcap.cons + maxcap.open +
+  econagg.dum +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
 # model the dependence between the error terms as a function of start year
-theta.formula <- ~ s(begyr)
+theta.formula <- ~ s(begyr) + maxcap.cons + maxcap.open 
 eq.sigma <- ~ 1
 
 
@@ -84,8 +105,8 @@ aic.gjrm <- lapply(gjrm.models, AIC)
 aic.gjrm
 
 # NB for interpretation: smoothed terms
-copulas[18] 
-joint.gjrm <- gjrm.models[[18]] 
+copulas[17] 
+joint.gjrm <- gjrm.models[[17]] 
 conv.check(joint.gjrm)
 
 AIC(joint.gjrm)
@@ -103,186 +124,62 @@ plot(joint.gjrm, eq = 4, seWithMean = TRUE,
 
 
 
-### fit a model with democratic proportion
 
-# glm model of unconditional military support
-uncond.glm.prop <- glm(uncond.milsup ~ dem.prop +
-                    fp.conc.index + num.mem + wartime + asymm +
-                    asymm.cap + non.maj.only + mean.threat + 
-                    low.kap.sc + begyr,
-                  family = binomial(link = "probit"),
-                  data = key.data)
-summary(uncond.glm.prop)
-
-
-# glm model of economic issue linkages
-linkage.glm.prop <- glm(econagg.dum ~ dem.prop +
-                     fp.conc.index + num.mem + wartime + asymm +  
-                     asymm.cap + non.maj.only + mean.threat +
-                     low.kap.sc + begyr,
-                   family = binomial(link = "probit"),
-                   data = key.data)
-summary(linkage.glm.prop)
-
+### Model process with aggregate indicator
 
 # Use a beta regression with rescaled depth 
-beta.reg.depth.prop <- betareg(latent.depth.mean.rs ~ dem.prop +
+beta.reg.depth.agg <- betareg(latent.depth.mean.rs ~ 
+                            maxcap.democ + econagg.dum +
                             fp.conc.index + num.mem + wartime + asymm + 
                             asymm.cap + non.maj.only + 
-                            mean.threat + low.kap.sc + begyr, data = key.data)
-summary(beta.reg.depth.prop)
-
-
-
-
-
-# set up model formulas 
-uncond.formula.prop <- uncond.milsup ~ s(dem.prop) + econagg.dum + 
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap +
-  s(mean.threat) + low.kap.sc + s(begyr)
-
-
-depth.formula.prop <- latent.depth.mean.rs ~ s(dem.prop) + econagg.dum +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
-  s(mean.threat) + low.kap.sc + s(begyr)
-
-
-# Create a list of models
-gjrm.models.prop <- vector(mode = "list", length = length(copulas))
-
-# Same model: probit and beta margins 
-for(i in 1:length(copulas)){
-  gjrm.models.prop[[i]]  <- gjrm(list(uncond.formula.prop, depth.formula.prop,
-                                     eq.sigma, theta.formula), data = key.data,
-                                margins = c("probit", "BE"),
-                                Model = "B",
-                                BivD = copulas[i]
-  )
-}
-aic.gjrm.prop <- lapply(gjrm.models.prop, AIC)
-aic.gjrm.prop
-
-# examine the results: 
-copulas[1] # copula that minimizes AIC and has best convergence
-joint.gjrm.prop <- gjrm.models.prop[[1]] 
-conv.check(joint.gjrm.prop)
-AIC(joint.gjrm.prop)
-summary(joint.gjrm.prop)
-
-
-# plot all smoothed terms 
-plot(joint.gjrm.prop, eq = 1, seWithMean = TRUE,
-     shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.prop, eq = 2, seWithMean = TRUE,
-     shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.prop, eq = 4, seWithMean = TRUE,
-     shade = TRUE, pages = 1) # smoothed terms 
-
-
-# Democracy smooths
-# uncond milsup
-plot(joint.gjrm.prop, eq = 1, seWithMean = TRUE,
-     shade = TRUE, select = 1,
-     xlab = "Proportion Democracies"
-)
-abline(h = 0)
-
-# Depth
-plot(joint.gjrm.prop, eq = 2, seWithMean = TRUE,
-     shade = TRUE, select = 1,
-     xlab = "Proportion Democracies"
-)
-abline(h = 0)
-
-
-
-
-
-
-
-### Model process with split democracy indicators
-
-# Interaction syntax for triple is:
-# maxcap.rec:maxcap.comp + maxcap.rec:maxcap.cons + maxcap.cons:maxcap.comp +
-# maxcap.rec:maxcap.comp:maxcap.cons +
-# doesn't work- singular fit at times
-
-# glm model of unconditional military support
-uncond.glm.split <- glm(uncond.milsup ~ 
-                    maxcap.rec + maxcap.comp + maxcap.cons +
-                    fp.conc.index + num.mem + wartime + asymm +
-                    asymm.cap + non.maj.only + mean.threat + 
-                    low.kap.sc + begyr,
-                  family = binomial(link = "probit"),
-                  data = key.data)
-summary(uncond.glm.split)
-
-
-# glm model of economic issue linkages
-linkage.glm.split <- glm(econagg.dum ~ 
-                     maxcap.rec + maxcap.comp + maxcap.cons +
-                     fp.conc.index + num.mem + wartime + asymm +  
-                     asymm.cap + non.maj.only + mean.threat +
-                     low.kap.sc + begyr,
-                   family = binomial(link = "probit"),
-                   data = key.data)
-summary(linkage.glm.split)
-
-
-# Use a beta regression with rescaled depth 
-beta.reg.depth.split <- betareg(latent.depth.mean.rs ~ 
-                            maxcap.rec + maxcap.comp + maxcap.cons +
-                            fp.conc.index + num.mem + wartime + asymm + 
-                            asymm.cap + non.maj.only + 
-                            mean.threat + low.kap.sc + begyr, data = key.data)
-summary(beta.reg.depth.split)
+                            mean.threat + low.kap.sc + post45, data = key.data)
+summary(beta.reg.depth.agg)
 
 
 
 # joint model
-uncond.formula.split <- uncond.milsup ~ maxcap.rec + maxcap.comp + maxcap.cons +
+uncond.formula.agg <- uncond.milsup ~ maxcap.democ +
   econagg.dum + 
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
-depth.formula.split <- latent.depth.mean.rs ~ maxcap.rec + maxcap.comp + maxcap.cons + 
+depth.formula.agg <- latent.depth.mean.rs ~ maxcap.democ + 
   econagg.dum +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
 
 # Create a list of models
-gjrm.models.split <- vector(mode = "list", length = length(copulas))
+gjrm.models.agg <- vector(mode = "list", length = length(copulas))
 
 # FISK (log-logistic), inverse gaussian, Dagum and beta distributions are best
 # in terms of residual fit
 # Beta has the lowest AIC.
 for(i in 1:length(copulas)){
-  gjrm.models.split[[i]]  <- gjrm(list(uncond.formula.split, depth.formula.split,
-                                      eq.sigma, theta.formula), 
+  gjrm.models.agg[[i]]  <- gjrm(list(uncond.formula, depth.formula), 
                                  data = key.data,
                                  margins = c("probit", "BE"),
                                  Model = "B",
                                  BivD = copulas[i]
   )
 }
-aic.gjrm.split <- lapply(gjrm.models.split, AIC)
-aic.gjrm.split
+aic.gjrm.agg <- lapply(gjrm.models.agg, AIC)
+aic.gjrm.agg
 
 # NB for interpretation: smoothed terms
-copulas[17] 
-joint.gjrm.split <- gjrm.models.split[[17]] 
-conv.check(joint.gjrm.split)
-AIC(joint.gjrm.split)
-summary(joint.gjrm.split)
+copulas[6] 
+joint.gjrm.agg <- gjrm.models.agg[[6]] 
+conv.check(joint.gjrm.agg)
+AIC(joint.gjrm.agg)
+summary(joint.gjrm.agg)
 
 
 # Plot smooths
-plot(joint.gjrm.split, eq = 1, seWithMean = TRUE,
+plot(joint.gjrm.agg, eq = 1, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.split, eq = 2, seWithMean = TRUE,
+plot(joint.gjrm.agg, eq = 2, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.split, eq = 4, seWithMean = TRUE,
+plot(joint.gjrm.agg, eq = 4, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
 
 
@@ -291,19 +188,20 @@ plot(joint.gjrm.split, eq = 4, seWithMean = TRUE,
 
 ### Trivariate model with issue linkages
 # model is not fitting well: no variation with different copulas
-# and theta estimates are poor 
-# can only get it to fit with Cholesky method for covariance matrix
-depth.formula.tri <- deep.alliance ~ maxcap.democ + 
+depth.formula.tri <- deep.alliance ~ 
+  maxcap.open + maxcap.cons +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
-  s(mean.threat) + low.kap.sc + s(begyr)
+  mean.threat + low.kap.sc + begyr
 
-uncond.formula.tri <- uncond.milsup ~ maxcap.democ + 
+uncond.formula.tri <- uncond.milsup ~ 
+  maxcap.open + maxcap.cons +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
-  s(mean.threat) + low.kap.sc + s(begyr)
+  mean.threat + low.kap.sc + post45
 
-linkage.formula <- econagg.dum ~ maxcap.democ +
+linkage.formula <- econagg.dum ~
+  maxcap.open + maxcap.cons +
   fp.conc.index + num.mem + wartime + asymm +  asymm.cap + non.maj.only +
-  s(mean.threat) + low.kap.sc + s(begyr)
+  mean.threat + low.kap.sc + post45
 
 # Create a list of models
 gjrm.models.tri <- vector(mode = "list", length = length(copulas))
@@ -316,7 +214,6 @@ for(i in 1:length(copulas)){
   )
 }
 lapply(gjrm.models.tri, AIC)
-lapply(gjrm.models.tri, conv.check)
 
 # No difference in AIC or convergence across these models
 copulas[1]
@@ -325,34 +222,6 @@ conv.check(joint.gjrm)
 AIC(joint.gjrm.tri)
 summary(joint.gjrm.tri)
 
-
-
-# Plot smooths
-plot(joint.gjrm.tri, eq = 1, seWithMean = TRUE,
-     shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.tri, eq = 2, seWithMean = TRUE,
-     shade = TRUE, pages = 1) # smoothed terms 
-plot(joint.gjrm.tri, eq = 3, seWithMean = TRUE,
-     shade = TRUE, pages = 1) # smoothed terms 
-
-# Democracy smooths
-# uncond milsup
-plot(joint.gjrm.tri, eq = 1, seWithMean = TRUE,
-     shade = TRUE, select = 1,
-     xlab = "Average Democracy"
-)
-
-# Depth
-plot(joint.gjrm.tri, eq = 2, seWithMean = TRUE,
-     shade = TRUE, select = 1,
-     xlab = "Average Democracy"
-)
-
-# Issue linkages
-plot(joint.gjrm.tri, eq = 3, seWithMean = TRUE,
-     shade = TRUE, select = 1,
-     xlab = "Average Democracy"
-)
 
 
 # switch off gjrm plots 

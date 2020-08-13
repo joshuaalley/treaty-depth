@@ -113,7 +113,9 @@ data_polity <- data_polity %>%
                   open.rec = ifelse(exrec == 8, 1, 0),
                   open.comp = ifelse(polcomp == 10, 1, 0),
                   exec.cons = ifelse(xconst == 7, 1, 0),
-                  open.pol = open.rec + open.comp
+                  open.pol = open.rec + open.comp,
+                  open.dum = ifelse(exrec == 8 &
+                                polcomp == 10, 1, 0),
                 )
 table(data_polity$open.pol)
 
@@ -154,6 +156,7 @@ alliance.year <- atop.cow.year %>%
     maxcap.rec = ifelse(most.cap == 1, open.rec, 0),
     maxcap.comp = ifelse(most.cap == 1, open.comp, 0),
     maxcap.cons = ifelse(most.cap == 1, exec.cons, 0),
+    maxcap.open = ifelse(most.cap == 1, open.pol, 0),
     
     maxcap.party = ifelse(most.cap == 1, gwf_party, 0),
     maxcap.military = ifelse(most.cap == 1, gwf_military, 0),
@@ -178,13 +181,14 @@ alliance.year <- atop.cow.year %>%
     prop.comp = mean(open.comp, na.rm = TRUE),
     prop.rec = mean(open.rec, na.rm = TRUE),
     prop.cons = mean(exec.cons, na.rm = TRUE),
+    prop.open = mean(open, na.rm = TRUE),
     
     
     maxcap.rec = max(maxcap.rec, na.rm = TRUE),
     maxcap.comp = max(maxcap.comp, na.rm = TRUE),
     maxcap.cons = max(maxcap.cons, na.rm = TRUE),
     open.count = sum(open, na.rm = TRUE),
-    
+    maxcap.open = max(maxcap.open, na.rm = TRUE),
   
     total.cap = sum(cinc, na.rm = TRUE),
     total.expend = sum(ln.milex, na.rm = TRUE),
@@ -224,7 +228,8 @@ alliance.democ <- alliance.year %>%
            avg.democ.weight, 
            max.threat, min.threat, mean.threat, 
            maxcap.democ.min, maxcap.democ.max,
-           maxcap.cons, maxcap.rec, maxcap.comp))
+           maxcap.cons, maxcap.rec, maxcap.comp, maxcap.open,
+           prop.open, prop.cons))
 write.csv(alliance.democ, "data/alliance-democ.csv",
           row.names = FALSE)
 

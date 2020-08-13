@@ -260,6 +260,32 @@ par(mfrow=c(1, 1))
 plot(density(diag.geweke$z))
 lines(density(rnorm(10000, 0, 1)))
 
+
+# Express correlations: check single latent dimension
+cor.ld1 <- cor_samp(latent.depth)
+dimnames(cor.ld1) <- list(colnames(atop.depth),
+                          colnames(atop.depth),
+                          paste0("sample", seq(1:1000))
+)
+ld1.samp <- apply(
+  apply(cor.ld1, 3L, c),
+  1, 
+  mean)
+ld1.vars <- expand.grid(dimnames(cor.ld1)[1:2])
+cor.ld1.mat <- data.frame(ld1.vars, ld1.samp) %>%
+  pivot_wider(id_cols = c(Var1),
+              names_from = Var2,
+              values_from = ld1.samp) %>%
+  select(-Var1)
+
+ev <- eigen(cor.ld1.mat) # get eigenvalues
+ap <- nFactors::parallel(subject=nrow(atop.depth),
+                         var=ncol(atop.depth),
+                         rep=100,cent=.05)
+nS <- nFactors::nScree(x=ev$values, aparallel=ap$eigen$qevpea)
+nFactors::plotnScree(nS)
+
+
 # plot density of factors
 # Create a dataset of factors
 latent.factors <- cbind.data.frame(c("Integrated Command", "Companion Mil. Agreement", 
@@ -416,3 +442,35 @@ summary(atop.milsup$maxcap.comp)
 atop.milsup$maxcap.comp[atop.milsup$maxcap.comp == -Inf] <- 0
 summary(atop.milsup$maxcap.cons)
 atop.milsup$maxcap.cons[atop.milsup$maxcap.cons == -Inf] <- 0
+
+
+# Create a post-45 dummy
+atop.milsup$post45 <- ifelse(atop.milsup$begyr > 1945, 1, 0)
+
+
+
+### compare model fit with one and two factors
+# latent.depth2 <- bfa_copula(~ intcom + compag.mil + 
+#                              milaid + milcon + base + 
+#                              organ1 + contrib, 
+#                            data = atop.depth, num.factor = 2,
+#                            restrict = list(c("intcom", 1, ">0"),
+#                                            c("milaid", 2, ">0")),
+#                            factor.scales = FALSE,
+#                            keep.scores = TRUE, loading.prior = "gdp", 
+#                            px = TRUE, imh.iter = 1000, imh.burn = 1000,
+#                            nburn = 20000, nsim = 30000, thin = 30, print.status = 2000)
+# plot(get_coda(latent.depth2))
+biplot(latent.depth2)
+
+
+# Diagnosis of convergence with coda
+lcap.sam <- get_coda(latent.depth2, scores = TRUE)
+effectiveSize(lcap.sam)
+diag.geweke  <- geweke.diag(lcap.sam)
+
+# Plot to see if Geweke Z-scores appear to be from Normal(0, 1) distribution
+par(mfrow=c(1, 1))
+plot(density(diag.geweke$z))
+lines(density(rnorm(10000, 0, 1)))
+
