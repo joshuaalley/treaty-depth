@@ -14,9 +14,8 @@ key.data <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.m
 key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
 summary(key.data$latent.depth.mean.rs)
 table(key.data$maxcap.open)
-table(key.data$maxcap.rec, key.data$maxcap.comp)
-table(key.data$maxcap.rec, key.data$maxcap.cons)
-table(key.data$maxcap.cons, key.data$maxcap.comp)
+table(key.data$maxcap.open, key.data$maxcap.cons)
+
 
 # glm model of unconditional military support
 # full democ
@@ -148,6 +147,7 @@ depth.formula.agg <- latent.depth.mean.rs ~ maxcap.democ +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
+theta.formula.agg <- ~ s(begyr) + maxcap.democ
 
 # Create a list of models
 gjrm.models.agg <- vector(mode = "list", length = length(copulas))
@@ -156,7 +156,8 @@ gjrm.models.agg <- vector(mode = "list", length = length(copulas))
 # in terms of residual fit
 # Beta has the lowest AIC.
 for(i in 1:length(copulas)){
-  gjrm.models.agg[[i]]  <- gjrm(list(uncond.formula, depth.formula), 
+  gjrm.models.agg[[i]]  <- gjrm(list(uncond.formula.agg, depth.formula.agg,
+                                     theta.formula.agg, eq.sigma), 
                                  data = key.data,
                                  margins = c("probit", "BE"),
                                  Model = "B",
@@ -167,8 +168,8 @@ aic.gjrm.agg <- lapply(gjrm.models.agg, AIC)
 aic.gjrm.agg
 
 # NB for interpretation: smoothed terms
-copulas[6] 
-joint.gjrm.agg <- gjrm.models.agg[[6]] 
+copulas[1] 
+joint.gjrm.agg <- gjrm.models.agg[[1]] 
 conv.check(joint.gjrm.agg)
 AIC(joint.gjrm.agg)
 summary(joint.gjrm.agg)
@@ -191,7 +192,7 @@ plot(joint.gjrm.agg, eq = 4, seWithMean = TRUE,
 depth.formula.tri <- deep.alliance ~ 
   maxcap.open + maxcap.cons +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
-  mean.threat + low.kap.sc + begyr
+  mean.threat + low.kap.sc + post45
 
 uncond.formula.tri <- uncond.milsup ~ 
   maxcap.open + maxcap.cons +
@@ -207,8 +208,9 @@ linkage.formula <- econagg.dum ~
 gjrm.models.tri <- vector(mode = "list", length = length(copulas))
 
 for(i in 1:length(copulas)){
-  gjrm.models.tri[[i]]  <- gjrm(list(uncond.formula.tri, depth.formula.tri, linkage.formula), data = key.data,
-                                margins = c("probit", "probit", "probit"),
+  gjrm.models.tri[[i]]  <- gjrm(list(uncond.formula.tri, depth.formula.tri, 
+                                     linkage.formula), data = key.data,
+                                margins = c("logit", "logit", "logit"),
                                 Model = "T", 
                                 BivD = copulas[i]
   )
@@ -216,8 +218,8 @@ for(i in 1:length(copulas)){
 lapply(gjrm.models.tri, AIC)
 
 # No difference in AIC or convergence across these models
-copulas[1]
-joint.gjrm.tri <- gjrm.models.tri[[1]] 
+copulas[17]
+joint.gjrm.tri <- gjrm.models.tri[[17]] 
 conv.check(joint.gjrm)
 AIC(joint.gjrm.tri)
 summary(joint.gjrm.tri)

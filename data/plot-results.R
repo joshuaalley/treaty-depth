@@ -153,10 +153,10 @@ dim(t(pred.depth.mat))
 # Calculate differences
 sim.res <- data.frame(linkinv(br[, 30:58] %*% t(pred.depth.mat)))
 depth.diff <- rbind.data.frame(
-               quantile(sim.res$X2 - sim.res$X1, c(0.05, .95)),
-               quantile(sim.res$X3 - sim.res$X1, c(0.05, .95)),
-               quantile(sim.res$X4 - sim.res$X1, c(0.05, .95)),
-               quantile(sim.res$X5 - sim.res$X1, c(0.05, .95))
+               quantile(sim.res$X2 - sim.res$X1, c(0.025, .975)),
+               quantile(sim.res$X3 - sim.res$X1, c(0.025, .975)),
+               quantile(sim.res$X4 - sim.res$X1, c(0.025, .975)),
+               quantile(sim.res$X5 - sim.res$X1, c(0.025, .975))
           )
 colnames(depth.diff) <- c("lower", "upper")
 depth.diff$scenario <- factor(seq(from = 1, to = 4, by = 1))
@@ -195,10 +195,10 @@ dim(t(pred.uncond.mat))
 # Calculate differences
 sim.res.uncond <- data.frame(pnorm(br[, 1:29] %*% t(pred.uncond.mat)))
 uncond.diff <- rbind.data.frame(
-  quantile(sim.res.uncond$X2 - sim.res.uncond$X1, c(0.05, .95)),
-  quantile(sim.res.uncond$X3 - sim.res.uncond$X1, c(0.05, .95)),
-  quantile(sim.res.uncond$X4 - sim.res.uncond$X1, c(0.05, .95)),
-  quantile(sim.res.uncond$X5 - sim.res.uncond$X1, c(0.05, .95))
+  quantile(sim.res.uncond$X2 - sim.res.uncond$X1, c(0.025, .975)),
+  quantile(sim.res.uncond$X3 - sim.res.uncond$X1, c(0.025, .975)),
+  quantile(sim.res.uncond$X4 - sim.res.uncond$X1, c(0.025, .975)),
+  quantile(sim.res.uncond$X5 - sim.res.uncond$X1, c(0.025, .975))
 )
 colnames(uncond.diff) <- c("lower", "upper")
 uncond.diff$scenario <- factor(seq(from = 1, to = 4, by = 1))

@@ -7,9 +7,29 @@
 atop.cow.year <- read.csv("data/atop-cow-year.csv")
 # raw polity data
 polity <- read.csv("data/polity4v2015.csv")
-# geddes et al autocracy types
-gwf.data <- read_dta("data/GWF_AllPoliticalRegimes.dta")
 
+
+# Dahl Polyarchy/contestation and Lexical Analysis of Democracy
+# from democracyData package
+polyarchy <- redownload_polyarchy_dimensions() %>%
+       select(cown, year, CONTESTstd, INCLUSstd) %>%
+          rename(
+            ccode = cown,
+          )
+glimpse(polyarchy)
+
+lied <- redownload_lied() %>%
+         select(lied_cow, year,
+                exselec, legselec, 
+                male_suffrage, female_suffrage,
+                opposition, competition,
+                lexical_index_original) %>%
+         rename(ccode = lied_cow)
+glimpse(lied)
+
+# Vdem from the vdem package
+vdem.polyarchy <- read.csv("data/vdem-poly.csv") %>%
+                    rename(ccode = COWcode)
 
 
 # Clean the POLITY Data
@@ -116,15 +136,22 @@ data_polity <- data_polity %>%
                   open.pol = open.rec + open.comp,
                   open.dum = ifelse(exrec == 8 &
                                 polcomp == 10, 1, 0),
-                )
+                ) %>%
+                left_join(polyarchy) %>%
+                left_join(lied) %>%
+                left_join(vdem.polyarchy)
 table(data_polity$open.pol)
+glimpse(data_polity)
 
-# Merge polity w/ atop-cow-year data
+
+### Merge polity w/ atop-cow-year data
 atop.cow.year <- left_join(atop.cow.year, data_polity)
 
 
 
 ###--Clean geddes et al data before merging------
+# geddes et al autocracy types
+gwf.data <- read_dta("data/GWF_AllPoliticalRegimes.dta")
 glimpse(gwf.data)
 table(gwf.data$gwf_nonautocracy)
 gwf.data <- select(gwf.data, cowcode, year, 
@@ -158,6 +185,17 @@ alliance.year <- atop.cow.year %>%
     maxcap.cons = ifelse(most.cap == 1, exec.cons, 0),
     maxcap.open = ifelse(most.cap == 1, open.pol, 0),
     
+    # polyarchy dim
+    maxcap.cont.std = ifelse(most.cap == 1, CONTESTstd, 0),
+    maxcap.inc.std = ifelse(most.cap == 1, INCLUSstd, 0),
+    maxcap.poly = ifelse(most.cap == 1, v2x_polyarchy, 0),
+    
+    # lied dim
+    maxcap.open.lied = ifelse(most.cap == 1, opposition, 0),
+    maxcap.comp.lied = ifelse(most.cap == 1, competition, 0),
+    maxcap.lied = ifelse(most.cap == 1, lexical_index_original, 0),
+    
+    # GWF coding 
     maxcap.party = ifelse(most.cap == 1, gwf_party, 0),
     maxcap.military = ifelse(most.cap == 1, gwf_military, 0),
     maxcap.personal = ifelse(most.cap == 1, gwf_personal, 0),
@@ -166,7 +204,7 @@ alliance.year <- atop.cow.year %>%
     cinc.share = cinc / sum(cinc, na.rm = TRUE),
     democ.weight = polity2 * cinc.share,
     democ = ifelse(polity2 > 5, 1, 0),
-    open = ifelse(open.pol == 2, 1, 0)
+    open = ifelse(open.pol >= 1, 1, 0)
   ) %>% 
   summarize(
     avg.democ = mean(polity2, na.rm = TRUE),
@@ -183,12 +221,22 @@ alliance.year <- atop.cow.year %>%
     prop.cons = mean(exec.cons, na.rm = TRUE),
     prop.open = mean(open, na.rm = TRUE),
     
-    
+    # POLITY summaries
     maxcap.rec = max(maxcap.rec, na.rm = TRUE),
     maxcap.comp = max(maxcap.comp, na.rm = TRUE),
     maxcap.cons = max(maxcap.cons, na.rm = TRUE),
     open.count = sum(open, na.rm = TRUE),
     maxcap.open = max(maxcap.open, na.rm = TRUE),
+    
+    # polyarchy dim
+    maxcap.cont.std = sum(maxcap.cont.std, na.rm = TRUE),  # works as all others are zero
+    maxcap.inc.std = sum(maxcap.inc.std, na.rm = TRUE),
+    maxcap.poly = max(maxcap.poly, na.rm = TRUE),
+    
+    # lied dim
+    maxcap.open.lied = max(maxcap.open.lied, na.rm = TRUE),
+    maxcap.comp.lied = max(maxcap.comp.lied, na.rm = TRUE),
+    maxcap.lied = max(maxcap.lied, na.rm = TRUE),
   
     total.cap = sum(cinc, na.rm = TRUE),
     total.expend = sum(ln.milex, na.rm = TRUE),
@@ -229,7 +277,10 @@ alliance.democ <- alliance.year %>%
            max.threat, min.threat, mean.threat, 
            maxcap.democ.min, maxcap.democ.max,
            maxcap.cons, maxcap.rec, maxcap.comp, maxcap.open,
-           prop.open, prop.cons))
+           prop.open, prop.cons,
+           maxcap.cont.std, maxcap.inc.std,
+           maxcap.comp.lied, maxcap.open.lied, maxcap.lied,
+           maxcap.poly))
 write.csv(alliance.democ, "data/alliance-democ.csv",
           row.names = FALSE)
 

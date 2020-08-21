@@ -5,12 +5,8 @@
 
 # descriptive statistics
 
-ggplot(atop.milsup, aes(dem.prop)) + geom_histogram()
-
-# democracy of the most capable state: weighted or not
-summary(atop.milsup$maxcap.democ)
-ggplot(atop.milsup, aes(x = maxcap.democ)) + geom_histogram()
-
+ggplot(atop.milsup, aes(maxcap.open)) + geom_bar()
+cor.test(atop.milsup$latent.depth.mean, atop.milsup$maxcap.open)
 
 
 # plot depth over time 

@@ -26,7 +26,8 @@ library(caseMatch)
 library(GJRM)
 library(gridExtra)
 library(conflicted)
-
+library(democracyData) 
+library(sn)
 
 # Look at conflicts 
 conflict_scout()
@@ -55,10 +56,11 @@ conflict_prefer("s", "mgcv")
 conflict_prefer("combine", "dplyr")
 conflict_prefer("ar", "brms")
 conflict_prefer("extract", "rstan")
+conflict_prefer("sd", "sn")
 
 # Set up RSTAN guidelines
 options(mc.cores = parallel::detectCores())
-
+rstan_options(auto_write = TRUE)
 
 # Set seed
 set.seed(12)

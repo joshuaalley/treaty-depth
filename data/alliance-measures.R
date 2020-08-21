@@ -414,11 +414,20 @@ table(atop.milsup$democ.pos)
 
 
 # Address max democ -Inf issue
+# comes from all NA
 atop.milsup$max.democ[atop.milsup$max.democ == -Inf] <- NA
 atop.milsup$max.democ.weight[atop.milsup$max.democ.weight == -Inf] <- NA
 atop.milsup$max.open[atop.milsup$max.open == -Inf] <- NA
 atop.milsup$maxcap.open[atop.milsup$maxcap.open == -Inf] <- NA
 
+atop.milsup$maxcap.comp.lied[atop.milsup$maxcap.comp.lied == -Inf] <- NA
+atop.milsup$maxcap.open.lied[atop.milsup$maxcap.open.lied == -Inf] <- NA
+atop.milsup$maxcap.lied[atop.milsup$maxcap.lied == -Inf] <- NA
+
+atop.milsup$maxcap.cont.std[atop.milsup$maxcap.cont.std == -Inf] <- NA
+atop.milsup$maxcap.inclus.std[atop.milsup$maxcap.inclus.std == -Inf] <- NA
+
+atop.milsup$maxcap.poly[atop.milsup$maxcap.poly == -Inf] <- NA
 
 # Clean up the maximum democracy by capability
 select(atop.milsup, atopid, maxcap.democ.max, maxcap.democ.min) %>% 
@@ -427,6 +436,7 @@ atop.milsup$maxcap.democ.max[atop.milsup$maxcap.democ.max < 0] <- 0 # Maximum be
 atop.milsup$maxcap.democ.min[atop.milsup$maxcap.democ.min > 0] <- 0 # minimum above 0
 select(atop.milsup, atopid, maxcap.democ.max, maxcap.democ.min) %>% 
   filter(maxcap.democ.max == maxcap.democ.min)
+
 
 # create measure with polity score of most capable 
 # Add zero in one column to max or min in the other 
