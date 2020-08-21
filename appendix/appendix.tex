@@ -122,35 +122,6 @@ In this bivariate model alliance with more democracies are not more likely under
 \end{figure}
 
 
-
-Differences between the bivariate and univariate models of democratic proportion and alliance design are the result of correlations in the error terms of the depth and unconditional support models.  
-Kendall's $\tau$ measures the strength of the correlation between the errors, and is a function of a parameter $\theta$ that I modeled in a third GJRM equation.
-I used the start year of the alliance to predict differences in $\theta$, which affects correlations in unobservables between depth and unconditional military support. 
-\autoref{fig:results-error} plots the smoothed term I used to predict the correlation in the error terms between treaty depth and unconditional military support. 
-The predicted values in the top panel of \autoref{fig:results-error} are on the scale of $\theta$. 
-In the bottom panel, I plot predicted $\tau$ values against the start year of the alliance. 
-
-
-\begin{figure}[hbtp]
-\centering
-\includegraphics[width=0.95\textwidth]{results-error.png}
-\caption{Predicted association between the errors of the unconditional military support and treaty depth equations in a generalized joint regression model based on the start year of the alliance. Limited alliance data before 1850 dramatically increases uncertainty in the smoothed term. To make the plot more legible, I present predictions from after 1850. The rug plot on the x-axis in the top row marks the distribution of alliances. Each point in the bottom row is an estimated $\tau$, one for each of the 277 observations.}
-\label{fig:results-error}
-\end{figure}
-
-
-As \autoref{fig:results-error} shows, the association between the errors cycles over time. 
-Most error correlations are positive between 1850 and 1900, before turning more negative between 1900 and 1950. 
-Around World War II depth and unconditional military support errors are positively correlated. 
-In general, the magnitude and direction of estimated correlation between depth and unconditional military support in unobserved factors $\tau$ changes dramatically over time.  
-
-
-Again, correlations between unobserved factors lead to different results between the bivariate model and the univariate models. 
-This same pattern the error correlations is present in the bivariate GJRM in the manuscript.
-As a result, the bivariate models are a crucial robustness check. 
-
-
-
 \section{Other Measures of Treaty Depth}
 
 
@@ -285,6 +256,96 @@ Findings about the association between treaty depth and Benson and Clinton's als
 Moving from an autocratic to a democratic alliance leader increases the overall costliness of the alliance obligations. 
 I suspect that this result is driven by the defense cooperation measures in Benson and Clinton's latent variable. 
 In summary, I find similar results with four alternative measures of treaty depth, including two measures from previous scholarship. 
+
+
+
+
+\section{Are Deep Alliances Less Reliable?} 
+
+
+\citet{LeedsAnac2005} find that institutionalized alliances are less reliable, which contradicts my claim that deep alliances increase treaty reliability. 
+Besides potential bias from non-random selection into challenges of alliances \citep{Smith1995}, this empirical finding depends in part on their ordinal measure. 
+Replacing the ordinal institutionalization measure with my latent depth variable leads to difference inferences about alliance treaty design and performance. 
+Therefore, the surprising finding in this paper that better institutionalized alliances have worse performance may also reflect measurement decisions. 
+
+
+I focus my replication on Leeds and Anac's model of whether alliance members honor treaties with active military support. 
+The replication focuses on this model because my argument examines defensive and offensive alliances. 
+Their dataset includes 103 alliance performance opportunities, where states could honor or violate promises of military support. 
+Using a logit model that adjusts for alliance formality, capability changes, changes in the policy process and whether the ally was the original target, Leeds and Anac find a negative relationship between institutionalization and performance. 
+I replicate this estimate in the first column of \autoref{tab:depth-performance}. 
+
+
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{tab:depth-performance} 
+\begin{adjustbox}{width= .95\textwidth, center}
+\begin{tabular}{@{\extracolsep{5pt}}lccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{2}{c}{Leeds and Anac} & Berkemeier and Fuhrmann \\ 
+\\[-1.8ex] & (1) & (2) & (3)\\ 
+\hline \\[-1.8ex] 
+ Military Institutionalization & $-$0.543 &  &  \\ 
+  & ($-$1.306, 0.221) &  &  \\ 
+  Latent Depth &  & 0.173 & 0.373 \\ 
+  &  & ($-$0.583, 0.929) & ($-$0.384, 1.131) \\ 
+  Alliance Formality & $-$1.161$^{}$ & $-$1.512$^{}$ &  \\ 
+  & ($-$2.082, $-$0.240) & ($-$2.466, $-$0.558) &  \\ 
+  Capability Change & $-$1.841$^{}$ & $-$1.928$^{}$ &  \\ 
+  & ($-$3.135, $-$0.547) & ($-$3.251, $-$0.604) &  \\ 
+  Process Change & $-$1.802$^{}$ & $-$1.462$^{}$ &  \\ 
+  & ($-$3.336, $-$0.269) & ($-$2.886, $-$0.039) &  \\ 
+  Original Target & $-$0.723 & $-$0.788 &  \\ 
+  & ($-$1.849, 0.403) & ($-$1.942, 0.366) &  \\ 
+  Asymmetric Capability &  &  & $-$2.832$^{}$ \\ 
+  &  &  & ($-$5.230, $-$0.434) \\ 
+  Non-Major Only &  &  & $-$2.036$^{}$ \\ 
+  &  &  & ($-$4.286, 0.213) \\ 
+  Post 1945 &  &  & $-$2.396$^{}$ \\ 
+  &  &  & ($-$3.958, $-$0.834) \\ 
+  Open Electoral Competition &  &  & 0.018 \\ 
+  &  &  & ($-$1.003, 1.039) \\ 
+  Executive Constraints &  &  & 1.420$^{}$ \\ 
+  &  &  & ($-$0.254, 3.093) \\ 
+  Number of Members &  &  & $-$0.233$^{}$ \\ 
+  &  &  & ($-$0.487, 0.021) \\ 
+  Economic Issue Linkage &  &  & $-$0.434 \\ 
+  &  &  & ($-$1.573, 0.705) \\ 
+  Unconditional Support &  &  & 1.047 \\ 
+  &  &  & ($-$0.646, 2.739) \\ 
+  Foreign Policy Concessions &  &  & $-$0.191 \\ 
+  &  &  & ($-$0.900, 0.517) \\ 
+  Constant & 3.430$^{}$ & 3.163$^{}$ & 2.949$^{}$ \\ 
+  & (1.972, 4.888) & (1.766, 4.559) & (0.633, 5.264) \\ 
+ \hline \\[-1.8ex] 
+Observations & 93 & 93 & 108 \\ 
+Log Likelihood & $-$39.131 & $-$40.039 & $-$48.046 \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{3}{r}{95\% Confidence Intervals in Parentheses.} \\ 
+\end{tabular}
+\end{adjustbox} 
+\end{table}
+
+
+I then replace Leeds and Anac's institutionalization measure with my latent treaty depth measure, which is in the second column of \autoref{tab:depth-performance}. 
+The coefficient on depth, in contrast to military institutionalization, is positive, though neither estimate is statistically significant at conventional levels. 
+Thus, the possible direction of this association shifts, depending on how alliance depth is measured.
+
+
+To further assess this finding, I utilized an updated alliance performance dataset from \citet{BerkemeierFuhrmann2018}.
+In this case, I specified a different logit model that included latent depth, unconditional support, dummy indicators of asymmetric capability and symmetric non-major power pacts, a post 1945 dummy, the two indicators of democratic institutions, the number of members, economic issue linkages, and foreign policy concessions. 
+All of these factors are potential sources of reliability, per different arguments in the literature. 
+In these models, I find a similar result--- a positive relationship between depth and honoring military support that cannot be distinguished from zero.
+
+
+In summary, I do not find that highly institutionalized alliances are less reliable. 
+The change in the direction of the coefficient is more meaningful than a difference in statistical significance, given the limited number of alliance performance opportunities in these datasets. 
+Again, given issues with non-random selection into alliance crises and challenges, one should not place too much weight on the above results. 
+They do suggest, however, that deep alliances are not necessarily less reliable when invoked. 
 
 
 \section{Adjusting for Alliance Formation}
