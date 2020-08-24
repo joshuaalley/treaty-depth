@@ -25,17 +25,6 @@ conv.check(gjrm.us)
 summary(gjrm.us)
 
 
-# Remove error term equation
-gjrm.no.theta <- gjrm(list(uncond.formula, depth.formula), 
-                      data = key.data,
-                      margins = c("probit", "BE"),
-                      Model = "B",
-                      BivD = "T"
-         ) 
-conv.check(gjrm.no.theta)
-summary(gjrm.no.theta)
-
-
 # fit model with interactions
 uncond.formula.inter <- uncond.milsup ~ maxcap.cons + maxcap.comp +
   maxcap.rec + 
@@ -64,6 +53,13 @@ summary(gjrm.inter)
 
 
 ### fit a model with democratic proportion
+
+# contrast these variables
+ggplot(atop.milsup, aes(x = factor(maxcap.open), y = prop.open)) +
+  geom_boxplot() +
+  geom_jitter(alpha = .85)
+
+
 
 # Set up unique dataframe
 key.data.prop <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
@@ -114,15 +110,17 @@ summary(beta.reg.depth.prop)
 
 # set up model formulas 
 uncond.formula.prop <- uncond.milsup ~ 
-  prop.open + prop.cons +
+  prop.cons + prop.open +
   econagg.dum + 
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap +
+  fp.conc.index + num.mem + wartime + asymm + 
+  asymm.cap + non.maj.only +
   s(mean.threat) + low.kap.sc + s(begyr)
 
 
 depth.formula.prop <- latent.depth.mean.rs ~ 
-  prop.open + prop.cons + econagg.dum +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
+  prop.cons + prop.open + econagg.dum +
+  fp.conc.index + num.mem + wartime + asymm + 
+  asymm.cap + non.maj.only +
   s(mean.threat) + low.kap.sc + s(begyr)
 
 theta.formula.prop <- ~ s(begyr) + prop.open + prop.cons 
@@ -268,42 +266,21 @@ summary(gjrm.poly.vdem)
 
 # Create a function to plot for all the models and variables
 
-substance.plot <- function(model, label){
+substance.plot <- function(model, label, destination){
 
   
 # list of plots
 depth.plots <- vector(mode = "list", length = length(models.comp))
 uncond.plots <- vector(mode = "list", length = length(models.comp))
   
-  
+# for loop to plot  
 for(i in 1:length(model)){
 
-if(label[[i]] != "Polyarchy Contestation"){    
-# set up new data
 sim.data <- cbind.data.frame(
-  x0 = rep(1, n = 2), # intercept
-  maxcap.cons = rep(1, n = 2),
-  par = c(min(model[[i]][["X1"]][, 3]), max(model[[i]][["X1"]][, 3])), # placeholder
-  econagg.dum = rep(0, n = 2),
-  fp.conc.index = rep(0, n = 2), # no concessions
-  num.mem = rep(2, n = 2), # bilateral
-  wartime = rep(0, n = 2), # peacetime
-  asymm = rep(0, n = 2), # symmetric obligations
-  asymm.cap = rep(1, n = 2), # asymmetric cap
-  non.maj.only = rep(0, n = 2),
-  mean.threat = rep(median(key.data$mean.threat), n = 2),
-  low.kap.sc = rep(median(key.data$low.kap.sc), n = 2),
-  begyr = rep(median(key.data$begyr), n = 2)
-)
-colnames(sim.data)[3] <- colnames(model[[i]][["X1"]])[3] # give proper name
-glimpse(sim.data)
-
-}else{ # data with polyarchy contestation
-  sim.data <- cbind.data.frame(
     x0 = rep(1, n = 2), # intercept
     maxcap.cons = rep(1, n = 2),
     par = c(min(model[[i]][["X1"]][, 3]), max(model[[i]][["X1"]][, 3])), # placeholder
-    maxcap.inc.std = rep(median(model[[i]][["X1"]][, 4]), n = 2),
+    prop.cons = rep(1, n = 2), 
     econagg.dum = rep(0, n = 2),
     fp.conc.index = rep(0, n = 2), # no concessions
     num.mem = rep(2, n = 2), # bilateral
@@ -318,7 +295,6 @@ glimpse(sim.data)
   )
   colnames(sim.data)[3] <- colnames(model[[i]][["X1"]])[3] # give proper name
   glimpse(sim.data)
-}
 
 # build out predictions for depth
 pred.depth.mat <- predict(model[[i]], eq = 2,
@@ -346,7 +322,7 @@ depth.diff <- rbind.data.frame(
   quantile(sim.res$X2 - sim.res$X1, c(0.025, .975))
 )
 colnames(depth.diff) <- c("lower", "upper")
-depth.diff$scenario <- c("Low Competition", "High Competition",
+depth.diff$scenario <- c("Low", "High",
                          "Difference")
 
 # plot intervals
@@ -386,7 +362,7 @@ uncond.diff <- rbind.data.frame(
   quantile(sim.res.uncond$X2 - sim.res.uncond$X1, c(0.025, .975))
 )
 colnames(uncond.diff) <- c("lower", "upper")
-uncond.diff$scenario <- c("Low Competition", "High Competition",
+uncond.diff$scenario <- c("Low", "High",
                          "Difference")
 # plot intervals
 uncond.intervals <- ggplot(uncond.diff, aes(x = scenario, y = upper)) +
@@ -394,7 +370,7 @@ uncond.intervals <- ggplot(uncond.diff, aes(x = scenario, y = upper)) +
   geom_errorbar(aes(ymin = lower,
                     ymax = upper),
                 width = .1, size = 1) +
-  labs(y = "Predicted Probability of Unconditional Support",
+  labs(y = "Predicted Prob. of Unconditional Support",
        x = "Scenario") +
   ggtitle(label[[i]]) +
   theme_bw()
@@ -406,25 +382,27 @@ uncond.plots[[i]] <- uncond.intervals
 
 # present results
 # Combine plots
-grid.arrange(depth.plots[[1]], depth.plots[[2]],
-             uncond.plots[[1]], uncond.plots[[2]],
+grid.arrange(depth.plots[[1]], depth.plots[[2]], depth.plots[[3]], 
+             uncond.plots[[1]], uncond.plots[[2]], uncond.plots[[3]],
              nrow = 2)
-results.all <- arrangeGrob(depth.plots[[1]], depth.plots[[2]], 
-                           uncond.plots[[1]], uncond.plots[[2]], 
+results.all <- arrangeGrob(depth.plots[[1]], depth.plots[[2]], depth.plots[[3]],
+                           uncond.plots[[1]], uncond.plots[[2]], uncond.plots[[3]],
                            nrow = 2)
-ggsave("figures/results-other-democ.png", results.all,
+ggsave(destination, results.all,
        height = 6, width = 8)
 
 } # end function
 
 
 # Inputs
-models.comp = list(joint.gjrm.lied, gjrm.poly.vdem)
-labels.comp = c("Lexical Index of Democracy", "Polyarchy (VDem)")
+models.comp = list(joint.gjrm.prop, joint.gjrm.lied, gjrm.poly.vdem)
+labels.comp = c("Proportion Elec. Comp.", "Lexical Index of Democracy.", "Polyarchy (VDem)")
 
 
 # Apply the function 
-substance.plot(model = models.comp, label = labels.comp)
+substance.plot(model = models.comp, label = labels.comp,
+               destination = "figures/results-other-democ.png")
+
 
 
 

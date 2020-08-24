@@ -186,7 +186,7 @@ ggplot(atop.milsup, aes(x = dem.prop)) +
 
 
 
-# summarize democracy by depth and uncond milsup 
+### summarize democracy by depth and uncond milsup 
 atop.democ.group <- atop.milsup %>%
                     group_by(deep.alliance, uncond.milsup) %>%
                      summarize(

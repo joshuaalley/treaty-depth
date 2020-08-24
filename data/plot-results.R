@@ -76,7 +76,8 @@ head.xtab$command <- paste0(paste0('& \\multicolumn{2}{c}{Uncond. Mil. Support} 
 
 print(
   xtable(joint.tab, 
-         caption = c("Results from joint generalized regression model of treaty depth and unconditional military support. 
+         caption = c("Results from joint generalized regression model of treaty depth and unconditional military support in 
+         offensive and defensive alliances from 1816 to 2007. 
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
                      The treaty depth model is a beta regression. 
@@ -294,39 +295,39 @@ plot.tau.cons
 
 
 # tabulate the results: gjrm with aggregate democracy
-summary.depth.split <- summary(joint.gjrm.split)
+summary.depth.prop <- summary(joint.gjrm.prop)
 
 
 # Combine all the results in a single table. 
 # Start with unconditional table
-uncond.tab.split <- as.data.frame(rbind(summary.depth.split[["tableP1"]][, 1:2],
-                                        summary.depth.split[["tableNP1"]][, c(1, 3)]
+uncond.tab.prop <- as.data.frame(rbind(summary.depth.prop[["tableP1"]][, 1:2],
+                                        summary.depth.prop[["tableNP1"]][, c(1, 3)]
 ))
-uncond.tab.split$variable <- c("(Intercept)", 
-                               "Competitive Elections", "Political Competition",
-                               "Executive Constraints",
-                               "Economic Issue Linkage", 
-                               "FP Concessions", "Number of Members", 
-                               "Wartime Alliances", "Asymmetric Obligations",
-                               "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
-                               "s(Mean Threat)", "s(Start Year)")
-
-
-# table for treaty depth
-depth.tab.split <- as.data.frame(rbind(summary.depth.split[["tableP2"]][, 1:2],
-                                       summary.depth.split[["tableNP2"]][, c(1, 3)]
-))
-depth.tab.split$variable <- c("(Intercept)", 
-                              "Competitive Elections", "Political Competition",
-                              "Executive Constraints",
+uncond.tab.prop$variable <- c("(Intercept)", 
+                              "Proportion Competitive Elections", 
+                              "Proportion Executive Constraints",
                               "Economic Issue Linkage", 
                               "FP Concessions", "Number of Members", 
                               "Wartime Alliances", "Asymmetric Obligations",
                               "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
                               "s(Mean Threat)", "s(Start Year)")
 
-joint.tab.split <- full_join(uncond.tab.split, depth.tab.split, by = "variable")
-joint.tab.split <- as.data.frame(joint.tab.split[, c(3, 1, 2, 4, 5)])
+
+# table for treaty depth
+depth.tab.prop <- as.data.frame(rbind(summary.depth.prop[["tableP2"]][, 1:2],
+                                       summary.depth.prop[["tableNP2"]][, c(1, 3)]
+))
+depth.tab.prop$variable <- c("(Intercept)", 
+                              "Proportion Competitive Elections", 
+                              "Proportion Executive Constraints",
+                              "Economic Issue Linkage", 
+                              "FP Concessions", "Number of Members", 
+                              "Wartime Alliances", "Asymmetric Obligations",
+                              "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
+                              "s(Mean Threat)", "s(Start Year)")
+
+joint.tab.prop <- full_join(uncond.tab.prop, depth.tab.prop, by = "variable")
+joint.tab.prop <- as.data.frame(joint.tab.prop[, c(3, 1, 2, 4, 5)])
 
 
 # Tabulate all the equations together
@@ -339,179 +340,18 @@ head.xtab$command <- paste0(paste0('& \\multicolumn{2}{c}{Uncond. Mil. Support} 
 
 
 print(
-  xtable(joint.tab.split, 
+  xtable(joint.tab.prop, 
          caption = c("Results from joint generalized regression model of treaty depth and unconditional military support. 
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
                      The treaty depth model is a beta regression. 
                      I model the error correlation between the two processes with a T copula."),
-         label = c("tab:gjrm-res-split"), auto = TRUE),
+         label = c("tab:gjrm-res-.prop"), auto = TRUE),
   add.to.row = head.xtab, 
   include.rownames = FALSE)
 
 
-### Predictions from model with polity of most capable state
 
-sim.data.mcap <- cbind.data.frame(
-  x0 = rep(1, n = 21), # intercept
-  maxcap.democ = seq(-10, 10, by = 1),
-  econagg.dum = rep(0, n = 21),
-  fp.conc.index = rep(0, n = 21), # no concessions
-  num.mem = rep(2, n = 21), # bilateral
-  wartime = rep(0, n = 21), # peacetime
-  asymm = rep(0, n = 21), # symmetric obligations
-  asymm.cap = rep(1, n = 21), # asymmetric cap
-  non.maj.only = rep(0, n = 21),
-  mean.threat = rep(median(key.data$mean.threat), n = 21),
-  low.kap.sc = rep(median(key.data$low.kap.sc), n = 21),
-  begyr = rep(median(key.data$begyr), n = 21)
-)
-glimpse(sim.data.mcap)
-
-
-# build out predictions for depth from the joint model ()
-pred.depth.mcap <- predict(joint.gjrm.agg, eq = 2,
-                           type = "response", 
-                           se.fit = TRUE,
-                           newdata = sim.data.mcap)
-
-pred.depth.mcap <- cbind.data.frame(pred.depth.mcap$fit, 
-                                    pred.depth.mcap$se.fit,
-                                    sim.data.mcap$maxcap.democ)
-colnames(pred.depth.mcap) <- c("pred", "se", "maxcap.democ")
-
-# calculate lower and upper bounds of 95% CI
-pred.depth.mcap$lower <- pred.depth.mcap$pred - 2*pred.depth.mcap$se
-pred.depth.mcap$upper <- pred.depth.mcap$pred + 2*pred.depth.mcap$se
-
-# get predictions and unc back on response scale
-pred.depth.mcap$response <- linkinv(pred.depth.mcap$pred)
-pred.depth.mcap$lower.res <- linkinv(pred.depth.mcap$lower)
-pred.depth.mcap$upper.res <- linkinv(pred.depth.mcap$upper)
-
-
-# plot predicted depth values
-plot.depth <- ggplot(pred.depth.mcap, aes(x = maxcap.democ, y = response)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = lower.res,
-                    ymax = upper.res),
-                width = .1, size = 1) +
-  labs(y = "Rescaled Latent Depth",
-       x = "Alliance Leader Polity") +
-  theme_bw()
-plot.depth
-
-
-# Plot for unconditional military support 
-pred.uncond.mcap <- predict(joint.gjrm, eq = 1,
-                            type = "response", 
-                            se.fit = TRUE,
-                            newdata = sim.data.mcap)
-
-pred.uncond.mcap <- cbind.data.frame(pred.uncond.mcap$fit, 
-                                     pred.uncond.mcap$se.fit,
-                                     sim.data.mcap$maxcap.democ)
-colnames(pred.uncond.mcap) <- c("pred", "se", "maxcap.democ")
-
-# calculate lower and upper bounds of 95% CI
-pred.uncond.mcap$lower <- pred.uncond.mcap$pred - 2*pred.uncond.mcap$se
-pred.uncond.mcap$upper <- pred.uncond.mcap$pred + 2*pred.uncond.mcap$se
-
-# get predictions and unc back on response scale
-pred.uncond.mcap$response <- linkinv(pred.uncond.mcap$pred)
-pred.uncond.mcap$lower.res <- linkinv(pred.uncond.mcap$lower)
-pred.uncond.mcap$upper.res <- linkinv(pred.uncond.mcap$upper)
-
-
-# plot predicted probability of unconditional military support
-plot.uncond <- ggplot(pred.uncond.mcap, aes(x = maxcap.democ, y = response)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = lower.res,
-                    ymax = upper.res),
-                width = .1, size = 1) +
-  labs(y = "Predicted Pr(Unconditional Military Support)",
-       x = "Alliance Leader Polity") +
-  theme_bw()
-plot.uncond
-
-
-
-
-
-# split models with proportion of democracies
-stargazer(list(beta.reg.depth.prop, uncond.glm.prop),
-          style = "all2",
-          dep.var.labels=c("Latent Depth (rescaled)","Unconditional Military Support"),
-          covariate.labels=c(
-            "Proportion of Democracies",
-            "Foreign Policy Concessions", "Number of Members",
-            "Wartime Alliance", "Asymmetric Obligations",
-            "Asymmetric Capability", "Non-Major Only",
-            "Average Threat",
-            "Foreign Policy Disagreement", "Start Year"
-          ),
-          keep.stat = c("n","ll"), ci=TRUE, 
-          star.char = c("", "", ""),
-          notes = "95\\% Confidence Intervals in Parentheses.", 
-          notes.append = FALSE,
-          label = c("tab:separate-models-prop")
-)
-
-
-# build out predictions from joint model
-pred.depth.prop <- predict(joint.gjrm.prop, eq = 2,
-                            type = "iterms", 
-                            se.fit = TRUE)
-
-pred.depth.prop <- cbind.data.frame(pred.depth.prop$fit[, "s(dem.prop)"], 
-                                     pred.depth.prop$se.fit[, "s(dem.prop)"],
-                                     key.data$dem.prop)
-colnames(pred.depth.prop) <- c("pred", "se", "dem.prop")
-
-plot.depth.prop <- ggplot(pred.depth.prop, aes(x = dem.prop, y = pred)) +
-  geom_hline(yintercept = 0) +
-  geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
-  geom_line() +
-  geom_ribbon(aes(ymin = (pred - 2*se), 
-                  ymax = (pred + 2*se) 
-  ), alpha = .5
-  ) +
-  labs(x = "Proportion of Democracies", y = "Predicted Change in Treaty Depth") +
-  ggtitle("Treaty Depth") +
-  theme_bw()
-plot.depth.prop
-
-
-# unconditional military support 
-pred.uncond.prop <- predict(joint.gjrm.prop, eq = 1,
-                             type = "iterms", se.fit = TRUE)
-
-
-pred.uncond.prop <- cbind.data.frame(pred.uncond.prop$fit[, "s(dem.prop)"], 
-                                     pred.uncond.prop$se.fit[, "s(dem.prop)"],
-                                      key.data$dem.prop)
-colnames(pred.uncond.prop) <- c("pred", "se", "dem.prop")
-
-plot.uncond.prop <- ggplot(pred.uncond.prop, aes(x = dem.prop, y = pred)) +
-  geom_rug(sides = "b", alpha = 1/2, position = "jitter") +
-  geom_line() +
-  geom_ribbon(aes(ymin = (pred - 2*se), 
-                  ymax = (pred + 2*se) 
-  ), alpha = .5
-  ) +
-  labs(x = "Proportion of Democracies", y = "Change in Predicted Probability") +
-  ggtitle("Unconditional Military Support") +
-  theme_bw()
-plot.uncond.prop
-
-
-# combine plots and export
-grid.arrange(plot.uncond.prop, plot.depth.prop,
-             ncol = 2)
-results.prop <- arrangeGrob(plot.uncond.prop, plot.depth.prop,
-                            ncol = 2)
-ggsave("appendix/results-prop.png", results.prop,
-       height = 6, width = 8) #save file
 
 
 
