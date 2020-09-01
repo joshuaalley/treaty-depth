@@ -20,7 +20,11 @@ state.vars <- state.vars %>%
                     polity, polity2, gdp,
                     majpower, super.power, cinc,
                     disputes, ln.milex,
-                    atwar, rival.milex, lsthreat)
+                    atwar, rival.milex, lsthreat) %>%
+           left_join(select(data_polity,
+                            ccode, year, exec.cons,
+                            open.pol, lexical_index_original, 
+                            v2x_polyarchy))
 
 
 # sequence will be something like this
@@ -59,6 +63,8 @@ alliance.data <- lapply(alliance.data,
                             mutate(
                               most.cap = ifelse(cinc == max(cinc, na.rm = TRUE), 1, 0),
                               maxcap.democ = ifelse(most.cap == 1, polity2, 0),
+                              maxcap.lied = ifelse(most.cap == 1, lexical_index_original, 0),
+                              maxcap.cons = ifelse(most.cap == 1 & exec.cons == 1, 1, 0)
                             ) %>%
                             summarize(
                               size = n(),
@@ -69,6 +75,8 @@ alliance.data <- lapply(alliance.data,
                               mp.count = sum(majpower, na.rm = TRUE),
                               wartime = max(atwar, na.rm = TRUE),
                               ccode.unique = length(unique(ccode)),
+                              maxcap.lied = max(maxcap.lied, na.rm = TRUE),
+                              maxcap.cons = max(maxcap.cons, na.rm = TRUE),
                               maxcap.democ.min = min(maxcap.democ, na.rm = TRUE),
                               maxcap.democ.max = max(maxcap.democ, na.rm = TRUE)
                             )   %>%
@@ -98,6 +106,8 @@ bilat.all <- bilat.all %>%
   mutate(
     most.cap = ifelse(cinc == max(cinc, na.rm = TRUE), 1, 0),
     maxcap.democ = ifelse(most.cap == 1, polity2, 0),
+    maxcap.lied = ifelse(most.cap == 1, lexical_index_original, 0),
+    maxcap.cons = ifelse(most.cap == 1 & exec.cons == 1, 1, 0)
   ) %>%
   summarize(
     size = n(),
@@ -108,6 +118,8 @@ bilat.all <- bilat.all %>%
     mp.count = sum(majpower, na.rm = TRUE),
     wartime = max(atwar, na.rm = TRUE),
     ccode.unique = length(unique(ccode)),
+    maxcap.lied = max(maxcap.lied, na.rm = TRUE),
+    maxcap.cons = max(maxcap.cons, na.rm = TRUE),
     maxcap.democ.min = min(maxcap.democ, na.rm = TRUE),
     maxcap.democ.max = max(maxcap.democ, na.rm = TRUE)
   )   %>%
@@ -135,23 +147,27 @@ samp.noall <- bind_rows(samp.noall)
 table(samp.noall$size)
 
 
+## Old measure
 # Clean up the maximum democracy by capability in non-allied groups
-select(samp.noall, maxcap.democ.max, maxcap.democ.min) %>% 
-  filter(maxcap.democ.max == maxcap.democ.min)
-samp.noall$maxcap.democ.max[samp.noall$maxcap.democ.max < 0] <- 0 # Maximum below 0
-samp.noall$maxcap.democ.min[samp.noall$maxcap.democ.min > 0] <- 0 # minimum above 0
-select(samp.noall, maxcap.democ.max, maxcap.democ.min) %>% 
-  filter(maxcap.democ.max == maxcap.democ.min)
+# select(samp.noall, maxcap.democ.max, maxcap.democ.min) %>% 
+#   filter(maxcap.democ.max == maxcap.democ.min)
+# samp.noall$maxcap.democ.max[samp.noall$maxcap.democ.max < 0] <- 0 # Maximum below 0
+# samp.noall$maxcap.democ.min[samp.noall$maxcap.democ.min > 0] <- 0 # minimum above 0
+# select(samp.noall, maxcap.democ.max, maxcap.democ.min) %>% 
+#   filter(maxcap.democ.max == maxcap.democ.min)
+# 
+# # create measure with polity score of most capable 
+# # Add zero in one column to max or min in the other 
+# samp.noall$maxcap.democ <- samp.noall$maxcap.democ.min + samp.noall$maxcap.democ.max
+# summary(samp.noall$maxcap.democ)
 
-# create measure with polity score of most capable 
-# Add zero in one column to max or min in the other 
-samp.noall$maxcap.democ <- samp.noall$maxcap.democ.min + samp.noall$maxcap.democ.max
-summary(samp.noall$maxcap.democ)
-
+# look at key IVs
+summary(samp.noall$maxcap.lied)
+table(samp.noall$maxcap.cons)
 
 # combine sampled data with observed alliances
 alldata.comb <- atop.milsup %>%
-                select(atopid, begyr, maxcap.democ, avg.democ, 
+                select(atopid, begyr, maxcap.lied, maxcap.cons, avg.democ, 
                        mean.threat, asymm.cap, non.maj.only, asymm, wartime,
                        latent.depth.mean, uncond.milsup, num.mem,
                        econagg.dum, fp.conc.index, low.kap.sc, uncond.oblig
@@ -197,7 +213,7 @@ alldata.comb$atopid[is.na(alldata.comb$atopid)] <- 0
 # varying intercepts by year 
 hurdle.depth <- brm(
   formula = bf(
-    latent.depth.hurdle ~ 1 + maxcap.democ + size + mean.threat +
+    latent.depth.hurdle ~ 1 + maxcap.lied + maxcap.cons + size + mean.threat +
       non.maj.only + asymm.cap + 
       wartime + (1 | begyr), 
     hu ~ 1 + avg.democ + mean.threat + asymm.cap + 
@@ -222,12 +238,12 @@ plot(conditional_effects(hurdle.depth, probs = c(0.05, 0.95)),
      rug = TRUE)
 # Pull democracy plot
 ce.democ <- conditional_effects(hurdle.depth, probs = c(0.05, 0.95),
-                    effects = "maxcap.democ")
+                    effects = "maxcap.lied")
 plot(ce.democ,
     plot = FALSE)[[1]] +
   scale_color_grey() +
   scale_fill_grey() +
-  labs(x = "Democracy of Alliance Leader",
+  labs(x = "Electoral Competition in Alliance Leader",
    y = "Latent Depth (shifted)")
 
 
@@ -236,7 +252,7 @@ plot(ce.democ,
 # start with a poisson hurdle of obligation str
 hurdle.cond <- brm(
   formula = bf(
-    oblig.str ~ 1 + maxcap.democ + size + mean.threat +
+    oblig.str ~ 1 + maxcap.lied + maxcap.cons + size + mean.threat +
       non.maj.only + asymm.cap +
       wartime + (1 | begyr), 
     hu ~ 1 + avg.democ + mean.threat + asymm.cap + 
@@ -264,13 +280,13 @@ plot(conditional_effects(hurdle.cond, probs = c(0.05, 0.95)),
 # better luck without setting the priors
 # depth 
 depth.formula.hurdle <- brmsformula(
-    latent.depth.hurdle ~ 1 + maxcap.democ + size + mean.threat +
+    latent.depth.hurdle ~ 1 + maxcap.lied + maxcap.cons + size + mean.threat +
       non.maj.only + asymm.cap +
       wartime + (1 | p | begyr), 
     hu ~ 1 + avg.democ + mean.threat + asymm.cap + 
       wartime 
   ) + hurdle_gamma(link = "log", link_shape = "log", link_hu = "logit")
-depth.priors.hurdle <- c(set_prior("normal(0, 10)", class = "b", resp = "latentdepthhurdle"),
+depth.priors.hurdle <- c(set_prior("normal(0, 5)", class = "b", resp = "latentdepthhurdle"),
                          set_prior("normal(0, 5)", class = "b", dpar = "hu", resp = "latentdepthhurdle"),
                         set_prior("cauchy(0, 1)", class = "sd", resp = "latentdepthhurdle")
                            )
@@ -278,13 +294,13 @@ depth.priors.hurdle <- c(set_prior("normal(0, 10)", class = "b", resp = "latentd
 
 # conditional str
 cond.formula.hurdle <- brmsformula(
-    oblig.str ~ 1 + maxcap.democ + size + mean.threat +
+    oblig.str ~ 1 + maxcap.lied + maxcap.cons + size + mean.threat +
       non.maj.only + asymm.cap +  
       wartime + (1 | p | begyr), 
     hu ~ 1 + avg.democ + mean.threat + asymm.cap + 
       wartime 
      ) + hurdle_poisson(link = "log")
-cond.priors.hurdle <- c(set_prior("normal(0, 10)", class = "b", resp = "obligstr"),
+cond.priors.hurdle <- c(set_prior("normal(0, 5)", class = "b", resp = "obligstr"),
                         set_prior("normal(0, 5)", class = "b", dpar = "hu", resp = "obligstr"),                         
                         set_prior("cauchy(0, 1)", class = "sd", resp = "obligstr")
           )
@@ -305,28 +321,28 @@ summary(joint.hurdle)
 
 
 # Pull and plot joint results
-ce.democ.joint <- conditional_effects(joint.hurdle, probs = c(0.05, 0.95),
-                                effects = "maxcap.democ")
+ce.democ.joint <- conditional_effects(joint.hurdle, probs = c(0.025, 0.975),
+                                effects = "maxcap.lied")
 ce.plot.joint <- plot(ce.democ.joint,
                 ask = FALSE,
                 line_args = (aes(color = "black"))
                 )
 
 # Obligations
-oblig.joint.plot <- ce.plot.joint$obligstr.obligstr_maxcap.democ +
+oblig.joint.plot <- ce.plot.joint$obligstr.obligstr_maxcap.lied +
   scale_color_grey() +
   scale_fill_grey() +
   theme_bw() +
-  labs(x = "Democracy of Alliance Leader",
+  labs(x = "Electoral Democracy of Alliance Leader",
        y = "Strength of Military Support Conditions")
 oblig.joint.plot
 
 # latent depth 
-depth.joint.plot <- ce.plot.joint$latentdepthhurdle.latentdepthhurdle_maxcap.democ +
+depth.joint.plot <- ce.plot.joint$latentdepthhurdle.latentdepthhurdle_maxcap.lied +
                       scale_color_grey() +
                       scale_fill_grey() +
                       theme_bw() + 
-                      labs(x = "Democracy of Alliance Leader",
+                      labs(x = "Electoral Democracy of Alliance Leader",
                        y = "Latent Depth (shifted)")
 depth.joint.plot
 

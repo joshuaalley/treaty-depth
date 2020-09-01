@@ -15,7 +15,7 @@
 
 
 \singlespace
-\title{\textbf{Appendix: Democracy and the Sources of Alliance Treaty Depth}}
+\title{\textbf{Appendix: Democracy, Electoral Competition, and Alliance Treaty Depth}}
 \author{}
 \date{}
 
@@ -28,7 +28,7 @@
 \doublespace 
 
 This appendix checks the findings in the manuscript in six ways. 
-In the first section, I show raw data about the proportion of democracies when the alliance formed and alliance treaty design.
+In the first section, I show results with three alternative model specifications, including raw data about the proportion of democracies when the alliance formed and alliance treaty design.
 Then I estimate the association between allied democracy and four alternative measures of treaty depth.
 After that, I show that findings of a negative correlation between military institutionalization and alliance performance are sensitive to how treaty depth is measured. 
 In the fourth section, I assess whether non-random selection into alliances affects inferences about democracy and treaty design.   
@@ -36,9 +36,88 @@ I also consider how uncertainty in the latent depth measure affects inferences a
 Last, I add issue linkages to create a trivariate model of the sources of alliance treaty credibility. 
 
 
-\section{Proportion of Democracies}
+\section{Alternative Model Specifications} 
 
 
+Throughout this appendix, I consider and estimate a series of modifications to the models in the paper.
+In addition to the robustness checks with alternative measures of electoral democracy, I fit two models with a crucial control and an alternative expression of the lexical index of electoral democracy (LIED). 
+First, one might wonder if the positive association between electoral democracy and treaty depth is driven by the United States, which formed multiple deep and conditional alliances after 1945. 
+To assess this possibility, I add a dummy indicator of US membership to the generalized joint regression model specification in the manuscript. 
+\autoref{tab:gjrm-res-us} summarizes the resulting estimates. 
+Even after adjusting for US membership, the same patterns hold- electoral democracy decreases the probability of unconditional support, but decreases treaty depth. 
+ 
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrr}
+  & \multicolumn{2}{c}{Uncond. Mil. Support} & \multicolumn{2}{c}{Latent Depth}\\ \hline
+ & Estimate & Std.Error & Estimate & Std.Error \\ 
+  \hline 
+  Executive Constraints & 1.1081371 & 0.3046954 & -0.3793998 & 0.21369644 \\ 
+  Electoral Democracy & -0.2340800 & 0.0617858 & 0.1444279 & 0.04532257 \\ 
+  Economic Issue Linkage & 0.2219283 & 0.1901216 & 0.0481853 & 0.12160564 \\ 
+  FP Concessions & -0.0118830 & 0.0826242 & -0.0759538 & 0.06839510 \\ 
+  Number of Members & -0.1375702 & 0.0239143 & 0.0293432 & 0.01403955 \\ 
+  Wartime Alliances & -0.6639533 & 0.2538412 & -0.0448174 & 0.16321017 \\ 
+  Asymmetric Obligations & -0.0594752 & 0.2309947 & 0.2610269 & 0.15671457 \\ 
+  Asymmetric Capability & 1.3877463 & 0.3753066 & 0.4730382 & 0.20524704 \\ 
+  Non-Major Only & 2.0663994 & 0.3836841 & 0.2133432 & 0.21641409 \\ 
+  FP Disagreement & 0.1379681 & 0.3563245 & 0.3221672 & 0.20796565 \\ 
+  US Member & -1.1898837 & 0.6020201 & 0.1615484 & 0.28569329 \\ 
+  (Intercept) & -1.0536613 & 0.4762219 & -1.5492049 & 0.27717852 \\
+   \hline
+\end{tabular}
+\caption{Results from joint generalized regression model of treaty depth and unconditional military support. 
+                     This model includes a dummy variable to control for US alliance membership.
+                     All smoothed terms report the effective degrees of freedom and the chi-squared term. 
+                     The unconditional military support model is a binomial GLM with a probit link function. 
+                     The treaty depth model is a beta regression. 
+                     I model the error correlation between the two processes with a T copula.} 
+\label{tab:gjrm-res-us}
+\end{table}
+
+
+As a further robustness check, I coarsen the lexical index of electoral democracy into a dummy indicator. 
+I set this high electoral democracy indicator equal to one if the most capable alliance member scores a four or higher on the ordinal lexical index. 
+Thus, this variable sets a threshold for electoral democracy to impact alliance treaty design. 
+\autoref{tab:gjrm-res-lih} shows the estimates from this model specification. 
+I find the same results with a binary measure of electoral democracy- high electoral democracy increases treaty depth and decreases the probability of unconditional military support. 
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrr}
+  & \multicolumn{2}{c}{Uncond. Mil. Support} & \multicolumn{2}{c}{Latent Depth}\\ \hline
+ & Estimate & Std. Error & Estimate & Std. Error  \\ 
+  \hline
+  Executive Constraints & 0.9442112 & 0.3559299 & -0.5381625 & 0.27584648 \\ 
+  Electoral Democracy Dummy & -1.0343771 & 0.3651659 & 0.8879481 & 0.26530270 \\ 
+  Economic Issue Linkage & 0.0494248 & 0.1439695 & 0.1208268 & 0.11773497 \\ 
+  FP Concessions & 0.0521648 & 0.0761914 & -0.0340476 & 0.06187035 \\ 
+  Number of Members & -0.1301782 & 0.0202125 & 0.0249192 & 0.01422685 \\ 
+  Wartime Alliances & -0.7028981 & 0.2541374 & -0.0251157 & 0.16317509 \\ 
+  Asymmetric Obligations & -0.0901847 & 0.2087038 & 0.2416300 & 0.15479277 \\ 
+  Asymmetric Capability & 1.2691873 & 0.4669832 & 0.5468754 & 0.22160833 \\ 
+  Non-Major Only & 1.8578049 & 0.4613107 & 0.2630524 & 0.23305490 \\ 
+  FP Disagreement & 0.2258478 & 0.2141165 & 0.4244338 & 0.20027990 \\ 
+  US Member & -0.4962261 & 0.4910999 & -0.0131635 & 0.27651037 \\ 
+  (Intercept) & -1.2203023 & 0.4882239 & -1.5997600 & 0.26454857 \\ 
+   \hline
+\end{tabular}
+\caption{Results from joint generalized regression model of treaty depth and unconditional military support. 
+                     This model replaces the ordinal lexical index of democracy with a dummy variable for states with a LIED score of four or higher.
+                     All smoothed terms report the effective degrees of freedom and the chi-squared term. 
+                     The unconditional military support model is a binomial GLM with a probit link function. 
+                     The treaty depth model is a beta regression. 
+                     I model the error correlation between the two processes with a T copula.} 
+\label{tab:gjrm-res-lih}
+\end{table}
+
+
+\subsection{Proportion of Democracies}
+
+
+This section offers a set of supporting estimates for inferences about the proportion of states with electoral competition reported in the manuscript. 
 First, raw data on the proportion of states with electoral competition are consistent with my argument. 
 Differences in the average proportion of states with open electoral competition across treaty depth and unconditional military support are consistent with the hypotheses, as \autoref{fig:democ-prop-combo} shows.
 Deep and conditional alliances have the highest average share of members with open electoral competition.
@@ -60,29 +139,29 @@ Similarly, the share of states with executive constraints increases the probabil
 \centering
 \begin{tabular}{lrrrr}
   & \multicolumn{2}{c}{Uncond. Mil. Support} & \multicolumn{2}{c}{Latent Depth}\\ \hline
-   & Estimate & Std. Error & Estimate & Std. Error \\ 
+ & Estimate & Std. Error & Estimate & Std. Error \\ 
   \hline
-(Intercept) & -1.3635074 & 0.4222320 & -1.2538393 & 0.25687735 \\ 
-  Proportion Competitive Elections & 0.9320197 & 0.2828479 & -0.0774065 & 0.22539759 \\ 
-  Proportion Executive Constraints & -1.1186741 & 0.3006014 & 0.6733284 & 0.23531775 \\ 
-  Economic Issue Linkage & 0.1705018 & 0.1784856 & -0.0140737 & 0.13123615 \\ 
-  FP Concessions & -0.1834578 & 0.1179508 & -0.0396814 & 0.07593533 \\ 
-  Number of Members & -0.1013599 & 0.0267192 & 0.0284584 & 0.01355192 \\ 
-  Wartime Alliances & -0.9061538 & 0.2819389 & -0.0257816 & 0.19041326 \\ 
-  Asymmetric Obligations & 0.0479751 & 0.2131197 & 0.2919342 & 0.15385803 \\ 
-  Asymmetric Capability & 1.2901802 & 0.3886467 & 0.3072588 & 0.20944350 \\ 
-  Non-Major Only & 1.9892150 & 0.3939641 & -0.0279217 & 0.22826829 \\ 
-  FP Disagreement & 0.2528277 & 0.2911067 & 0.3811598 & 0.21516245 \\ 
-  s(Mean Threat) & 7.6074253 & 70.6496034 & 1.0000006 & 26.08734378 \\ 
-  s(Start Year) & 5.2531392 & 77.7869322 & 8.3638226 & 72.04780339 \\ 
+(Intercept) & -1.5850732 & 0.3294719 & -1.2447009 & 0.2377012 \\ 
+  Proportion Executive Constraints & 0.5637788 & 0.3475136 & 0.0160054 & 0.2408229 \\ 
+  Proportion Competitive Elections & -0.5655971 & 0.4144783 & 0.5601933 & 0.2961993 \\ 
+  Economic Issue Linkage & -0.0172118 & 0.1695159 & -0.1939038 & 0.1266578 \\ 
+  FP Concessions & -0.0395622 & 0.1041516 & -0.0016768 & 0.0697079 \\ 
+  Number of Members & -0.1060018 & 0.0295824 & 0.0248622 & 0.0129170 \\ 
+  Wartime Alliances & -0.6712526 & 0.2297478 & -0.0990558 & 0.1707358 \\ 
+  Asymmetric Obligations & -0.0603567 & 0.2200877 & 0.2190547 & 0.1517361 \\ 
+  Asymmetric Capability & 1.3044587 & 0.3101569 & 0.4031646 & 0.2033981 \\ 
+  Non-Major Only & 2.1016074 & 0.3260663 & 0.0306805 & 0.2244879 \\ 
+  FP Disagreement & 0.3567875 & 0.2708757 & 0.3919474 & 0.1920820 \\ 
+  s(Mean Threat) & 7.1651906 & 78.5923458 & 1.1901939 & 20.3472391 \\ 
+  s(Start Year) & 6.0636471 & 70.2441994 & 8.6164670 & 64.3156386 \\ 
    \hline
 \end{tabular}
-\caption{Results from joint generalized regression model of treaty depth and unconditional military support. 
+\caption{Results from joint generalized regression model of treaty depth and unconditional military support using the proportion of states with democratic institutions as the key independent variables. 
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
                      The treaty depth model is a beta regression. 
                      I model the error correlation between the two processes with a T copula.} 
-\label{tab:gjrm-res-.prop}
+\label{tab:gjrm-res-prop}
 \end{table}
 
 
@@ -90,67 +169,36 @@ Similarly, the share of states with executive constraints increases the probabil
 \section{Other Measures of Treaty Depth}
 
 
+
 To address a highly skewed distribution and facilitate inferences across a wide range of estimation strategies, results in the paper are based on rescaled mean latent treaty depth, which ranges between 0 and 1. 
 I modeled the rescaled outcome with a beta distribution. 
-I make similar inferences about treaty depth and the Polity score of the most capable alliance member when I estimate regression models of treaty depth without this transformation, however. 
-\autoref{tab:depth-alt-models} summarizes these results. 
-
-\begin{table}[!htbp] 
-\centering 
-\begin{adjustbox}{width= .95\textwidth, center}
-\begin{tabular}{@{\extracolsep{5pt}}lcccc} 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{4}{c}{\textit{Dependent variable:}} \\ 
-\cline{2-5} 
-\\[-1.8ex] & \multicolumn{3}{c}{Latent Depth} & Deep Alliance Dummy \\ 
-\\[-1.8ex] & \textit{OLS} & \multicolumn{2}{c}{\textit{Robust Reg.}} & \textit{Probit} \\ 
-\\[-1.8ex] & (1) & (2) & (3) & (4)\\ 
-\hline \\[-1.8ex] 
- Alliance Leader Polity & 0.020$^{}$ & 0.019$^{}$ & 0.028$^{}$ & 0.030$^{}$ \\ 
-  & (0.004, 0.035) & (0.003, 0.035) & (0.010, 0.046) & (0.004, 0.056) \\ 
-  Foreign Policy Concessions & $-$0.043 & $-$0.043 & $-$0.104 & 0.006 \\ 
-  & ($-$0.157, 0.070) & ($-$0.159, 0.073) & ($-$0.239, 0.030) & ($-$0.188, 0.199) \\ 
-  Number of Members & 0.015 & 0.017 & 0.017 & 0.033$^{}$ \\ 
-  & ($-$0.005, 0.036) & ($-$0.003, 0.038) & ($-$0.004, 0.037) & ($-$0.005, 0.071) \\ 
-  Wartime Alliance & $-$0.253$^{}$ & $-$0.240$^{}$ & 0.040 & $-$0.429$^{}$ \\ 
-  & ($-$0.511, 0.005) & ($-$0.505, 0.024) & ($-$0.306, 0.386) & ($-$0.877, 0.019) \\ 
-  Asymmetric Obligations & 0.101 & 0.126 & 0.293$^{}$ & 0.339 \\ 
-  & ($-$0.155, 0.356) & ($-$0.136, 0.388) & ($-$0.040, 0.625) & ($-$0.089, 0.767) \\ 
-  Asymmetric Capability & 0.302$^{}$ & 0.283 & 0.212 & 0.671$^{}$ \\ 
-  & ($-$0.043, 0.646) & ($-$0.070, 0.636) & ($-$0.499, 0.924) & (0.069, 1.273) \\ 
-  Non-Major Only & 0.229 & 0.230 & 0.072 & 0.675$^{}$ \\ 
-  & ($-$0.143, 0.601) & ($-$0.151, 0.611) & ($-$0.639, 0.783) & (0.029, 1.321) \\ 
-  Average Threat & 0.963$^{}$ & 0.965$^{}$ & 1.424$^{}$ & 1.881$^{}$ \\ 
-  & (0.317, 1.608) & (0.303, 1.626) & (0.650, 2.198) & (0.748, 3.014) \\ 
-  Foreign Policy Disagreement & 0.180 & 0.161 & 0.333 & 0.279 \\ 
-  & ($-$0.158, 0.517) & ($-$0.185, 0.507) & ($-$0.104, 0.770) & ($-$0.294, 0.853) \\ 
-  Start Year & 0.003$^{}$ & 0.003$^{}$ & 0.021$^{}$ & 0.001 \\ 
-  & (0.0003, 0.005) & (0.00001, 0.005) & (0.014, 0.027) & ($-$0.003, 0.006) \\ 
-  Constant & $-$6.226$^{}$ & $-$5.789$^{}$ & $-$41.431$^{}$ & $-$4.431 \\ 
-  & ($-$11.203, $-$1.249) & ($-$10.890, $-$0.688) & ($-$53.699, $-$29.162) & ($-$12.869, 4.006) \\ 
- \hline \\[-1.8ex] 
-Observations & 279 & 279 & 203 & 279 \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{4}{r}{95\% Confidence Intervals in Parentheses.} \\ 
-\end{tabular}
-\end{adjustbox} 
-  \caption{Regression models of untransformed alliance treaty depth. Model 1 uses an OLS estimator, while Models 2 and 3 are robust regressions with Tukey's Biweight function. Model 3 includes data from 1919 to 2010. Model 4 is a binomial model of whether an alliance has median treaty depth or higher. All four models find a positive association between the Polity score of the most capable alliance member and treaty depth.} 
-  \label{tab:depth-alt-models} 
-\end{table} 
+I make similar inferences about treaty depth and the electoral democracy of the most capable alliance member when I estimate regression models of treaty depth without this transformation, however. 
 
 
-In \autoref{tab:depth-alt-models}, I include inferences from OLS, a robust regression estimator, and a probit GLM. 
-The robust regression re-weights observations to correct for non-normal residuals and influential observations that might bias inferences from the OLS estimator. 
-Model 3 is a robust regression of alliances after 1919, which is the time frame in \citet{Mattes2012}. 
-In the probit model, the outcome is dummy variable that I set equal to one if the alliance has higher than the median latent depth. 
+As the discussion of treaty depth in the manuscript notes, depth is extremely skewed. 
+This in turn leads to violations of OLS assumptions and reduces model fit with more standard regressions. 
+To address this problem, I fit skew-t and skew-cauchy models of treaty depth.
+Both these estimators model the skewed errors, and the skew-cauchy model allows for larger outliers.   
+The skewed regressions accommodate non-normal residuals and influential observations that might bias inferences from the OLS estimator. 
+I summarize the estimates from the skew models in \autoref{fig:skew-model-res}. 
+
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=0.95\textwidth]{skew-model-res.png}
+	\caption{Coefficient plot of estimates from skew-t and skew-cauchy models of alliance treaty depth in offensive and defensive ATOP alliances from 1816 to 2012. Both estimators find a positive association between electoral democracy and treaty depth.}
+	\label{fig:skew-model-res}
+\end{figure} 
+
+
+Without rescaling treaty depth, I still find a positive relationship between electoral democracy and alliance treaty depth. 
+This inference also does not depend on how extreme the assumed skewness in the error terms is. 
 
 
 In addition to examining the association between democracy and depth without rescaling the outcome, I examine the association between alliance leader democracy and two measures from earlier scholarship that capture parts of treaty depth. 
 First, \citet{LeedsAnac2005} develop an ordinal measure of military institutionalization.
 Second, \citet{BensonClinton2016} use a latent variable model to measure treaty depth, but their concept views depth as the overall costliness of the alliance obligations. 
-Although these two measures have limitations that make my measure a better fit for this paper, I find that the Polity score of the alliance leader is positively correlated with both variables.
+Although these two measures have limitations that make my measure a better fit for this paper, I find that the electoral democracy of the alliance leader is positively correlated with both variables.
 
 
 Alliance leader democracy is positively correlated with the Leeds and Anac measure of military institutionalization in separate and joint models.
@@ -182,21 +230,21 @@ Their measure is also based on version 3 of the ATOP data, so it has more limite
 Last, their latent variable model makes a series of distributional assumptions that affect the estimated distribution of the latent variable. 
 My latent variable model uses a semiparametric approach that accounts for dependencies between the factors and latent variables, so the distribution of the latent variable may be more accurate \citep{Murrayetal2013}.
 For these three reasons, my latent measure better captures the concept of defense coordination and cooperation.\footnote{When scholars want to measure the overall costliness of alliance obligations, they should consider Benson and Clinton's measure.} 
-Despite these differences, I find a positive association between the Polity score of the most capable alliance member and Benson and Clinton's measure of depth. 
+Despite these differences, I find a positive association between the lexical index of democracy in the most capable alliance member and Benson and Clinton's measure of depth. 
 
 
 I now discuss the results of analyses with both alternative dependent variables. 
-As in the paper, I start with univariate models then estimate a bivariate model with each depth measure and unconditional military support. 
+I start with univariate models then estimate a bivariate model with each depth measure and unconditional military support. 
 First, I fit an ordinal model of military institutionalization. 
 Then, after rescaling Benson and Clinton's depth measure to range between 0 and 1, I fit a beta regression model. 
-\autoref{fig:results-alt-measures-sep} plots the substantive effect of the most capable alliance member's Polity score on both outcomes. 
-Democratic institutions in the alliance leader increase the probability of high institutionalization and decrease the probability of no institutionalization. 
+\autoref{fig:results-alt-measures-sep} plots the substantive effect of the most capable alliance member's lexical index of electoral democracy score on both outcomes. 
+Electoral democracy in the alliance leader increase the probability of high institutionalization and decrease the probability of no institutionalization. 
 Alliance leader democracy is also positively associated with Benson and Clinton's measure of depth. 
 
 
 \begin{figure}
 \includegraphics[width=.95\textwidth]{results-alt-measures-sep.png}  
-\caption{Predicted changes in treaty depth by the Polity score of the most capable alliance member. The line marks predicted values, and the shaded areas encapsulate the 95\% confidence interval.}
+\caption{Predicted changes in treaty depth by the electoral democracy of the most capable alliance member. The line marks predicted values, and the shaded areas encapsulate the 95\% confidence interval.}
 \label{fig:results-alt-measures-sep}
 \end{figure}
 
@@ -205,20 +253,19 @@ Alliance leader democracy is also positively associated with Benson and Clinton'
 For the military institutionalization measure, I could not fit an ordinal model in GJRM.
 Therefore, I created a dummy variable and set it equal to one if the alliance had high institutionalization. 
 I then used a probit estimator to model the high military institutionalization dummy. 
-The results of this analysis are weaker than expected. 
-As the left panel of \autoref{fig:results-alt-measures} shows, although the the probability of high military institutionalization increases with alliance leader democracy, the increase is small. 
+As the left panel of \autoref{fig:results-alt-measures} shows, the probability of high military institutionalization increases with alliance leader electoral democracy, although the predicted probabilities are fairly uncertain. 
 This may reflect limited variation in the ordinal measure, which I further reduced by translating it into a dummy variable. 
 
 
 \begin{figure}
 \includegraphics[width=.95\textwidth]{results-alt-measures.png}  
-\caption{Predicted probability of military institutionalization and predicted treaty depth as a function of alliance leader democracy. The line marks predicted values, and the error bars summarize the approximate 95\% confidence interval. Predictions based on the smoothed terms from two joint generalized regression models, one for high military institutionalization and unconditional support, and another with Benson and Clinton's depth measure and unconditional military support. }
+\caption{Predicted probability of military institutionalization and predicted treaty depth as a function of alliance leader electoral democracy. The line marks predicted values, and the error bars summarize the approximate 95\% confidence interval. Predictions based on estimates from two joint generalized regression models, one for high military institutionalization and unconditional support, and another with Benson and Clinton's depth measure and unconditional military support. These estimates hold all other factors equal.}
 \label{fig:results-alt-measures}
 \end{figure}
 
 
 Findings about the association between treaty depth and Benson and Clinton's also match the treaty depth hypothesis. 
-Moving from an autocratic to a democratic alliance leader increases the overall costliness of the alliance obligations. 
+Greater electoral democracy increases the overall costliness of the alliance obligations. 
 I suspect that this result is driven by the defense cooperation measures in Benson and Clinton's latent variable. 
 In summary, I find similar results with four alternative measures of treaty depth, including two measures from previous scholarship. 
 
@@ -302,7 +349,7 @@ Thus, the possible direction of this association shifts, depending on how allian
 
 
 To further assess this finding, I utilized an updated alliance performance dataset from \citet{BerkemeierFuhrmann2018}.
-In this case, I specified a different logit model that included latent depth, unconditional support, dummy indicators of asymmetric capability and symmetric non-major power pacts, a post 1945 dummy, the two indicators of democratic institutions, the number of members, economic issue linkages, and foreign policy concessions. 
+In this case, I specified a new logit model that included latent depth, unconditional support, dummy indicators of asymmetric capability and symmetric non-major power pacts, a post 1945 dummy, the two indicators of democratic institutions, the number of members, economic issue linkages, and foreign policy concessions. 
 All of these factors are potential sources of reliability, per different arguments in the literature. 
 In these models, I find a similar result--- a positive relationship between depth and honoring military support that cannot be distinguished from zero.
 
@@ -313,14 +360,16 @@ Again, given issues with non-random selection into alliance crises and challenge
 They do suggest, however, that deep alliances are not necessarily less reliable when invoked. 
 
 
+
 \section{Adjusting for Alliance Formation}
+
 
 
 Observed alliances are the result of negotiations between potential members. 
 Therefore the set of observed alliances is not a random sample.
 Rather, alliance members overcame the many obstacles to alliance formation \citep{Poast2019a}.  
 In this section, I account for non-random alliance formation using a hurdle model of observed alliances after combining a stratified random sample of non-allied groups of states with observed alliances. 
-This research design produces similar inferences: the Polity score of the most capable alliance member increases treaty depth but has no effect on unconditional military support. 
+This research design produces partially similar inferences: electoral democracy in the most capable alliance member increases treaty depth but has an unclear relationship with conditions on military support. 
 
 
 My research design for this robustness check follows established procedures for dealing with selection into alliances and treaty design. 
@@ -329,7 +378,7 @@ First I constructed a random sample of groups of states that could have formed a
 Then I took a stratified sample of the non-allied k-ads to include five times as many non-allied observations as alliance observations for each observed value of alliance size. 
 For example, there are 215 bilateral alliances, so I sampled 1075 non-allied bilateral groups. 
 There is only one alliance with 34 members, so I added five non-alled k-ads with 34 members. 
-Finally, I summarized key characteristics of these non-allied k-ads, including average Polity score, the Polity score of the most capable member, the number of members, mean threat, asymmetric capability, and wartime, and merged the non-allied data with the observed alliance data. 
+Finally, I summarized key characteristics of these non-allied k-ads, including average Polity score, the electoral democracy of the most capable member, the number of members, mean threat, asymmetric capability, and wartime, and merged the non-allied data with the observed alliance data. 
 
 
 To model alliance treaty alliance design, I used the research design of \citet{Chibaetal2015}, who estimated a hurdle model to assess whether democracies were more likely to offer conditional obligations.
@@ -357,21 +406,21 @@ Thus, the final measure of military support commitment strength ranges between 1
 
 
 In both models, I use average democracy, mean threat, asymmetric capability, wartime, and year varying intercepts to predict whether the group of states clears the alliance formation hurdle.
-In the second stage, I use the democracy of the most capable alliance member, the number of members, mean threat, dummy indicators of asymmetric capability or non-major power only membership, wartime and year varying intercepts to model treaty design. 
+In the second stage, I use electoral competition and executive constraints in the most capable alliance member, the number of members, mean threat, dummy indicators of asymmetric capability or non-major power only membership, wartime and year varying intercepts to model treaty design. 
 I then estimate the two hurdle models simultaneously using the BRMS package for \textsf{R}, which employs STAN for fully Bayesian inference \citep{Buerkner2017}. 
 Unlike the GJRM estimators in the manuscripts, I cannot directly estimate residual correlations.
 Instead, I connect the two hurdle models with a correlated set of year varying intercepts.\footnote{The complexity of this joint hurdle model and limited sample size in the second stage means results should be treated with caution. I find similar results with separate hurdle models for depth and conditions on military support. Results on file with the author.} 
 
 
-Even after accounting for non-random alliance formation with the joint hurdle model, I find similar results to the manuscript. 
+After accounting for non-random alliance formation with the joint hurdle model, I find partially similar results to the manuscript. 
 \autoref{fig:results-joint-hurdle} plots the results of the joint hurdle model. 
-This figure shows the predicted marginal effect of alliance leader polity on commitment strength and shifted treaty depth, along with 90\% credible intervals.\footnote{Inferences from 90\% credible intervals in Bayesian models are more stable.} 
-As in the sample with only observed alliances, greater democracy among alliance members increases treaty depth and has no clear relationship with conditions on military support. 
+This figure shows the predicted marginal effect of open elections in the alliance leader on commitment strength and shifted treaty depth, along with 95\% credible intervals.
+Electoral competition in the most capable alliance member increases treaty depth and has no clear relationship with conditions on military support. 
 
 
 \begin{figure}
 \includegraphics[width=.95\textwidth]{results-joint-hurdle.png}  
-\caption{Predicted commitment strength and changes in treaty depth by the the average Polity score of alliance members when the treaty formed based on a joint hurdle model of alliances. The line marks predicted values, and the shaded areas encapsulate the 90\% credible interval. The rug plot on the x-axis marks observed values of allied democracy. Predictions hold all other variables constant.}
+\caption{Predicted commitment strength and changes in treaty depth by electoral competition in the most capable alliance member when the treaty formed. Estimates are based on a joint hurdle model of alliances. The line marks predicted values, and the shaded areas encapsulate the 90\% credible interval. The rug plot on the x-axis marks observed values of allied democracy. Predictions hold all other variables constant.}
 \label{fig:results-joint-hurdle}
 \end{figure}
 
@@ -399,16 +448,17 @@ After multiple imputation, researchers fit a separate model to each imputed data
 % Expand on these results later 
 Even after accounting for uncertainty in the treaty depth measure, I find a similar pattern, albeit with more uncertainty in the estimates. 
 I plot the relevant posterior distributions in \autoref{fig:results-unc-depth}. 
-The 90\% credible interval for treaty depth barely overlaps zero, but 91\% of the posterior mass is positive. 
-For unconditional military support, the 90\% credible interval has substantial uncertainty, but the alliance leader Polity has 88\% negative posterior probability. 
-Thus the preponderance of evidence from these estimates matches the hypotheses. 
+The 95\% credible interval of the association between electoral democracy is uniformly positive and 99\% of the posterior mass is positive. 
+For unconditional military support, the 95\% credible interval has substantial uncertainty, and the alliance leader electoral democracy has 78\% negative posterior probability. 
+Thus the preponderance of evidence from these estimates matches the hypotheses, but the effect on unconditional support is weaker. 
 
 
 \begin{figure}
 \includegraphics[width=.95\textwidth]{results-unc-depth.png}  
-\caption{Estimated association between the democracy of the most capable alliance member and two sources of treaty depth from a Bayesian model that accounts for uncertainty in the latent depth measure. The density plot shows the posterior distributions, and the shaded area summarizes the 90\% credible interval.}
+\caption{Estimated association between the democracy of the most capable alliance member and two sources of treaty depth from a Bayesian model that accounts for uncertainty in the latent depth measure. The density plot shows the posterior distributions, and the shaded area summarizes the 95\% credible interval.}
 \label{fig:results-unc-depth}
 \end{figure}
+
 
 
 
@@ -421,7 +471,7 @@ Because issue linkages make alliance commitments more credible in this ``hard ca
 In the manuscript, I use issue linkages as a control variable and do not discuss them in the theory. 
 I offer minimal discussion of issue linkages to simplify the argument and empirical tests. 
 Examining treaty depth, unconditional military support and issue linkages together is a logical next step in theory development. 
-For this paper, I also find a positive association between alliance leader democracy and treaty depth in a trivariate model of treaty depth, unconditional military support and issue linkages. 
+For this paper, I also find a positive association between alliance leader electoral democracy and treaty depth in a trivariate model of treaty depth, unconditional military support and issue linkages. 
 
 
 The trivariate model uses three dummy variables to measure the outcomes, as this is a limitation of the GJRM estimator. 
@@ -431,15 +481,15 @@ Last, I set the issue linkages dummy equal to one if the alliance promises econo
 The trivariate model converges to the same estimates regardless of the copula, so the results below should be interpreted with some caution.
 
 
-Even after accounting for correlated errors between models of treaty depth, unconditional military support and issue linkages, I find a positive relationship between the Polity score of the most capable alliance member and treaty depth. 
+Even after accounting for correlated errors between models of treaty depth, unconditional military support and issue linkages, I find a positive relationship between the electoral democracy of the most capable alliance member and treaty depth. 
 I also find no clear association between the political institutions of the alliance leader and the probability of unconditional military support. 
-\autoref{fig:pred-trivar} summarizes the predicted probabilities of each credibility source for the values of the alliance leaders' Polity score. 
-Estimates hold all variables besides the Polity score of the most capable alliance member at their mode or median.  
+\autoref{fig:pred-trivar} summarizes the predicted probabilities of each credibility source for the values of the lexical index of electoral democracy. 
+Estimates hold all variables besides the electoral democracy of the most capable alliance member at their mode or median.  
 
 
 \begin{figure}
 \includegraphics[width=.95\textwidth]{pred-trivar.png}  
-\caption{Predicted probabilities an alliance includes treaty depth, unconditional military support or issue linkages for each value of alliance leader Polity scores. The three outcomes are dummy variables for a deep alliance, unconditional military support, and issue linkages. Predictions based on estimates from a trivariate GJRM with a normal copula.}
+\caption{Predicted probabilities an alliance has greater than median treaty depth, unconditional military support or issue linkages for each value of alliance leader electoral democracy. The three outcomes are dummy variables for a deep alliance, unconditional military support, and issue linkages. Predictions based on estimates from a trivariate GJRM with a normal copula.}
 \label{fig:pred-trivar}
 \end{figure}
 

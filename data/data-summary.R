@@ -6,7 +6,7 @@
 # descriptive statistics
 
 ggplot(atop.milsup, aes(maxcap.open)) + geom_bar()
-cor.test(atop.milsup$latent.depth.mean, atop.milsup$maxcap.open)
+cor.test(atop.milsup$latent.depth.mean, atop.milsup$maxcap.lied)
 
 
 # plot depth over time 
@@ -191,7 +191,7 @@ atop.democ.group <- atop.milsup %>%
                     group_by(deep.alliance, uncond.milsup) %>%
                      summarize(
                        avg.prop.open = mean(prop.open, na.rm = TRUE),
-                       avg.open = mean(maxcap.open, na.rm = TRUE)
+                       avg.open = mean(maxcap.lied, na.rm = TRUE)
                      )
 
 
@@ -236,6 +236,8 @@ ggplot(data = atop.democ.group,
   theme(axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12))
 ggsave("appendix/democ-prop-combo.png", height = 6, width = 8)
+
+
 
 
 

@@ -3,12 +3,12 @@
 # must run after joint-cred-analysis.R 
 
 # add a control for US membership
-uncond.formula.us <- uncond.milsup ~ maxcap.cons + maxcap.open +
+uncond.formula.us <- uncond.milsup ~ maxcap.cons + maxcap.lied +
   econagg.dum + 
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr) + us.mem
 
-depth.formula.us <- latent.depth.mean.rs ~ maxcap.cons + maxcap.open +
+depth.formula.us <- latent.depth.mean.rs ~ maxcap.cons + maxcap.lied +
   econagg.dum +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr) + us.mem
@@ -19,35 +19,36 @@ gjrm.us <- gjrm(list(uncond.formula.us, depth.formula.us,
                           data = key.data,
                           margins = c("probit", "BE"),
                           Model = "B",
-                          BivD = "T"
+                          BivD = "N"
                       ) 
 conv.check(gjrm.us)
 summary(gjrm.us)
 
 
-# fit model with interactions
-uncond.formula.inter <- uncond.milsup ~ maxcap.cons + maxcap.comp +
-  maxcap.rec + 
+# dummy of high LIED (> 4)
+key.data$maxcap.liedh <- ifelse(key.data$maxcap.lied >= 4, 1, 0)
+# formulas with alt IV
+uncond.formula.lih <- uncond.milsup ~ maxcap.cons + maxcap.liedh +
   econagg.dum + 
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr) + us.mem
 
-depth.formula.inter <- latent.depth.mean.rs ~ maxcap.cons + maxcap.comp +
-  maxcap.rec + maxcap.comp:maxcap.rec +
+depth.formula.lih <- latent.depth.mean.rs ~ maxcap.cons + maxcap.liedh +
   econagg.dum +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr) + us.mem
 
+theta.formula.lih <- ~ s(begyr) + maxcap.cons + maxcap.liedh
 
-gjrm.inter <- gjrm(list(uncond.formula.inter, depth.formula.inter,
-                     eq.sigma, theta.formula), 
+gjrm.lih <- gjrm(list(uncond.formula.lih, depth.formula.lih,
+                     eq.sigma, theta.formula.lih), 
                 data = key.data,
                 margins = c("probit", "BE"),
                 Model = "B",
-                BivD = "T"
+                BivD = "N"
 ) 
-conv.check(gjrm.inter)
-summary(gjrm.inter)
+conv.check(gjrm.lih)
+summary(gjrm.lih)
 
 
 
@@ -55,9 +56,10 @@ summary(gjrm.inter)
 ### fit a model with democratic proportion
 
 # contrast these variables
-ggplot(atop.milsup, aes(x = factor(maxcap.open), y = prop.open)) +
+ggplot(atop.milsup, aes(x = factor(maxcap.lied), y = prop.open)) +
   geom_boxplot() +
-  geom_jitter(alpha = .85)
+  geom_jitter(alpha = .85) +
+  theme_bw()
 
 
 
@@ -125,24 +127,15 @@ depth.formula.prop <- latent.depth.mean.rs ~
 
 theta.formula.prop <- ~ s(begyr) + prop.open + prop.cons 
 
-# Create a list of models
-gjrm.models.prop <- vector(mode = "list", length = length(copulas))
-
 # Same model: probit and beta margins 
-for(i in 1:length(copulas)){
-  gjrm.models.prop[[i]]  <- gjrm(list(uncond.formula.prop, depth.formula.prop,
+joint.gjrm.prop  <- gjrm(list(uncond.formula.prop, depth.formula.prop,
                                       eq.sigma, theta.formula.prop), data = key.data.prop,
                                  margins = c("probit", "BE"),
                                  Model = "B",
-                                 BivD = copulas[i]
-  )
-}
-aic.gjrm.prop <- lapply(gjrm.models.prop, AIC)
-aic.gjrm.prop
+                                 BivD =  "T" # better AIC than normal
+                          )
 
 # examine the results: 
-copulas[17] # copula that minimizes AIC and has best convergence
-joint.gjrm.prop <- gjrm.models.prop[[17]] 
 conv.check(joint.gjrm.prop)
 AIC(joint.gjrm.prop)
 summary(joint.gjrm.prop)
@@ -151,41 +144,33 @@ summary(joint.gjrm.prop)
 
 ### consider alternative meaures of democracy/competition
 
-# Start with lexical index of democracy
-# Set up unique dataframe
-key.data.lied <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
-                   fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                   low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.lied,
-                   maxcap.open.lied, maxcap.comp.lied, maxcap.cons, us.mem) %>%
-  drop_na()
-key.data.lied$latent.depth.mean.rs <- (key.data.lied$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
-summary(key.data.lied$latent.depth.mean.rs)
+# Start with polity
 
-uncond.formula.lied <- uncond.milsup ~ maxcap.cons + maxcap.lied +
+uncond.formula.pol <- uncond.milsup ~ maxcap.cons + maxcap.rec + maxcap.comp +
   econagg.dum + 
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
-depth.formula.lied <- latent.depth.mean.rs ~ maxcap.cons + maxcap.lied +
+depth.formula.pol <- latent.depth.mean.rs ~ maxcap.cons + maxcap.rec + maxcap.comp +
   econagg.dum +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
 # model the dependence between the error terms as a function of start year
-theta.formula.lied <- ~ s(begyr) + maxcap.cons + maxcap.lied
+theta.formula.pol <- ~ s(begyr) + maxcap.cons + maxcap.rec 
 eq.sigma <- ~ 1
 
 # Fit the model 
-joint.gjrm.lied <- gjrm(list(uncond.formula.lied, depth.formula.lied,
-                                 eq.sigma, theta.formula.lied), 
-                            data = key.data.lied,
+joint.gjrm.pol <- gjrm(list(uncond.formula.pol, depth.formula.pol,
+                                 eq.sigma, theta.formula.pol), 
+                            data = key.data,
                             margins = c("probit", "BE"),
                             Model = "B",
-                            BivD = "T"
+                            BivD = "N"
                   )
-conv.check(joint.gjrm.lied)
-summary(joint.gjrm.lied)
-post.check(joint.gjrm.lied)
+conv.check(joint.gjrm.pol)
+summary(joint.gjrm.pol)
+post.check(joint.gjrm.pol)
 
 
 ### Model with contestation and inclusiveness
@@ -253,7 +238,7 @@ gjrm.poly.vdem <- gjrm(list(uncond.formula.poly.vdem, depth.formula.poly.vdem,
                   data = key.data.poly.vdem,
                   margins = c("probit", "BE"),
                   Model = "B",
-                  BivD = "N"
+                  BivD = "T"
 ) 
 AIC(gjrm.poly.vdem)
 conv.check(gjrm.poly.vdem)
@@ -281,6 +266,7 @@ sim.data <- cbind.data.frame(
     maxcap.cons = rep(1, n = 2),
     par = c(min(model[[i]][["X1"]][, 3]), max(model[[i]][["X1"]][, 3])), # placeholder
     prop.cons = rep(1, n = 2), 
+    maxcap.comp = rep(1, n = 2),
     econagg.dum = rep(0, n = 2),
     fp.conc.index = rep(0, n = 2), # no concessions
     num.mem = rep(2, n = 2), # bilateral
@@ -395,8 +381,8 @@ ggsave(destination, results.all,
 
 
 # Inputs
-models.comp = list(joint.gjrm.prop, joint.gjrm.lied, gjrm.poly.vdem)
-labels.comp = c("Proportion Elec. Comp.", "Lexical Index of Democracy.", "Polyarchy (VDem)")
+models.comp = list(joint.gjrm.prop, joint.gjrm.pol, gjrm.poly.vdem)
+labels.comp = c("Proportion Elec. Comp.", "Polity Elections.", "Polyarchy (VDem)")
 
 
 # Apply the function 

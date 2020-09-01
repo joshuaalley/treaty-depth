@@ -230,7 +230,7 @@ atop.milsup <- filter(atop, offense == 1 | defense == 1)
 atop.depth <- select(atop.milsup,
                      intcom, compag.mil,  
                      milaid, milcon, base, 
-                     organ1, contrib) 
+                     organ1) 
 atop.depth <- as.data.frame(atop.depth)
 for(i in 1:ncol(atop.depth)){
   atop.depth[, i] <- as.ordered(atop.depth[, i])
@@ -239,16 +239,17 @@ for(i in 1:ncol(atop.depth)){
 # Use Murray BFA approach
 latent.depth <- bfa_copula(~ intcom + compag.mil + 
                              milaid + milcon + base + 
-                             organ1 + contrib, 
+                             organ1, 
                            data = atop.depth, num.factor = 1,
                            restrict = list(c("intcom", 1, ">0")),
                           factor.scales = FALSE,
                           keep.scores = TRUE, loading.prior = "gdp", 
                           px = TRUE, imh.iter = 1000, imh.burn = 1000,
-                          nburn = 20000, nsim = 30000, thin = 30, print.status = 2000)
+                          nburn = 20000, nsim = 30000, thin = 30, 
+                          print.status = 2000)
 
 # Little bit of diagnosis
-plot(get_coda(latent.depth))
+# plot(get_coda(latent.depth))
 
 # Diagnosis of convergence with coda
 lcap.sam <- get_coda(latent.depth, scores = TRUE)
@@ -290,7 +291,7 @@ nFactors::plotnScree(nS)
 # Create a dataset of factors
 latent.factors <- cbind.data.frame(c("Integrated Command", "Companion Mil. Agreement", 
                                      "Military Aid", "Policy Coordination", "Bases",
-                                     "Formal IO", "Specific Contribution"),
+                                     "Formal IO"),
                                    latent.depth[["post.loadings.mean"]],
                                    sqrt(latent.depth[["post.loadings.var"]])
 )
@@ -343,7 +344,12 @@ ls.styear <- ggplot(atop.milsup, aes(x = begyr, y = latent.depth.mean)) +
   theme_classic()
 ls.styear
 # Combine loadings and styear plot
-multiplot.ggplot(loadings.plot, ls.styear, cols = 1)
+grid.arrange(loadings.plot, ls.styear, ncol = 1)
+depth.sum <- arrangeGrob(loadings.plot, ls.styear, ncol = 1)
+ggsave("figures/loadings-measure.png",
+       depth.sum,
+       height = 6, width = 8)
+
 
 # 171 alliances with depth above -.6 
 sum(atop.milsup$latent.depth.mean > -.6)
@@ -460,18 +466,17 @@ atop.milsup$post45 <- ifelse(atop.milsup$begyr > 1945, 1, 0)
 
 
 ### compare model fit with one and two factors
-# latent.depth2 <- bfa_copula(~ intcom + compag.mil + 
-#                              milaid + milcon + base + 
-#                              organ1 + contrib, 
-#                            data = atop.depth, num.factor = 2,
-#                            restrict = list(c("intcom", 1, ">0"),
-#                                            c("milaid", 2, ">0")),
-#                            factor.scales = FALSE,
-#                            keep.scores = TRUE, loading.prior = "gdp", 
-#                            px = TRUE, imh.iter = 1000, imh.burn = 1000,
-#                            nburn = 20000, nsim = 30000, thin = 30, print.status = 2000)
+latent.depth2 <- bfa_copula(~ intcom + compag.mil +
+                             milaid + milcon + base +
+                             organ1,
+                           data = atop.depth, num.factor = 2,
+                           restrict = list(c("intcom", 1, ">0"),
+                                           c("milaid", 2, ">0")),
+                           factor.scales = FALSE,
+                           keep.scores = TRUE, loading.prior = "gdp",
+                           px = TRUE, imh.iter = 1000, imh.burn = 1000,
+                           nburn = 20000, nsim = 30000, thin = 30, print.status = 2000)
 # plot(get_coda(latent.depth2))
-biplot(latent.depth2)
 
 
 # Diagnosis of convergence with coda
@@ -483,4 +488,4 @@ diag.geweke  <- geweke.diag(lcap.sam)
 par(mfrow=c(1, 1))
 plot(density(diag.geweke$z))
 lines(density(rnorm(10000, 0, 1)))
-
+# decidedly not- some really fat tails. 

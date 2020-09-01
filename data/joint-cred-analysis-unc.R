@@ -8,15 +8,18 @@
 # Use brms
 # set up model formulas and priors
 # depth model
-bf.depth <- brmsformula(latent.depth.mean.rs ~ maxcap.democ +  econagg.dum +
+bf.depth <- brmsformula(latent.depth.mean.rs ~ 
+                          maxcap.cons + maxcap.lied +
+                          econagg.dum +
                           fp.conc.index + num.mem + wartime + 
                           asymm + asymm.cap + non.maj.only +
                           mean.threat + low.kap.sc + begyr,
-                        center = TRUE) + Beta(link = "logit", link_phi = "log")
-depth.priors <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthmeanrs") 
+                        center = TRUE) + Beta(link = "logit")
+depth.priors <- set_prior("normal(0, .75)", class = "b", resp = "latentdepthmeanrs") 
 
 # Unconditional military support model  
-bf.uncond <- brmsformula(uncond.milsup ~ maxcap.democ + econagg.dum + 
+bf.uncond <- brmsformula(uncond.milsup ~ maxcap.cons + maxcap.lied +
+                           econagg.dum + 
                            fp.conc.index + num.mem + wartime + 
                            asymm + asymm.cap + non.maj.only +
                            mean.threat + low.kap.sc + begyr,
@@ -28,7 +31,7 @@ uncond.priors <- set_prior("student_t(7, 0, 3)", class = "b", resp = "uncondmils
 full.priors <- depth.priors + uncond.priors
 brm.multivar <- brm(bf.depth + bf.uncond +
                       set_rescor(FALSE), 
-                    data = key.data,
+                    data = key.data.lied,
                     prior = full.priors,
                     chains = 2, cores = 2)
 # brm.multivar <- add_criterion(brm.multivar, "loo", reloo = TRUE)
@@ -38,7 +41,7 @@ summary(brm.multivar)
 
 # Plot marginal effects of average democracy
 plot(conditional_effects(brm.multivar,
-                        effects = "maxcap.democ",
+                        effects = "maxcap.lied",
                         method = "fitted",
                         theme = "bw"),
                      ask = FALSE)
@@ -51,7 +54,7 @@ plot(conditional_effects(brm.multivar,
 
 
 # create an empty list of dataframes with all the variables
-brms.data.key <- select(atop.milsup, maxcap.democ, econagg.dum, uncond.milsup, 
+brms.data.key <- select(atop.milsup, maxcap.lied, maxcap.cons, econagg.dum, uncond.milsup, 
                                      fp.conc.index, num.mem, wartime, asymm,
                                      asymm.cap, non.maj.only,
                                      low.kap.sc, begyr, mean.threat) 
@@ -61,39 +64,40 @@ brms.data.unc <- vector(mode = "list", length = ncol(post.score[1, , ]))
 
 for(i in 1:ncol(post.score[1, , ])){
   brms.data.unc[[i]] <- cbind.data.frame(brms.data.key, post.score[1, , i]) 
-  colnames(brms.data.unc[[i]])[13] <- "latent.depth"
+  colnames(brms.data.unc[[i]])[14] <- "latent.depth"
 }
 
 # rescale depth column:
 brms.data.unc.rs <- lapply(brms.data.unc, function(data){
-  cbind.data.frame(data, (data[, 13] + 10) / (10 + max(data[, 13]) + .01))
+  cbind.data.frame(data, (data[, 14] + 10) / (10 + max(data[, 14]) + .01))
 }
 )
 
 # rename depth column
 for(i in 1:length(brms.data.unc.rs)){
-  colnames(brms.data.unc.rs[[i]])[14] <- "latent.depth.rs"
+  colnames(brms.data.unc.rs[[i]])[15] <- "latent.depth.rs"
 }
 
-# sample 500 at random for an initial run
-brms.data.unc.short <- sample(brms.data.unc.rs, size = 500, replace = FALSE)
+# sample 500 at random 
+brms.data.unc.short <- sample(brms.data.unc.rs, size = 400, replace = FALSE)
 
 ### run model: brm_multiple
 # uses priors and formula from earlier model
 
 # depth model: update formula
-bf.depth.unc <- brmsformula(latent.depth.rs ~ maxcap.democ + econagg.dum + 
+bf.depth.unc <- brmsformula(latent.depth.rs ~ maxcap.lied + maxcap.cons +
+                          econagg.dum + 
                           fp.conc.index + num.mem + wartime + asymm + 
                             asymm.cap + non.maj.only + mean.threat +
                           low.kap.sc + begyr,
                         #+ (1 | p | gr(begyr, dist = "gaussian")),
                         center = TRUE) + Beta(link = "logit", link_phi = "log")
-depth.priors.unc <- set_prior("normal(0, 1)", class = "b", resp = "latentdepthrs") 
+depth.priors.unc <- set_prior("normal(0, .25)", class = "b", resp = "latentdepthrs") 
 # same uncond milsup model and priors as earlier analysis
 priors.unc <- depth.priors.unc + uncond.priors
 
-# run the model on 500 of the 1000 datasets
-# 1000 datasets has 12+ hour run time
+# run the model on 400 of the 1000 datasets
+# 1000 datasets has 12+ hour run time and takes up too much memory
 system.time(
 brm.multivar.unc <- brm_multiple(bf.depth.unc + bf.uncond +
                       set_rescor(FALSE), 
@@ -120,19 +124,19 @@ summary.brms
 # Plot key intervals
 color_scheme_set(scheme = "gray")
 intervals.unc <- mcmc_areas(brm.multivar.unc,
-                                pars = c("b_latentdepthrs_maxcap.democ",
-                                         "b_uncondmilsup_maxcap.democ"),
-                                prob = .9,
+                                pars = c("b_latentdepthrs_maxcap.lied",
+                                         "b_uncondmilsup_maxcap.lied"),
+                                prob = .95,
                                 point_est = "median"
                                 )
 intervals.unc +
   vline_0(linetype = 2) + 
-  scale_x_continuous(limits = c(-.1, .05)) +
+ # scale_x_continuous(limits = c(-.1, .05)) +
   scale_y_discrete(
-    labels = c(b_latentdepthrs_maxcap.democ = "Latent Depth", 
-            b_uncondmilsup_maxcap.democ = "Unconditional Support")
+    labels = c(b_latentdepthrs_maxcap.lied = "Latent Depth", 
+            b_uncondmilsup_maxcap.lied = "Unconditional Support")
     ) +
-  ggtitle("Effect of Alliance Leader Polity") +
+  ggtitle("Effect of Alliance Leader Electoral Democracy") +
   labs(x = "Estimate", y = "") +
   theme_bw()
 ggsave("appendix/results-unc-depth.png", height = 6, width = 8)
@@ -140,11 +144,13 @@ ggsave("appendix/results-unc-depth.png", height = 6, width = 8)
 
 # Calculate posterior probabilities
 coefs.unc <- extract(brm.multivar.unc$fit, pars = 
-                       c("b_latentdepthrs_maxcap.democ",
-                         "b_uncondmilsup_maxcap.democ"))
+                       c("b_latentdepthrs_maxcap.lied",
+                         "b_uncondmilsup_maxcap.lied",
+                         "b_latentdepthrs_maxcap.cons",
+                         "b_uncondmilsup_maxcap.cons"))
 
-mean(coefs.unc$b_latentdepthrs_maxcap.democ > 0)
-mean(coefs.unc$b_uncondmilsup_maxcap.democ < 0)
+mean(coefs.unc$b_latentdepthrs_maxcap.lied > 0)
+mean(coefs.unc$b_uncondmilsup_maxcap.lied < 0)
 
 # Save model elsewhere: takes up a ton of space
 saveRDS(brm.multivar.unc, "data/brm-multivar-unc.rds")

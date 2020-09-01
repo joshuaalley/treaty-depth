@@ -133,13 +133,14 @@ data_polity <- data_polity %>%
                   open.rec = ifelse(exrec == 8, 1, 0),
                   open.comp = ifelse(polcomp == 10, 1, 0),
                   exec.cons = ifelse(xconst == 7, 1, 0),
-                  open.pol = open.rec + open.comp,
-                  open.dum = ifelse(exrec == 8 &
-                                polcomp == 10, 1, 0),
+                  open.pol = open.rec + open.comp
                 ) %>%
                 left_join(polyarchy) %>%
                 left_join(lied) %>%
-                left_join(vdem.polyarchy)
+                left_join(vdem.polyarchy) %>%
+                mutate(
+                 open.dum = ifelse(lexical_index_original >= 4, 1, 0)
+                )
 table(data_polity$open.pol)
 glimpse(data_polity)
 
@@ -219,7 +220,7 @@ alliance.year <- atop.cow.year %>%
     prop.comp = mean(open.comp, na.rm = TRUE),
     prop.rec = mean(open.rec, na.rm = TRUE),
     prop.cons = mean(exec.cons, na.rm = TRUE),
-    prop.open = mean(open, na.rm = TRUE),
+    prop.open = mean(open.dum, na.rm = TRUE),
     
     # POLITY summaries
     maxcap.rec = max(maxcap.rec, na.rm = TRUE),
