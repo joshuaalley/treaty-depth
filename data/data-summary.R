@@ -46,6 +46,11 @@ ggplot(atop.milsup, aes(x = num.mem, y = latent.depth.mean)) +
   geom_point()
 
 
+# correlation between different democracy pieces
+table(atop.milsup$maxcap.cons, atop.milsup$maxcap.lied)
+t.test(maxcap.lied ~ maxcap.cons, data = atop.milsup)
+
+
 # Focus on avg democracy 
 ggplot(atop.milsup, aes(x = as.factor(uncond.milsup), y = latent.depth.mean)) +
   geom_violin() +  # add violin

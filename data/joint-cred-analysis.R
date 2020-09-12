@@ -9,13 +9,11 @@ key.data <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.m
                    fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
                    low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.democ, 
                    dem.prop, joint.democ, avg.democ, maxcap.democ, maxcap.open,
-                   maxcap.rec, maxcap.comp, maxcap.cons, maxcap.lied, us.mem) %>%
+                   maxcap.rec, maxcap.comp, maxcap.cons, maxcap.lied, us.mem, bilat) %>%
             drop_na()
 key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
 summary(key.data$latent.depth.mean.rs)
 table(key.data$maxcap.lied)
-table(key.data$maxcap.lied, key.data$maxcap.cons)
-
 
 # glm model of unconditional military support
 # full democ
@@ -77,7 +75,7 @@ depth.formula <- latent.depth.mean.rs ~ maxcap.cons + maxcap.lied +
   s(mean.threat) + low.kap.sc + s(begyr)
 
 # model the dependence between the error terms as a function of start year
-theta.formula <- ~ s(begyr) + maxcap.cons + maxcap.lied 
+theta.formula <- ~ s(begyr) + maxcap.cons + maxcap.lied + num.mem
 eq.sigma <- ~ 1
 
 
@@ -110,7 +108,7 @@ joint.gjrm <- gjrm(list(uncond.formula, depth.formula,
                    data = key.data,
                    margins = c("probit", "BE"),
                    Model = "B",
-                   BivD = "N"
+                   BivD = "T"
 )
 conv.check(joint.gjrm)
 
@@ -153,7 +151,7 @@ depth.formula.agg <- latent.depth.mean.rs ~ maxcap.democ +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
-theta.formula.agg <- ~ s(begyr) + maxcap.democ
+theta.formula.agg <- ~ s(begyr) + maxcap.democ + num.mem
 
 # Create a list of models
 gjrm.models.agg <- vector(mode = "list", length = length(copulas))
@@ -163,7 +161,7 @@ gjrm.models.agg <- vector(mode = "list", length = length(copulas))
 # Beta has the lowest AIC.
 for(i in 1:length(copulas)){
   gjrm.models.agg[[i]]  <- gjrm(list(uncond.formula.agg, depth.formula.agg,
-                                     theta.formula.agg, eq.sigma), 
+                                     eq.sigma, theta.formula.agg), 
                                  data = key.data,
                                  margins = c("probit", "BE"),
                                  Model = "B",
@@ -174,8 +172,8 @@ aic.gjrm.agg <- lapply(gjrm.models.agg, AIC)
 aic.gjrm.agg
 
 # NB for interpretation: smoothed terms
-copulas[1] 
-joint.gjrm.agg <- gjrm.models.agg[[1]] 
+copulas[17] 
+joint.gjrm.agg <- gjrm.models.agg[[17]] 
 conv.check(joint.gjrm.agg)
 AIC(joint.gjrm.agg)
 summary(joint.gjrm.agg)
@@ -194,7 +192,6 @@ plot(joint.gjrm.agg, eq = 4, seWithMean = TRUE,
 
 
 ### Trivariate model with issue linkages
-# model is not fitting well: no variation with different copulas
 depth.formula.tri <- deep.alliance ~ 
   maxcap.lied + maxcap.cons +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only +
@@ -210,23 +207,14 @@ linkage.formula <- econagg.dum ~
   fp.conc.index + num.mem + wartime + asymm +  asymm.cap + non.maj.only +
   mean.threat + low.kap.sc + post45
 
-# Create a list of models
-gjrm.models.tri <- vector(mode = "list", length = length(copulas))
-
-for(i in 1:length(copulas)){
-  gjrm.models.tri[[i]]  <- gjrm(list(uncond.formula.tri, depth.formula.tri, 
+joint.gjrm.tri <- gjrm(list(uncond.formula.tri, depth.formula.tri, 
                                      linkage.formula), data = key.data,
                                 margins = c("probit", "probit", "probit"),
                                 Model = "T", 
-                                BivD = copulas[[i]]
-  )
-}
-lapply(gjrm.models.tri, AIC)
+                                BivD = "N")
 
-# No difference in AIC or convergence across these models
-copulas[1]
-joint.gjrm.tri <- gjrm.models.tri[[1]] 
-conv.check(joint.gjrm)
+# No difference in AIC or convergence across copulas
+conv.check(joint.gjrm.tri)
 AIC(joint.gjrm.tri)
 summary(joint.gjrm.tri)
 

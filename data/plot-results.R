@@ -77,12 +77,12 @@ head.xtab$command <- paste0(paste0('& \\multicolumn{2}{c}{Uncond. Mil. Support} 
 
 print(
   xtable(joint.tab, 
-         caption = c("Results from joint generalized regression model of treaty depth and unconditional military support in 
+         caption = c("Results from a joint generalized regression model of treaty depth and unconditional military support in 
          offensive and defensive alliances from 1816 to 2007. 
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
                      The treaty depth model is a beta regression. 
-                     I model the error correlation between the two processes with a Normal copula."),
+                     I model the error correlation between the two processes with a T copula."),
          label = c("tab:gjrm-res"), auto = TRUE),
   add.to.row = head.xtab, 
   include.rownames = FALSE)
@@ -114,7 +114,7 @@ plot.uncond.sep <- ggplot(margins.uncond, aes(x = factor(x), y = predicted)) +
 plot.uncond.sep
 
 
-### Plot predictions with split POLITY components
+### Plot predictions with split democracy components
 
 # set up new data
 sim.data <- cbind.data.frame(
@@ -234,6 +234,7 @@ error.res <- as.data.frame(rbind(summary.depth.gjrm[["tableP4"]],
                         ) # depth 
 rownames(error.res) <- c("Intercept", 
                         "Executive Constraints", "Electoral Democracy",
+                        "Number of Members",
                         "s(Start Year)")
 xtable(error.res,
        caption = c("Error term correlation equation estimates from a joint generalized regression model of treaty depth and unconditional military support. 
@@ -324,7 +325,7 @@ joint.tab.us <- as.data.frame(joint.tab.us[, c(3, 1, 2, 4, 5)])
 
 print(
   xtable(joint.tab.us, 
-         caption = c("Results from joint generalized regression model of treaty depth and unconditional military support. 
+         caption = c("Results from a joint generalized regression model of treaty depth and unconditional military support. 
                      This model includes a dummy variable to control for US alliance membership.
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
@@ -339,14 +340,64 @@ joint.tab.lih <- full_join(rc.list[[3]], rc.list[[4]], by = "variable")
 joint.tab.lih <- as.data.frame(joint.tab.lih[, c(3, 1, 2, 4, 5)])
 
 print(
-  xtable(joint.tab.lih, 
-         caption = c("Results from joint generalized regression model of treaty depth and unconditional military support. 
-                     This model replaces the ordinal lexical index of democracy with a dummy variable for states with a LIED score of 5 or higher.
+  xtable(joint.tab.lih,  
+         caption = c("Results from a joint generalized regression model of treaty depth and unconditional military support. 
+                     This model replaces the ordinal lexical index of democracy with a dummy variable for states with a LIED score of four or higher.
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
                      The treaty depth model is a beta regression. 
                      I model the error correlation between the two processes with a T copula."),
          label = c("tab:gjrm-res-lih"), auto = TRUE),
+  add.to.row = head.xtab, 
+  include.rownames = FALSE)
+
+
+
+### Polity Scores
+# tabulate the results:
+summary.depth.agg <- summary(joint.gjrm.agg)
+
+
+# Combine all the results in a single table. 
+# Start with unconditional table
+uncond.tab.agg <- as.data.frame(rbind(summary.depth.agg[["tableP1"]][, 1:2],
+                                       summary.depth.agg[["tableNP1"]][, c(1, 3)]
+))
+uncond.tab.agg$variable <- c("(Intercept)", 
+                              "Most Capable Member Polity", 
+                              "Economic Issue Linkage", 
+                              "FP Concessions", "Number of Members", 
+                              "Wartime Alliances", "Asymmetric Obligations",
+                              "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
+                              "s(Mean Threat)", "s(Start Year)")
+
+
+# table for treaty depth
+depth.tab.agg <- as.data.frame(rbind(summary.depth.agg[["tableP2"]][, 1:2],
+                                      summary.depth.agg[["tableNP2"]][, c(1, 3)]
+))
+depth.tab.agg$variable <- c("(Intercept)", 
+                             "Most Capable Member Polity", 
+                             "Economic Issue Linkage", 
+                             "FP Concessions", "Number of Members", 
+                             "Wartime Alliances", "Asymmetric Obligations",
+                             "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
+                             "s(Mean Threat)", "s(Start Year)")
+
+joint.tab.agg <- full_join(uncond.tab.agg, depth.tab.agg, by = "variable")
+joint.tab.agg <- as.data.frame(joint.tab.agg[, c(3, 1, 2, 4, 5)])
+
+
+# Tabulate all the equations together
+
+print(
+  xtable(joint.tab.agg, 
+         caption = c("Results from a joint generalized regression model of treaty depth and unconditional military support. 
+                     All smoothed terms report the effective degrees of freedom and the chi-squared term. 
+                     The unconditional military support model is a binomial GLM with a probit link function. 
+                     The treaty depth model is a beta regression. 
+                     I model the error correlation between the two processes with a T copula."),
+         label = c("tab:gjrm-res-agg"), auto = TRUE),
   add.to.row = head.xtab, 
   include.rownames = FALSE)
 
@@ -397,7 +448,7 @@ print(
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
                      The treaty depth model is a beta regression. 
-                     I model the error correlation between the two processes with a T copula."),
+                     I model the error correlation between the two processes with a normal copula."),
          label = c("tab:gjrm-res-prop"), auto = TRUE),
   add.to.row = head.xtab, 
   include.rownames = FALSE)

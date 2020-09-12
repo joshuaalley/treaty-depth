@@ -45,7 +45,7 @@ depth.reg.skewt <- selm(latent.depth.mean ~
                         opt.method = "Nelder-Mead",
                         param.type = "pseudo-CP")
 summary(depth.reg.skewt, "pseudo-CP")
-plot(depth.reg.skewt, param.type = "pseudo-CP")
+# plot(depth.reg.skewt, param.type = "pseudo-CP")
 
 # also fit a skew-cauchy model
 depth.reg.skewc <- selm(latent.depth.mean ~ 
@@ -59,7 +59,7 @@ depth.reg.skewc <- selm(latent.depth.mean ~
                 opt.method = "BFGS",
                 param.type = "pseudo-CP")
 summary(depth.reg.skewc, "pseudo-CP")
-plot(depth.reg.skewc, param.type = "pseudo-CP")
+# plot(depth.reg.skewc, param.type = "pseudo-CP")
 
 
 

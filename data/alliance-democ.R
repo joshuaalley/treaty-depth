@@ -238,6 +238,11 @@ alliance.year <- atop.cow.year %>%
     maxcap.open.lied = max(maxcap.open.lied, na.rm = TRUE),
     maxcap.comp.lied = max(maxcap.comp.lied, na.rm = TRUE),
     maxcap.lied = max(maxcap.lied, na.rm = TRUE),
+    maxcap.liedh = ifelse(maxcap.lied >= 4, 1, 0),
+    
+    # interact lied and cons
+    maxcap.lied.cons = maxcap.cons*maxcap.lied,
+    maxcap.liedh.cons = maxcap.cons*maxcap.liedh, 
   
     total.cap = sum(cinc, na.rm = TRUE),
     total.expend = sum(ln.milex, na.rm = TRUE),
@@ -281,7 +286,8 @@ alliance.democ <- alliance.year %>%
            prop.open, prop.cons,
            maxcap.cont.std, maxcap.inc.std,
            maxcap.comp.lied, maxcap.open.lied, maxcap.lied,
-           maxcap.poly))
+           maxcap.lied.cons,
+           maxcap.liedh, maxcap.liedh.cons, maxcap.poly))
 write.csv(alliance.democ, "data/alliance-democ.csv",
           row.names = FALSE)
 

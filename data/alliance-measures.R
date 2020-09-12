@@ -85,6 +85,7 @@ atop <- atop %>%
     milaid.dum = ifelse(milaid > 0, 1, 0), # dummy indicator of military aid
     base.dum = ifelse(base > 0, 1, 0),
     milcon.dum = ifelse(milcon > 0, 1, 0),
+    subord.dum = ifelse(subord > 0, 1, 0),
     
     trade.dum = ifelse(ecaid == 3, 1, 0), # dummy indicator of economic aid
     compag.econ = ifelse(compag == 2, 1, 0),
@@ -230,20 +231,20 @@ atop.milsup <- filter(atop, offense == 1 | defense == 1)
 atop.depth <- select(atop.milsup,
                      intcom, compag.mil,  
                      milaid, milcon, base, 
-                     organ1) 
+                     organ1, subord.dum, contrib) 
 atop.depth <- as.data.frame(atop.depth)
 for(i in 1:ncol(atop.depth)){
   atop.depth[, i] <- as.ordered(atop.depth[, i])
 }
 
 # Use Murray BFA approach
-latent.depth <- bfa_copula(~ intcom + compag.mil + 
+latent.depth <- bfa_copula(~ intcom + compag.mil +
                              milaid + milcon + base + 
-                             organ1, 
+                             organ1 + subord.dum + contrib, 
                            data = atop.depth, num.factor = 1,
                            restrict = list(c("intcom", 1, ">0")),
                           factor.scales = FALSE,
-                          keep.scores = TRUE, loading.prior = "gdp", 
+                          keep.scores = TRUE, loading.prior = "normal", 
                           px = TRUE, imh.iter = 1000, imh.burn = 1000,
                           nburn = 20000, nsim = 30000, thin = 30, 
                           print.status = 2000)
@@ -276,8 +277,13 @@ ld1.vars <- expand.grid(dimnames(cor.ld1)[1:2])
 cor.ld1.mat <- data.frame(ld1.vars, ld1.samp) %>%
   pivot_wider(id_cols = c(Var1),
               names_from = Var2,
-              values_from = ld1.samp) %>%
+              values_from = ld1.samp)
+cor.ld1.mat # print correlation 
+# remove var1 for decomposition
+cor.ld1.mat <- cor.ld1.mat %>%
   select(-Var1)
+
+
 
 ev <- eigen(cor.ld1.mat) # get eigenvalues
 ap <- nFactors::parallel(subject=nrow(atop.depth),
@@ -291,7 +297,7 @@ nFactors::plotnScree(nS)
 # Create a dataset of factors
 latent.factors <- cbind.data.frame(c("Integrated Command", "Companion Mil. Agreement", 
                                      "Military Aid", "Policy Coordination", "Bases",
-                                     "Formal IO"),
+                                     "Formal IO", "Subordination", "Specific Contrib"),
                                    latent.depth[["post.loadings.mean"]],
                                    sqrt(latent.depth[["post.loadings.var"]])
 )
@@ -313,7 +319,6 @@ loadings.plot <- ggplot(latent.factors, aes(x = mean, y = var)) +
 loadings.plot 
 
 # get posterior scores of latent factor: mean and variance
-post.score <- get_posterior_scores(latent.depth)
 atop.milsup$latent.depth.mean <- as.numeric(t(latent.depth$post.scores.mean))
 atop.milsup$latent.depth.var <- as.numeric(t(latent.depth$post.scores.var))
 atop.milsup$latent.depth.sd <- sqrt(atop.milsup$latent.depth.var)
@@ -468,12 +473,12 @@ atop.milsup$post45 <- ifelse(atop.milsup$begyr > 1945, 1, 0)
 ### compare model fit with one and two factors
 latent.depth2 <- bfa_copula(~ intcom + compag.mil +
                              milaid + milcon + base +
-                             organ1,
+                             organ1 + subord.dum + contrib,
                            data = atop.depth, num.factor = 2,
                            restrict = list(c("intcom", 1, ">0"),
                                            c("milaid", 2, ">0")),
                            factor.scales = FALSE,
-                           keep.scores = TRUE, loading.prior = "gdp",
+                           keep.scores = TRUE, loading.prior = "normal",
                            px = TRUE, imh.iter = 1000, imh.burn = 1000,
                            nburn = 20000, nsim = 30000, thin = 30, print.status = 2000)
 # plot(get_coda(latent.depth2))
@@ -488,4 +493,4 @@ diag.geweke  <- geweke.diag(lcap.sam)
 par(mfrow=c(1, 1))
 plot(density(diag.geweke$z))
 lines(density(rnorm(10000, 0, 1)))
-# decidedly not- some really fat tails. 
+# decidedly not- some fat tails. 

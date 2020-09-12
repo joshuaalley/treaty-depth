@@ -19,14 +19,14 @@ gjrm.us <- gjrm(list(uncond.formula.us, depth.formula.us,
                           data = key.data,
                           margins = c("probit", "BE"),
                           Model = "B",
-                          BivD = "N"
+                          BivD = "T"
                       ) 
 conv.check(gjrm.us)
 summary(gjrm.us)
 
 
 # dummy of high LIED (> 4)
-key.data$maxcap.liedh <- ifelse(key.data$maxcap.lied >= 4, 1, 0)
+key.data$maxcap.liedh <- ifelse(key.data$maxcap.lied >= 4, 1 ,0)
 # formulas with alt IV
 uncond.formula.lih <- uncond.milsup ~ maxcap.cons + maxcap.liedh +
   econagg.dum + 
@@ -38,14 +38,14 @@ depth.formula.lih <- latent.depth.mean.rs ~ maxcap.cons + maxcap.liedh +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr) + us.mem
 
-theta.formula.lih <- ~ s(begyr) + maxcap.cons + maxcap.liedh
+theta.formula.lih <- ~ s(begyr) + maxcap.cons + maxcap.liedh + num.mem
 
 gjrm.lih <- gjrm(list(uncond.formula.lih, depth.formula.lih,
                      eq.sigma, theta.formula.lih), 
                 data = key.data,
                 margins = c("probit", "BE"),
                 Model = "B",
-                BivD = "N"
+                BivD = "T"
 ) 
 conv.check(gjrm.lih)
 summary(gjrm.lih)
@@ -125,14 +125,14 @@ depth.formula.prop <- latent.depth.mean.rs ~
   asymm.cap + non.maj.only +
   s(mean.threat) + low.kap.sc + s(begyr)
 
-theta.formula.prop <- ~ s(begyr) + prop.open + prop.cons 
+theta.formula.prop <- ~ s(begyr) + prop.open + prop.cons + num.mem 
 
 # Same model: probit and beta margins 
 joint.gjrm.prop  <- gjrm(list(uncond.formula.prop, depth.formula.prop,
                                       eq.sigma, theta.formula.prop), data = key.data.prop,
                                  margins = c("probit", "BE"),
                                  Model = "B",
-                                 BivD =  "T" # better AIC than normal
+                                 BivD =  "N" 
                           )
 
 # examine the results: 
@@ -156,8 +156,8 @@ depth.formula.pol <- latent.depth.mean.rs ~ maxcap.cons + maxcap.rec + maxcap.co
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
-# model the dependence between the error terms as a function of start year
-theta.formula.pol <- ~ s(begyr) + maxcap.cons + maxcap.rec 
+# model the dependence between the error terms 
+theta.formula.pol <- ~ s(begyr) + maxcap.cons + maxcap.rec + num.mem
 eq.sigma <- ~ 1
 
 # Fit the model 
@@ -170,7 +170,6 @@ joint.gjrm.pol <- gjrm(list(uncond.formula.pol, depth.formula.pol,
                   )
 conv.check(joint.gjrm.pol)
 summary(joint.gjrm.pol)
-post.check(joint.gjrm.pol)
 
 
 ### Model with contestation and inclusiveness
@@ -230,7 +229,7 @@ depth.formula.poly.vdem <- latent.depth.mean.rs ~ maxcap.cons + maxcap.poly +
   fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
   s(mean.threat) + low.kap.sc + s(begyr)
 
-theta.formula.poly.vdem <- ~ s(begyr) + maxcap.cons + maxcap.poly 
+theta.formula.poly.vdem <- ~ s(begyr) + maxcap.cons + maxcap.poly + num.mem 
 
 # fit the model
 gjrm.poly.vdem <- gjrm(list(uncond.formula.poly.vdem, depth.formula.poly.vdem,
@@ -238,7 +237,7 @@ gjrm.poly.vdem <- gjrm(list(uncond.formula.poly.vdem, depth.formula.poly.vdem,
                   data = key.data.poly.vdem,
                   margins = c("probit", "BE"),
                   Model = "B",
-                  BivD = "T"
+                  BivD = "N"
 ) 
 AIC(gjrm.poly.vdem)
 conv.check(gjrm.poly.vdem)
@@ -267,6 +266,7 @@ sim.data <- cbind.data.frame(
     par = c(min(model[[i]][["X1"]][, 3]), max(model[[i]][["X1"]][, 3])), # placeholder
     prop.cons = rep(1, n = 2), 
     maxcap.comp = rep(1, n = 2),
+    maxcap.inc.std = rep(median(key.data.poly$maxcap.inc.std), na.rm = TRUE),
     econagg.dum = rep(0, n = 2),
     fp.conc.index = rep(0, n = 2), # no concessions
     num.mem = rep(2, n = 2), # bilateral
@@ -382,13 +382,11 @@ ggsave(destination, results.all,
 
 # Inputs
 models.comp = list(joint.gjrm.prop, joint.gjrm.pol, gjrm.poly.vdem)
-labels.comp = c("Proportion Elec. Comp.", "Polity Elections.", "Polyarchy (VDem)")
+labels.comp = c("Proportion Electoral Democracy", "Polity Elections.", "Polyarchy (VDem)")
 
 
 # Apply the function 
 substance.plot(model = models.comp, label = labels.comp,
                destination = "figures/results-other-democ.png")
-
-
 
 

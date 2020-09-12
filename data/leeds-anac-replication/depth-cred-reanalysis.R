@@ -76,7 +76,7 @@ bf.rep <- left_join(bf.rep, atop.milsup, by = "atopid")
 # model honored
 bf.logit.depth <- glm(honorLLM ~ latent.depth.mean +
                       non.maj.only + asymm.cap +
-                        post45 + maxcap.open + maxcap.cons +
+                        post45 +  prop.open + prop.cons +
                         num.mem + econagg.dum + uncond.milsup +
                         fp.conc.index,
                       family = binomial(link = "logit"),
@@ -87,7 +87,7 @@ summary(bf.logit.depth)
 # model honored w/ sabrosky coding
 bf.logits.depth <- glm(sabroskyhonorllm ~ latent.depth.mean +
                         non.maj.only + asymm.cap +
-                        post45 + maxcap.open + maxcap.cons +
+                        post45 + prop.open + prop.cons +
                         num.mem + econagg.dum + uncond.milsup +
                         fp.conc.index,
                       family = binomial(link = "logit"),
@@ -109,7 +109,7 @@ stargazer(la.logit, la.logit.depth, bf.logit.depth,
             "Alliance Formality", "Capability Change", "Process Change",
             "Original Target",
             "Asymmetric Capability", "Non-Major Only", "Post 1945",
-            "Open Electoral Competition", "Executive Constraints", 
+            "Share Electoral Democracy", "Share Executive Constraints", 
             "Number of Members", "Economic Issue Linkage", "Unconditional Support",
             "Foreign Policy Concessions"
           ),
