@@ -15,7 +15,7 @@
 
 
 \singlespace
-\title{\textbf{Appendix: Democracy, Electoral Competition, and Alliance Treaty Depth}}
+\title{\textbf{Appendix: Democracy, Elections, and Alliance Treaty Depth}}
 \author{}
 \date{}
 
@@ -33,7 +33,7 @@ Then I estimate the association between allied democracy and alternative measure
 After that, I show that findings of a negative correlation between military institutionalization and alliance performance are sensitive to how treaty depth is measured. 
 In the fourth section, I assess whether accounting for non-random selection into alliances changes the relationship between democracy and treaty design.   
 I also consider how uncertainty in the latent depth measure affects inferences about the association between democracy and treaty depth. 
-Last, I add issue linkages to create a trivariate model of the sources of alliance treaty credibility. 
+Last, I create a trivariate model of the sources of alliance treaty credibility by including issue linkages along with treaty depth and unconditional support. 
 
 
 \section{Alternative Model Specifications} 
@@ -44,7 +44,7 @@ In addition to the robustness checks with alternative measures of electoral demo
 First, perhaps the positive association between electoral democracy and treaty depth is driven by the United States, which formed multiple deep and conditional alliances after 1945. 
 To assess this possibility, I add a dummy indicator of US membership to the generalized joint regression model specification in the manuscript. 
 \autoref{tab:gjrm-res-us} summarizes the resulting estimates. 
-Even after adjusting for US membership, the same patterns hold- electoral democracy decreases the probability of unconditional support, but decreases treaty depth. 
+Even after adjusting for US membership, the same patterns hold- electoral democracy decreases the probability of unconditional support, but increases treaty depth. 
  
 
 \begin{table}[ht]
@@ -121,7 +121,7 @@ I find the same results with a binary measure of electoral democracy- high elect
 As an alternative expression of the impact of democracy, I estimated a model with the Polity indicator of regime type in place of the lexical index of democracy and executive constraints variables. 
 Polity scores are a function of electoral competition, executive constraints, and open political competition, so this aggregate index is more focused on regime type than a specific characteristic of democracy. 
 Thus, the results below should not be interpreted as evidence for or against the two hypotheses, because the hypotheses emphasize electoral politics.
-Rather, this analysis gives a sense of the possible overall impact of democratic regimes, when different components are aggregated and combined based on the Polity project's criteria. 
+Rather, this analysis gives a sense of the overall impact of democratic regimes when different components are aggregated based on the Polity project's criteria. 
 
 
 \begin{table}[ht]
@@ -158,14 +158,14 @@ Replacing the two democracy components with the Polity Index leads to slightly d
 Increasing the Polity score of the most capable alliance member leads to greater treaty depth.
 Thus, the next effect of elections, competition and executive constraints on treaty depth is positive, and this likely reflects the impact of elections. 
 The Polity coefficient for unconditional support is negative, but it cannot be distinguished from zero at conventional levels of statistical significance. 
-This may reflect the competing effects of elections and executive constraints, as well as how Polity aggregates its component indicators. 
+This may reflect the competing effects of elections and executive constraints, as well as how Polity aggregates its component indicators.\footnote{Furthermore, the difference between statistically significant and insignificant findings are not themselves statistically significant \citep{GelmanStern2006}.}
 
 
 
 \subsection{Proportion of Democracies}
 
 
-This section offers a set of supporting estimates for inferences about the proportion of states with electoral competition reported in the manuscript. 
+This section offers a set of supporting estimates for inferences about the proportion of states with electoral democracy that I report in the manuscript. 
 First, raw data on the proportion of states with electoral competition are consistent with my argument. 
 Differences in the average proportion of states with open electoral competition across treaty depth and unconditional military support are consistent with the hypotheses, as \autoref{fig:democ-prop-combo} shows.
 Deep and conditional alliances have the highest average share of members with open electoral competition.
@@ -180,7 +180,8 @@ Deep and conditional alliances have the highest average share of members with op
 
 This section also shows the parameter estimates which I translate into substantive effect calculations in the paper in \autoref{tab:gjrm-res-prop}. 
 As in the model that emphasizes competition and constraints in the most capable alliance member, the proportion of competition variable is negative for unconditional support and positive for treaty depth. 
-Similarly, the share of states with executive constraints increases the probability of unconditional support, but has no clear relationship with treaty depth. 
+Similarly, the share of states with executive constraints increases the probability of unconditional support.
+Unlike the most capable alliance member estimates, there is no clear relationship between the share of states with executive constraints and treaty depth, however. 
 
 
 \begin{table}[ht]
@@ -312,8 +313,8 @@ This may reflect limited variation in the ordinal measure, which I further reduc
 \end{figure}
 
 
-Findings about the association between treaty depth and Benson and Clinton's also match the treaty depth hypothesis. 
-Greater electoral democracy increases the overall costliness of the alliance obligations, probably due to the defense cooperation measures in Benson and Clinton's latent variable. 
+Findings about the association between treaty depth and Benson and Clinton's measure also match the treaty depth hypothesis. 
+Electoral democracy increases the overall costliness of the alliance obligations, probably due to the defense cooperation measures in Benson and Clinton's latent variable. 
 In summary, I find similar results with four alternative measures of treaty depth, including two measures from previous scholarship. 
 
 
@@ -397,7 +398,7 @@ Thus, the possible direction of this association shifts, depending on how allian
 
 To further assess this finding, I utilized an updated alliance performance dataset from \citet{BerkemeierFuhrmann2018}.
 In this analysis, I specified a logit model that uses latent depth, unconditional support, dummy indicators of asymmetric capability and symmetric non-major power pacts, a post 1945 dummy, the two indicators of democratic membership, the number of members, economic issue linkages, and foreign policy concessions to predict whether an alliance was honored in war. 
-All of these factors are potential sources of reliability, per different arguments in the literature. 
+All of these factors are potential sources of reliability and correlates of depth. 
 In these models, I find a similar result--- a positive relationship between depth and honoring military support that cannot be distinguished from zero.
 
 
@@ -412,11 +413,10 @@ They do suggest, however, that deep alliances are not necessarily less reliable 
 
 
 
-Observed alliances are the result of negotiations between potential members. 
-Therefore the set of observed alliances is not a random sample.
+Observed alliances are the result of negotiations between potential members, so the set of observed alliances is not a random sample.
 Rather, alliance members overcame the many obstacles to alliance formation \citep{Poast2019a}.  
 In this section, I account for non-random alliance formation using a hurdle model of observed alliances after combining a stratified random sample of non-allied groups of states with observed alliances. 
-This research design produces partially similar inferences: electoral democracy in the most capable alliance member increases treaty depth but has an unclear relationship with conditions on military support. 
+This research design produces partially similar inferences: electoral democracy in the most capable alliance member increases treaty depth but has an unclear relationship with conditions on military support, in part because the hurdle model requires a different formulation of the conditions variable. 
 
 
 My research design for this robustness check follows established procedures for dealing with selection into alliances and treaty design. 
@@ -461,13 +461,13 @@ Instead, I connect the two hurdle models with a correlated set of year varying i
 
 After accounting for non-random alliance formation with the joint hurdle model, I find partially similar results to the manuscript. 
 \autoref{fig:results-joint-hurdle} plots the results of the joint hurdle model. 
-This figure shows the predicted marginal effect of open elections in the alliance leader on commitment strength and shifted treaty depth, along with 95\% credible intervals.
-Electoral competition in the most capable alliance member increases treaty depth and has no clear relationship with the strength of conditions on military support. 
+This figure shows the predicted marginal effect of electoral democracy in the alliance leader on commitment strength and shifted treaty depth, along with 95\% credible intervals.
+Electoral democracy in the most capable alliance member increases treaty depth and has no clear relationship with the strength of conditions on military support. 
 
 
 \begin{figure}
 \includegraphics[width=.95\textwidth]{results-joint-hurdle.png}  
-\caption{Predicted commitment strength and changes in treaty depth by electoral competition in the most capable alliance member when the treaty formed. Estimates are based on a joint hurdle model of alliances. The line marks predicted values, and the shaded areas encapsulate the 90\% credible interval. The rug plot on the x-axis marks observed values of allied democracy. Predictions hold all other variables constant.}
+\caption{Predicted commitment strength and changes in treaty depth by electoral democracy in the most capable alliance member when the treaty formed. Estimates are based on a joint hurdle model of alliances. The line marks predicted values, and the shaded areas encapsulate the 95\% credible interval. Predictions hold all other variables constant.}
 \label{fig:results-joint-hurdle}
 \end{figure}
 
@@ -497,7 +497,7 @@ Even after accounting for uncertainty in the treaty depth measure, I find a simi
 I plot the relevant posterior distributions in \autoref{fig:results-unc-depth}. 
 The 95\% credible interval of the association between electoral democracy is uniformly positive and 99\% of the posterior mass is positive. 
 For unconditional military support, the 95\% credible interval has substantial uncertainty, and the alliance leader electoral democracy has 78\% negative posterior probability. 
-Thus the preponderance of evidence from these estimates matches the hypotheses, but the effect on unconditional support is weaker than expected. 
+Thus the preponderance of evidence from these estimates matches the hypotheses, but the effect on unconditional support is weaker than expected, probably because the error term correlations are omitted. 
 
 
 \begin{figure}
