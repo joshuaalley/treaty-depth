@@ -3,245 +3,11 @@
 # must run after joint-cred-analysis.R 
 
 # add a control for US membership
-uncond.formula.us <- uncond.milsup ~ maxcap.cons + maxcap.lied +
-  econagg.dum + 
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
-  s(mean.threat) + low.kap.sc + s(begyr) + us.mem
-
-depth.formula.us <- latent.depth.mean.rs ~ maxcap.cons + maxcap.lied +
-  econagg.dum +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
-  s(mean.threat) + low.kap.sc + s(begyr) + us.mem
-
-
-gjrm.us <- gjrm(list(uncond.formula.us, depth.formula.us,
-                               eq.sigma, theta.formula), 
-                          data = key.data,
-                          margins = c("probit", "BE"),
-                          Model = "B",
-                          BivD = "T"
-                      ) 
-conv.check(gjrm.us)
-summary(gjrm.us)
-
-
-# dummy of high LIED (> 4)
-key.data$maxcap.liedh <- ifelse(key.data$maxcap.lied >= 4, 1 ,0)
-# formulas with alt IV
-uncond.formula.lih <- uncond.milsup ~ maxcap.cons + maxcap.liedh +
-  econagg.dum + 
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
-  s(mean.threat) + low.kap.sc + s(begyr) + us.mem
-
-depth.formula.lih <- latent.depth.mean.rs ~ maxcap.cons + maxcap.liedh +
-  econagg.dum +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
-  s(mean.threat) + low.kap.sc + s(begyr) + us.mem
-
-theta.formula.lih <- ~ s(begyr) + maxcap.cons + maxcap.liedh + num.mem
-
-gjrm.lih <- gjrm(list(uncond.formula.lih, depth.formula.lih,
-                     eq.sigma, theta.formula.lih), 
-                data = key.data,
-                margins = c("probit", "BE"),
-                Model = "B",
-                BivD = "T"
-) 
-conv.check(gjrm.lih)
-summary(gjrm.lih)
 
 
 
 
-### fit a model with democratic proportion
-
-# contrast these variables
-ggplot(atop.milsup, aes(x = factor(maxcap.lied), y = prop.open)) +
-  geom_boxplot() +
-  geom_jitter(alpha = .85) +
-  theme_bw()
-
-
-
-# Set up unique dataframe
-key.data.prop <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
-                        fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                        low.kap.sc, begyr, post45, asymm.cap, mean.threat, 
-                        dem.prop, joint.democ, avg.democ, 
-                        prop.open, prop.cons) %>%
-  drop_na()
-key.data.prop$latent.depth.mean.rs <- (key.data.prop$latent.depth.mean + 1) / (1 + max(key.data.prop$latent.depth.mean) + .01)
-summary(key.data.prop$latent.depth.mean.rs)
-
-summary(key.data.prop$prop.open)
-
-# glm model of unconditional military support
-uncond.glm.prop <- glm(uncond.milsup ~ 
-                         prop.open + prop.cons +
-                         econagg.dum +
-                         fp.conc.index + num.mem + wartime + asymm +
-                         asymm.cap + non.maj.only + mean.threat + 
-                         low.kap.sc + post45,
-                       family = binomial(link = "probit"),
-                       data = key.data.prop)
-summary(uncond.glm.prop)
-
-
-# glm model of economic issue linkages
-linkage.glm.prop <- glm(econagg.dum ~ 
-                          prop.open + prop.cons +  
-                          fp.conc.index + num.mem + wartime + asymm +  
-                          asymm.cap + non.maj.only + mean.threat +
-                          low.kap.sc + post45,
-                        family = binomial(link = "probit"),
-                        data = key.data.prop)
-summary(linkage.glm.prop)
-
-
-# Use a beta regression with rescaled depth 
-beta.reg.depth.prop <- betareg(latent.depth.mean.rs ~ 
-                                 prop.open + prop.cons +
-                                 econagg.dum +
-                                 fp.conc.index + num.mem + wartime + asymm + 
-                                 asymm.cap + non.maj.only + 
-                                 mean.threat + low.kap.sc + post45, data = key.data.prop)
-summary(beta.reg.depth.prop)
-
-
-
-
-# set up model formulas 
-uncond.formula.prop <- uncond.milsup ~ 
-  prop.cons + prop.open +
-  econagg.dum + 
-  fp.conc.index + num.mem + wartime + asymm + 
-  asymm.cap + non.maj.only +
-  s(mean.threat) + low.kap.sc + s(begyr)
-
-
-depth.formula.prop <- latent.depth.mean.rs ~ 
-  prop.cons + prop.open + econagg.dum +
-  fp.conc.index + num.mem + wartime + asymm + 
-  asymm.cap + non.maj.only +
-  s(mean.threat) + low.kap.sc + s(begyr)
-
-theta.formula.prop <- ~ s(begyr) + prop.open + prop.cons + num.mem 
-
-# Same model: probit and beta margins 
-joint.gjrm.prop  <- gjrm(list(uncond.formula.prop, depth.formula.prop,
-                                      eq.sigma, theta.formula.prop), data = key.data.prop,
-                                 margins = c("probit", "BE"),
-                                 Model = "B",
-                                 BivD =  "N" 
-                          )
-
-# examine the results: 
-conv.check(joint.gjrm.prop)
-AIC(joint.gjrm.prop)
-summary(joint.gjrm.prop)
-
-
-
-### consider alternative meaures of democracy/competition
-
-# Start with polity
-
-uncond.formula.pol <- uncond.milsup ~ maxcap.cons + maxcap.rec + maxcap.comp +
-  econagg.dum + 
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
-  s(mean.threat) + low.kap.sc + s(begyr)
-
-depth.formula.pol <- latent.depth.mean.rs ~ maxcap.cons + maxcap.rec + maxcap.comp +
-  econagg.dum +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
-  s(mean.threat) + low.kap.sc + s(begyr)
-
-# model the dependence between the error terms 
-theta.formula.pol <- ~ s(begyr) + maxcap.cons + maxcap.rec + num.mem
-eq.sigma <- ~ 1
-
-# Fit the model 
-joint.gjrm.pol <- gjrm(list(uncond.formula.pol, depth.formula.pol,
-                                 eq.sigma, theta.formula.pol), 
-                            data = key.data,
-                            margins = c("probit", "BE"),
-                            Model = "B",
-                            BivD = "N"
-                  )
-conv.check(joint.gjrm.pol)
-summary(joint.gjrm.pol)
-
-
-### Model with contestation and inclusiveness
-# cuts sample to 1950
-key.data.poly <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
-                        fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                        low.kap.sc, begyr, post45, asymm.cap, mean.threat,
-                        maxcap.cont.std, maxcap.inc.std, maxcap.cons, us.mem) %>%
-  drop_na() %>%
-  filter(maxcap.inc.std != 0) # zeros are NA
-key.data.poly$latent.depth.mean.rs <- (key.data.poly$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
-summary(key.data.poly$latent.depth.mean.rs)
-summary(key.data.poly$maxcap.cont.std)
-
-uncond.formula.poly <- uncond.milsup ~ maxcap.cons + 
-  maxcap.cont.std + maxcap.inc.std +
-  econagg.dum + 
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
-  mean.threat + low.kap.sc + begyr + us.mem
-
-depth.formula.poly <- latent.depth.mean.rs ~ maxcap.cons + 
-  maxcap.cont.std + maxcap.inc.std +
-  econagg.dum +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + 
-  mean.threat + low.kap.sc + begyr + us.mem
-
-# no theta eqn- too little data for convergence
-# fit the model
-gjrm.poly <- gjrm(list(uncond.formula.poly, depth.formula.poly), 
-                data = key.data.poly,
-                margins = c("probit", "BE"),
-                Model = "B",
-                BivD = "N"
-) 
-AIC(gjrm.poly)
-conv.check(gjrm.poly)
-summary(gjrm.poly)
-
-
-# Analysis with Vdem polyarchy
-key.data.poly.vdem <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
-                        fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                        low.kap.sc, begyr, post45, asymm.cap, mean.threat,
-                        maxcap.poly, maxcap.cons, us.mem) %>%
-  drop_na()
-key.data.poly.vdem$latent.depth.mean.rs <- (key.data.poly.vdem$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
-summary(key.data.poly.vdem$latent.depth.mean.rs)
-summary(key.data.poly.vdem$maxcap.poly)
-
-uncond.formula.poly.vdem <- uncond.milsup ~ maxcap.cons + maxcap.poly +
-  econagg.dum + 
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
-  s(mean.threat) + low.kap.sc + s(begyr) 
-
-depth.formula.poly.vdem <- latent.depth.mean.rs ~ maxcap.cons + maxcap.poly +
-  econagg.dum +
-  fp.conc.index + num.mem + wartime + asymm + asymm.cap + non.maj.only + 
-  s(mean.threat) + low.kap.sc + s(begyr)
-
-theta.formula.poly.vdem <- ~ s(begyr) + maxcap.cons + maxcap.poly + num.mem 
-
-# fit the model
-gjrm.poly.vdem <- gjrm(list(uncond.formula.poly.vdem, depth.formula.poly.vdem,
-                       eq.sigma, theta.formula.poly.vdem), 
-                  data = key.data.poly.vdem,
-                  margins = c("probit", "BE"),
-                  Model = "B",
-                  BivD = "N"
-) 
-AIC(gjrm.poly.vdem)
-conv.check(gjrm.poly.vdem)
-summary(gjrm.poly.vdem)
+### alternative measures of electoral competition
 
 
 
@@ -255,7 +21,6 @@ substance.plot <- function(model, label, destination){
   
 # list of plots
 depth.plots <- vector(mode = "list", length = length(models.comp))
-uncond.plots <- vector(mode = "list", length = length(models.comp))
   
 # for loop to plot  
 for(i in 1:length(model)){
@@ -331,48 +96,13 @@ res <- linkinv(br[, (ncol(pred.depth.mat)+1):(ncol(pred.depth.mat)+ ncol(pred.de
 mean(res);var(res)
 
 
-
-# repeat the process for unconditional military support
-pred.uncond.mat <- predict(model[[i]], eq = 1,
-                           type = "lpmatrix", 
-                           newdata = sim.data)
-
-dim(br[, 1:ncol(pred.uncond.mat)])
-dim(t(pred.uncond.mat))
-
-# Calculate differences
-sim.res.uncond <- data.frame(pnorm(br[, 1:ncol(pred.uncond.mat)] %*% t(pred.uncond.mat)))
-uncond.diff <- rbind.data.frame(
-  quantile(sim.res.uncond$X1, c(0.025, .975)),
-  quantile(sim.res.uncond$X2, c(0.025, .975)),
-  quantile(sim.res.uncond$X2 - sim.res.uncond$X1, c(0.025, .975))
-)
-colnames(uncond.diff) <- c("lower", "upper")
-uncond.diff$scenario <- c("Low", "High",
-                         "Difference")
-# plot intervals
-uncond.intervals <- ggplot(uncond.diff, aes(x = scenario, y = upper)) +
-  geom_hline(yintercept = 0) +
-  geom_errorbar(aes(ymin = lower,
-                    ymax = upper),
-                width = .1, size = 1) +
-  labs(y = "Predicted Prob. of Unconditional Support",
-       x = "Scenario") +
-  ggtitle(label[[i]]) +
-  theme_bw()
-uncond.intervals
-
-uncond.plots[[i]] <- uncond.intervals
-
 } # end plot loop
 
 # present results
 # Combine plots
-grid.arrange(depth.plots[[1]], depth.plots[[2]], depth.plots[[3]], 
-             uncond.plots[[1]], uncond.plots[[2]], uncond.plots[[3]],
+grid.arrange(depth.plots[[1]], depth.plots[[2]], depth.plots[[3]],
              nrow = 2)
 results.all <- arrangeGrob(depth.plots[[1]], depth.plots[[2]], depth.plots[[3]],
-                           uncond.plots[[1]], uncond.plots[[2]], uncond.plots[[3]],
                            nrow = 2)
 ggsave(destination, results.all,
        height = 6, width = 8)
@@ -389,4 +119,97 @@ labels.comp = c("Proportion Electoral Democracy", "Polity Elections.", "Polyarch
 substance.plot(model = models.comp, label = labels.comp,
                destination = "figures/results-other-democ.png")
 
+
+
+
+### try skew-t and skew-cauchy models
+# not converging 
+# use a skew-t model
+depth.reg.skewt <- selm(latent.depth.mean ~ 
+                          maxcap.lied + maxcap.cons + 
+                          econagg.dum + uncond.milsup +
+                          fp.conc.index + num.mem + wartime + asymm + 
+                          asymm.cap + non.maj.only + 
+                          mean.threat + low.kap.sc + post45,
+                        data = atop.milsup,
+                        family = "ST",
+                        opt.method = "CG",
+                        param.type = "pseudo-CP")
+summary(depth.reg.skewt, "pseudo-CP")
+# plot(depth.reg.skewt, param.type = "pseudo-CP")
+
+# also fit a skew-cauchy model
+depth.reg.skewc <- selm(latent.depth.mean ~ 
+                          maxcap.lied + maxcap.cons +
+                          econagg.dum + uncond.milsup +
+                          fp.conc.index + num.mem + wartime + asymm + 
+                          asymm.cap + non.maj.only + 
+                          mean.threat + low.kap.sc + post45,
+                        data = atop.milsup,
+                        family = "SC",
+                        opt.method = "SANN",
+                        param.type = "pseudo-CP")
+summary(depth.reg.skewc, "pseudo-CP")
+plot(depth.reg.skewc, param.type = "pseudo-CP")
+
+
+
+# Summarize results in a table for the appendix
+# OLS only- unreliable so leave out
+stargazer(list(depth.reg.dem, depth.reg),
+          style = "all2",
+          dep.var.labels=c("Latent Depth"),
+          covariate.labels=c(
+            "Alliance Leader Polity",
+            "Executive Constraints", "Electoral Competition",
+            "Economic Issue Linkage", "Unconditional Support",
+            "Foreign Policy Concessions", "Number of Members",
+            "Wartime Alliance", "Asymmetric Obligations",
+            "Asymmetric Capability", "Non-Major Only",
+            "Average Threat",
+            "Foreign Policy Disagreement", "Post 1945"
+          ),
+          keep.stat = c("n"), ci=TRUE, 
+          star.char = c("", "", ""),
+          notes = "95\\% Confidence Intervals in Parentheses.", 
+          notes.append = FALSE,
+          label = c("tab:depth-alt-models-ols")
+)
+
+
+# Skew-t and Skew-cauchy models
+sum.skewt <- summary(depth.reg.skewt, "pseudo-CP")
+sum.skewc <- summary(depth.reg.skewc, "pseudo-CP")
+
+dim(sum.skewc@param.table)
+
+skew.res.tab <- as.data.frame(rbind(sum.skewt@param.table[1:13, 1:2],
+                                    sum.skewc@param.table[1:13, 1:2]
+))
+
+skew.res.tab$variable <- rep(c("(Intercept)",  
+                               "Executive Constraints", 
+                               "Lexical Index of Democracy",
+                               "Economic Issue Linkage", 
+                               "FP Concessions", "Number of Members", 
+                               "Wartime Alliances", "Asymmetric Obligations",
+                               "Asymmetric Capability", "Non-Major Only", 
+                               "Mean Threat",  "FP Disagreement", "Post 1945"),
+                             2)
+skew.res.tab$model = c(rep("Skew T", n = 13), rep("Skew Cauchy", n = 13))
+
+
+# Plot the coefficient estimates
+ggplot(skew.res.tab, aes(x = estimate, y = variable)) +
+  facet_wrap(~ model) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 2) +
+  geom_errorbarh(aes(
+    xmin = estimate - 2*std.err,
+    xmax = estimate + 2*std.err
+  ), size = 1, height = .25) +
+  ggtitle("Skew Models of Latent Treaty Depth") +
+  labs(x = "Estimate", y = "Variable") +
+  theme_bw() 
+ggsave("appendix/skew-model-res.png", height = 6, width = 8)
 

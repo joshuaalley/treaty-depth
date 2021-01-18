@@ -369,14 +369,6 @@ atop.milsup %>%
 
 
 
-# compare three different measures of depth
-commitment.depth <- select(atop.milsup, atopid, 
-                           latent.depth.mean, scope.index,
-                           econagg.dum)
-heatmap(as.matrix(commitment.depth[, 2:4]), scale="column")
-
-
-
 # Look at correlation between FP similarity and depth
 cor.test(atop.milsup$mean.kap.sc, atop.milsup$latent.depth.mean)
 cor.test(atop.milsup$low.kap.sc, atop.milsup$latent.depth.mean)
@@ -426,14 +418,12 @@ table(atop.milsup$democ.pos)
 
 # Address max democ -Inf issue
 # comes from all NA
-atop.milsup$max.democ[atop.milsup$max.democ == -Inf] <- NA
-atop.milsup$max.democ.weight[atop.milsup$max.democ.weight == -Inf] <- NA
-atop.milsup$max.open[atop.milsup$max.open == -Inf] <- NA
 atop.milsup$maxcap.open[atop.milsup$maxcap.open == -Inf] <- NA
 
 atop.milsup$maxcap.comp.lied[atop.milsup$maxcap.comp.lied == -Inf] <- NA
 atop.milsup$maxcap.open.lied[atop.milsup$maxcap.open.lied == -Inf] <- NA
 atop.milsup$maxcap.lied[atop.milsup$maxcap.lied == -Inf] <- NA
+atop.milsup$maxcap.lied.rc[atop.milsup$maxcap.lied.rc == -Inf] <- NA
 
 atop.milsup$maxcap.cont.std[atop.milsup$maxcap.cont.std == -Inf] <- NA
 atop.milsup$maxcap.inclus.std[atop.milsup$maxcap.inclus.std == -Inf] <- NA
@@ -461,12 +451,49 @@ summary(atop.milsup$maxcap.rec)
 atop.milsup$maxcap.rec[atop.milsup$maxcap.rec == -Inf] <- 0
 summary(atop.milsup$maxcap.comp)
 atop.milsup$maxcap.comp[atop.milsup$maxcap.comp == -Inf] <- 0
-summary(atop.milsup$maxcap.cons)
+summary(atop.milsup$maxcap.comp)
 atop.milsup$maxcap.cons[atop.milsup$maxcap.cons == -Inf] <- 0
 
 
 # Create a post-45 dummy
 atop.milsup$post45 <- ifelse(atop.milsup$begyr > 1945, 1, 0)
+
+
+# tabulate raw data
+t.test(atop.milsup$latent.depth.mean ~ atop.milsup$maxcap.liedh)
+cor.test(atop.milsup$latent.depth.mean, atop.milsup$maxcap.lied)
+# boxplot depth by electoral comp 
+depth.boxplot <- filter(atop.milsup, !is.na(maxcap.liedh)) %>%
+                 ggplot(aes(x = factor(maxcap.liedh), y = (latent.depth.mean))) +
+                  geom_boxplot() +
+                  geom_jitter() +
+                  labs(x = "Full Electoral Democracy", y = "Mean Latent Treaty Depth")
+depth.boxplot
+# plot against start year
+depth.time <- filter(atop.milsup, !is.na(maxcap.liedh)) %>%
+                ggplot(aes(x = begyr, y = latent.depth.mean, 
+                        shape = factor(maxcap.liedh))) +
+                  geom_point(alpha = .75, size = 2) +
+                  scale_shape_manual(values = c(16, 17),
+                     labels = c("Present", "Absent")) +
+                  labs(x = "Alliance Start Year", y = "Mean Latent Treaty Depth",
+                  shape = "Full Electoral \n Democracy")
+depth.time
+
+# combine plots
+grid.arrange(depth.boxplot, depth.time,
+             nrow = 2)
+raw.data <- arrangeGrob(depth.boxplot, depth.time,
+                        nrow = 2)
+ggsave("figures/raw-data.png", raw.data, height = 6, width = 8)
+
+# two IVS
+table(atop.milsup$maxcap.cons, atop.milsup$maxcap.lied)
+table(atop.milsup$maxcap.cons, atop.milsup$maxcap.liedh)
+# France and post-Soviet Russia are the two alliance leaders
+# that have full elections w/o constraints
+
+
 
 
 

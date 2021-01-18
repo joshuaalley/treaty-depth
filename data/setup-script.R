@@ -65,6 +65,9 @@ rstan_options(auto_write = TRUE)
 # Set seed
 set.seed(12)
 
+# default ggplot theme
+theme_set(theme_bw())
+
 
 # Get beta regression predictions on outcome, not link scale
 # Take these off the link function scale using linkinv from betareg package

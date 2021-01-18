@@ -141,7 +141,9 @@ data_polity <- data_polity %>%
                 mutate(
                  open.dum = ifelse(lexical_index_original >= 4, 1, 0)
                 )
+                 
 table(data_polity$open.pol)
+table(data_polity$lied.recode)
 glimpse(data_polity)
 
 
@@ -238,7 +240,7 @@ alliance.year <- atop.cow.year %>%
     maxcap.open.lied = max(maxcap.open.lied, na.rm = TRUE),
     maxcap.comp.lied = max(maxcap.comp.lied, na.rm = TRUE),
     maxcap.lied = max(maxcap.lied, na.rm = TRUE),
-    maxcap.liedh = ifelse(maxcap.lied >= 4, 1, 0),
+    maxcap.liedh = ifelse(maxcap.lied == 6, 1, 0),
     
     # interact lied and cons
     maxcap.lied.cons = maxcap.cons*maxcap.lied,
@@ -270,14 +272,16 @@ alliance.year <- atop.cow.year %>%
     
     max.threat = max(lsthreat, na.rm = TRUE),
     min.threat = min(lsthreat, na.rm = TRUE),
-    mean.threat = mean(lsthreat, na.rm = TRUE)
+    mean.threat = mean(lsthreat, na.rm = TRUE),
+    # keep groups
+    .groups = "keep"
   )
 
 alliance.year[order(alliance.year$atopid, alliance.year$year),] 
 
 
 # Create separate democracy data
-alliance.democ <- alliance.year %>% 
+alliance.democ <- alliance.year %>% ungroup() %>% 
   select(c(atopid, dem.prop, joint.democ, avg.democ, max.democ, min.democ, 
            avg.democ.weight, 
            max.threat, min.threat, mean.threat, 
@@ -287,7 +291,7 @@ alliance.democ <- alliance.year %>%
            maxcap.cont.std, maxcap.inc.std,
            maxcap.comp.lied, maxcap.open.lied, maxcap.lied,
            maxcap.lied.cons,
-           maxcap.liedh, maxcap.liedh.cons, maxcap.poly))
+           maxcap.liedh, maxcap.poly))
 write.csv(alliance.democ, "data/alliance-democ.csv",
           row.names = FALSE)
 

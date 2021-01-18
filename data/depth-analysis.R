@@ -7,23 +7,32 @@
 
 
 ### Analysis focusing on alliances with military support
-
+# Set up unique dataframe
+key.data <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
+                   fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
+                   low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.democ, 
+                   dem.prop, joint.democ, avg.democ, maxcap.comp, maxcap.lied, maxcap.open,
+                   maxcap.rec, maxcap.cons, maxcap.liedh, us.mem, bilat) %>%
+  drop_na()
+key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
+summary(key.data$latent.depth.mean.rs)
+table(key.data$maxcap.lied)
 
 # Regression of depth on other alliance characteristics
-depth.reg.dem <- lm(latent.depth.mean ~ maxcap.democ +
-                  econagg.dum + 
+depth.reg.dem <- lm(latent.depth.mean.rs ~ maxcap.democ +
+                  econagg.dum + uncond.milsup +
                   fp.conc.index + num.mem + wartime + asymm + 
                   asymm.cap + non.maj.only +
                   mean.threat +
                   low.kap.sc + post45,
-                data = atop.milsup)
+                data = key.data)
 summary(depth.reg.dem)
 plot(density(depth.reg.dem$residuals))
 
 # Regression of depth on other democratic characteristics
 depth.reg <- lm(latent.depth.mean ~
-                  maxcap.cons + maxcap.lied +
-                  econagg.dum + 
+                  maxcap.lied + maxcap.cons + 
+                  econagg.dum + uncond.milsup +
                   fp.conc.index + num.mem + wartime + asymm + 
                   asymm.cap + non.maj.only +
                   mean.threat +
@@ -31,93 +40,161 @@ depth.reg <- lm(latent.depth.mean ~
                 data = atop.milsup)
 summary(depth.reg)
 
-
-# Very skewed residuals: try skew models
-# use a skew-t model
-depth.reg.skewt <- selm(latent.depth.mean ~ 
-                          maxcap.cons + maxcap.lied +
-                          econagg.dum +
-                          fp.conc.index + num.mem + wartime + asymm + 
-                          asymm.cap + non.maj.only + 
-                          mean.threat + low.kap.sc + post45,
-                        data = atop.milsup,
-                        family = "ST",
-                        opt.method = "Nelder-Mead",
-                        param.type = "pseudo-CP")
-summary(depth.reg.skewt, "pseudo-CP")
-# plot(depth.reg.skewt, param.type = "pseudo-CP")
-
-# also fit a skew-cauchy model
-depth.reg.skewc <- selm(latent.depth.mean ~ 
-                  maxcap.cons + maxcap.open +
-                    econagg.dum +
+# robust regression
+depth.rlm <- rlm(latent.depth.mean ~
+                  maxcap.lied + maxcap.cons + 
+                  econagg.dum + uncond.milsup +
                   fp.conc.index + num.mem + wartime + asymm + 
-                    asymm.cap + non.maj.only + 
-                    mean.threat + low.kap.sc + post45,
-                data = atop.milsup,
-                family = "SC",
-                opt.method = "BFGS",
-                param.type = "pseudo-CP")
-summary(depth.reg.skewc, "pseudo-CP")
-# plot(depth.reg.skewc, param.type = "pseudo-CP")
+                  asymm.cap + non.maj.only +
+                  mean.threat +
+                  low.kap.sc + post45,
+                data = atop.milsup)
+summary(depth.rlm)
+
+
+### beta regression
+# alliance leader polity
+depth.breg.dem <- betareg(latent.depth.mean.rs ~ maxcap.democ +
+                           econagg.dum + uncond.milsup +
+                           fp.conc.index + num.mem + wartime + asymm + 
+                           asymm.cap + non.maj.only +
+                           mean.threat +
+                           low.kap.sc + post45,
+                         data = key.data)
+summary(depth.breg.dem)
+
+
+# LIED and constraints dummy
+beta.reg.depth <- betareg(latent.depth.mean.rs ~ 
+                            maxcap.lied + maxcap.cons +
+                            econagg.dum + uncond.milsup +
+                            fp.conc.index + num.mem + wartime + asymm + 
+                            asymm.cap + non.maj.only + 
+                            mean.threat + low.kap.sc + post45, data = key.data)
+summary(beta.reg.depth)
+
+
+# before and after 1945
+# before 
+key.data.b45 <- filter(key.data, post45 == 0)
+beta.depth.b45 <- betareg(latent.depth.mean.rs ~ 
+                            maxcap.lied + maxcap.cons + 
+                            econagg.dum + uncond.milsup +
+                            fp.conc.index + num.mem + wartime + asymm + 
+                            asymm.cap + non.maj.only +
+                            mean.threat + low.kap.sc, data = key.data.b45)
+summary(beta.depth.b45)
+
+# after 1945
+key.data.p45 <- filter(key.data, post45 == 1)
+beta.depth.p45 <- betareg(latent.depth.mean.rs ~ 
+                            maxcap.lied + maxcap.cons +
+                            econagg.dum + uncond.milsup +
+                            fp.conc.index + num.mem + wartime + asymm + 
+                            asymm.cap + 
+                            mean.threat + low.kap.sc, data = key.data.p45)
+summary(beta.depth.p45)
 
 
 
-# Summarize results in a table for the appendix
-# OLS only- unreliable so leave out
-stargazer(list(depth.reg.dem, depth.reg),
+# US membership
+beta.reg.depth.us <- betareg(latent.depth.mean.rs ~ 
+                            maxcap.lied + maxcap.cons +
+                            econagg.dum + uncond.milsup +
+                            fp.conc.index + num.mem + wartime + asymm + 
+                            asymm.cap + non.maj.only + 
+                            mean.threat + low.kap.sc + post45 +
+                            us.mem, data = key.data)
+summary(beta.reg.depth.us)
+
+
+### calculate substantive effects
+# set up new data
+sim.data <- cbind.data.frame(
+  x0 = rep(1, n = 14), # intercept
+  maxcap.lied = rep(seq(0, 6, by = 1), 2),
+  maxcap.cons = c(rep(0, 7), rep(1, 7)),
+  econagg.dum = rep(0, n = 14),
+  uncond.milsup = rep(0, n = 14),
+  fp.conc.index = rep(0, n = 14), # no concessions
+  num.mem = rep(2, n = 14), # bilateral
+  wartime = rep(0, n = 14), # peacetime
+  asymm = rep(0, n = 14), # symmetric obligations
+  asymm.cap = rep(1, n = 14), # asymmetric cap
+  non.maj.only = rep(0, n = 14),
+  mean.threat = rep(median(key.data$mean.threat), n = 14),
+  low.kap.sc = rep(median(key.data$low.kap.sc), n = 14),
+  post45 = rep(1, n = 14)
+)
+glimpse(sim.data)
+
+# Bootstrap
+n.bs <- 5000
+bs.sim <- matrix(NA, nrow = n.bs, ncol = length(coef(beta.reg.depth))- 1)
+for (i in 1:n.bs) {
+  bs.samp <- sample(1:nrow(key.data), nrow(key.data), replace = T)
+  bs.data <- key.data[bs.samp, ]
+  bs.est <- betareg(latent.depth.mean.rs ~ 
+                      maxcap.lied + maxcap.cons +
+                      econagg.dum + uncond.milsup +
+                      fp.conc.index + num.mem + wartime + asymm + 
+                      asymm.cap + non.maj.only + 
+                      mean.threat + low.kap.sc + post45, data = bs.data)
+  bs.sim[i, ] <- coef(bs.est)[1:length(coef(bs.est))-1] # removes shape parameter
+}
+# multiply bootstrapped params by simulated data
+# also inverts the link function
+sub.est <- linkinv(as.matrix(bs.sim) %*% t(as.matrix(sim.data)))
+sub.est <- as.data.frame(sub.est)
+# calculate differences
+depth.diff <- rbind.data.frame(
+  apply(sub.est[2:ncol(sub.est)], 2, function(x)
+    quantile(x - sub.est$V1, c(0.025, .975))
+))
+depth.diff <- cbind(t(depth.diff), select(sim.data[2:nrow(sim.data), ],
+                                        maxcap.lied, maxcap.cons))
+colnames(depth.diff)[1:2] <- c("lower", "upper")
+
+# plot results
+ggplot(depth.diff, aes(x = factor(maxcap.lied), y = upper,
+                                  color = factor(maxcap.cons))) +
+  geom_hline(yintercept = 0) +
+  geom_errorbar(aes(ymin = lower,
+                    ymax = upper),
+                width = .1, size = 2,
+                position = position_dodge(.5)) +
+  scale_color_manual(values = c(`0` = "gray66",
+                                  `1` = "gray0"),
+                     labels = c("Absent", "Present")
+                       )+
+  labs(y = "Predicted Difference in Treaty Depth",
+       x = "Lexical Index Change from Zero",
+       color = "Executive Constraints") +
+  ggtitle("Predicted Difference in Treaty Depth")
+ggsave("figures/results-diff.png", height = 6, width = 8)
+
+
+
+# Tabulate results
+stargazer(list(depth.breg.dem, beta.reg.depth,
+               beta.depth.b45, beta.depth.p45),
           style = "all2",
-          dep.var.labels=c("Latent Depth"),
+          dep.var.labels=c("Latent Depth (rescaled)"),
           covariate.labels=c(
-            "Alliance Leader Polity",
-            "Executive Constraints", "Electoral Competition",
-            "Economic Issue Linkage",
+            "Alliance Leader Polity Score",
+            "Lexical Index of Democracy","Executive Constraints", 
+            "Economic Issue Linkage", "Unconditional Support",
             "Foreign Policy Concessions", "Number of Members",
             "Wartime Alliance", "Asymmetric Obligations",
             "Asymmetric Capability", "Non-Major Only",
             "Average Threat",
             "Foreign Policy Disagreement", "Post 1945"
           ),
-          keep.stat = c("n"), ci=TRUE, 
+          keep.stat = c("n","ll"), ci=TRUE, 
           star.char = c("", "", ""),
           notes = "95\\% Confidence Intervals in Parentheses.", 
           notes.append = FALSE,
-          label = c("tab:depth-alt-models-ols")
+          label = c("tab:reg-est")
 )
 
 
-# Skew-t and Skew-cauchy models
-sum.skewt <- summary(depth.reg.skewt, "pseudo-CP")
-sum.skewc <- summary(depth.reg.skewc, "pseudo-CP")
-
-dim(sum.skewc@param.table)
-
-skew.res.tab <- as.data.frame(rbind(sum.skewt@param.table[1:13, 1:2],
-                                    sum.skewc@param.table[1:13, 1:2]
-))
-
-skew.res.tab$variable <- rep(c("(Intercept)",  
-                         "Executive Constraints", 
-                         "Lexical Index of Democracy",
-                         "Economic Issue Linkage", 
-                         "FP Concessions", "Number of Members", 
-                         "Wartime Alliances", "Asymmetric Obligations",
-                         "Asymmetric Capability", "Non-Major Only", 
-                        "Mean Threat",  "FP Disagreement", "Post 1945"),
-                          2)
-skew.res.tab$model = c(rep("Skew T", n = 13), rep("Skew Cauchy", n = 13))
-
-
-# Plot the coefficient estimates
-ggplot(skew.res.tab, aes(x = estimate, y = variable)) +
-  facet_wrap(~ model) +
-  geom_vline(xintercept = 0) +
-  geom_point(size = 2) +
-  geom_errorbarh(aes(
-    xmin = estimate - 2*std.err,
-    xmax = estimate + 2*std.err
-  ), size = 1, height = .25) +
-  ggtitle("Skew Models of Latent Treaty Depth") +
-  labs(x = "Estimate", y = "Variable") +
-  theme_bw() 
-ggsave("appendix/skew-model-res.png", height = 6, width = 8)
