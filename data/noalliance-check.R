@@ -78,6 +78,7 @@ alliance.data <- lapply(alliance.data,
                               wartime = max(atwar, na.rm = TRUE),
                               ccode.unique = length(unique(ccode)),
                               maxcap.lied = max(maxcap.lied, na.rm = TRUE),
+                              maxcap.liedh = max(maxcap.liedh, na.rm = TRUE),
                               maxcap.cons = max(maxcap.cons, na.rm = TRUE),
                               maxcap.democ.min = min(maxcap.democ, na.rm = TRUE),
                               maxcap.democ.max = max(maxcap.democ, na.rm = TRUE),
@@ -125,6 +126,7 @@ bilat.all <- bilat.all %>%
     wartime = max(atwar, na.rm = TRUE),
     ccode.unique = length(unique(ccode)),
     maxcap.lied = max(maxcap.lied, na.rm = TRUE),
+    maxcap.liedh = max(maxcap.liedh, na.rm = TRUE),
     maxcap.cons = max(maxcap.cons, na.rm = TRUE),
     maxcap.democ.min = min(maxcap.democ, na.rm = TRUE),
     maxcap.democ.max = max(maxcap.democ, na.rm = TRUE),
@@ -155,6 +157,7 @@ samp.noall[[i]] <- samp.data %>% ungroup() %>% # ungroup data
 # samp.noall <- lapply(samp.noall, function(x) slice_sample(x, n = (5*nrow(x))))
 samp.noall <- bind_rows(samp.noall)
 table(samp.noall$size)
+table(samp.noall$size) == num.mem.obs$num.all*5 # check the numbers
 
 # look at key IVs
 summary(samp.noall$maxcap.lied)
@@ -162,9 +165,9 @@ table(samp.noall$maxcap.cons)
 
 # combine sampled data with observed alliances
 alldata.comb <- atop.milsup %>%
-                select(atopid, begyr, maxcap.liedh, maxcap.cons, avg.democ, 
+                select(atopid, begyr, maxcap.lied, maxcap.cons, avg.democ, 
                        mean.threat, asymm.cap, non.maj.only, asymm, wartime,
-                       latent.depth.mean, uncond.milsup, num.mem,
+                       latent.depth.mean, uncond.milsup, num.mem, maxcap.liedh,
                        econagg.dum, fp.conc.index, low.kap.sc, uncond.milsup,
                        ) %>%
                 rename(
@@ -174,9 +177,17 @@ alldata.comb <- atop.milsup %>%
 
 
 # Rescale depth for beta dist: shift location
-alldata.comb$latent.depth.mean.rs <- (alldata.comb$latent.depth.mean + 1)
+alldata.comb$latent.depth.mean.rs <- (alldata.comb$latent.depth.mean + .9)
+summary(alldata.comb$latent.depth.mean.rs)
 
 # Check the data
+# check and ordered
+table(alldata.comb$maxcap.lied)
+#alldata.comb$maxcap.lied <- as.ordered(alldata.comb$maxcap.lied)
+table(alldata.comb$maxcap.cons)
+alldata.comb$maxcap.cons <- as.ordered(alldata.comb$maxcap.cons)
+table(alldata.comb$maxcap.lied, alldata.comb$maxcap.cons)
+# other variables
 table(alldata.comb$asymm.cap)
 table(alldata.comb$non.maj.only)
 summary(alldata.comb$avg.democ)
@@ -202,38 +213,97 @@ alldata.comb$atopid[is.na(alldata.comb$atopid)] <- 0
 # varying intercepts by year 
 hurdle.depth <- brm(
   formula = bf(
-    latent.depth.hurdle ~ 1 + maxcap.liedh + maxcap.cons + size + mean.threat +
-      non.maj.only + asymm.cap + uncond.milsup +
+    latent.depth.hurdle ~ 1 + maxcap.lied + maxcap.cons + size + mean.threat +
+      non.maj.only + asymm.cap + 
       wartime + (1 | begyr), 
-    hu ~ 1 + avg.democ + mean.threat + asymm.cap + maxcap.liedh + maxcap.cons +
-      wartime + (1 | begyr)
+    hu ~ 1 + avg.democ + mean.threat + asymm.cap + maxcap.lied + maxcap.cons +
+      wartime + size + (1 | begyr)
   ),
   family = hurdle_gamma,
   prior = c(
     set_prior("normal(0, 5)", class = "b"),
-    set_prior("normal(0, 5)", class = "b", dpar = "hu"),
-    set_prior("normal(0, 1)", class = "sd")
+    set_prior("student_t(3, 0, .5)", class = "b", dpar = "hu"),
+    set_prior("normal(0, .5)", class = "sd")
   ),
   data = alldata.comb,
-  control = list(adapt_delta = .9)
+  control = list(adapt_delta = .95)
 )
 
 pp_check(hurdle.depth)
 summary(hurdle.depth)
 
 # plot conditional effects: 90% intervals
-plot(conditional_effects(hurdle.depth, probs = c(0.05, 0.95)),
+plot(conditional_effects(hurdle.depth, prob = 0.90),
      ask = FALSE,
      rug = TRUE)
 # Pull democracy plot
-ce.democ <- conditional_effects(hurdle.depth, probs = c(0.05, 0.95),
-                    effects = c("maxcap.liedh", "maxcap.cons"))
-plot(ce.democ,
-    plot = FALSE)[[1]] +
-  scale_color_grey() +
-  scale_fill_grey() +
-  labs(x = "Electoral Competition in Alliance Leader",
-   y = "Latent Depth (shifted)")
+ce.democ <- conditional_effects(hurdle.depth, prob = .90,
+                    effects = c("maxcap.lied", 
+                                "maxcap.cons"))
+
+# clean up plots
+ce.democ$maxcap.lied <- filter(ce.democ$maxcap.lied, 
+                        (ce.democ$maxcap.lied$maxcap.lied == 0 |
+                         ce.democ$maxcap.lied$maxcap.lied == 1 |
+                         ce.democ$maxcap.lied$maxcap.lied == 2 |
+                         ce.democ$maxcap.lied$maxcap.lied == 3 |
+                         ce.democ$maxcap.lied$maxcap.lied == 4 |
+                         ce.democ$maxcap.lied$maxcap.lied == 5 |
+                         ce.democ$maxcap.lied$maxcap.lied == 6
+                          ))
+
+
+ce.democ$maxcap.cons <- filter(ce.democ$maxcap.cons, 
+                               (ce.democ$maxcap.cons$maxcap.cons == 0 |
+                                  ce.democ$maxcap.cons$maxcap.cons == 1 
+                               ))
+
+# electoral democracy
+elec.hurd <-  ggplot(ce.democ$maxcap.lied, aes(x = maxcap.lied, y = estimate__)) +
+              geom_point() +
+              geom_linerange(aes(ymin = lower__, ymax = upper__)) +
+              labs(x = "Alliance Leader Electoral Democracy",
+              y = "Latent Depth (shifted)",
+              title = "Electoral Democracy")
+elec.hurd
+# executive constraints
+cons.hurd <-  ggplot(ce.democ$maxcap.cons, aes(x = factor(maxcap.cons), y = estimate__)) +
+                geom_point() +
+                geom_linerange(aes(ymin = lower__, ymax = upper__)) +
+               labs(x = "Alliance Leader Executive Constraints",
+               y = "Latent Depth (shifted)",
+               title = "Executive Constraints")
+cons.hurd
+# combine
+grid.arrange(elec.hurd, cons.hurd)
+hurdle.ce <- arrangeGrob(elec.hurd, cons.hurd)
+ggsave("figures/results-hurdle.png", hurdle.ce, 
+       height = 6, width = 8)
 
 
 
+### same model after 1945
+# no major difference
+alldata.comb.p45 <- filter(ungroup(alldata.comb), begyr > 1945)
+
+hurdle.depth.p45 <- brm(
+  formula = bf(
+    latent.depth.hurdle ~ 1 + maxcap.lied + maxcap.cons + size + mean.threat +
+      non.maj.only + asymm.cap + 
+      wartime + (1 | begyr), 
+    hu ~ 1 + avg.democ + mean.threat + asymm.cap + maxcap.lied + maxcap.cons +
+      wartime + size + (1 | begyr)
+  ),
+  family = hurdle_gamma,
+  prior = c(
+    set_prior("normal(0, 5)", class = "b"),
+    set_prior("student_t(3, 0, .5)", class = "b", dpar = "hu"),
+    set_prior("normal(0, .5)", class = "sd")
+  ),
+  data = alldata.comb.p45,
+  control = list(adapt_delta = .95)
+)
+
+# check the results
+pp_check(hurdle.depth.p45)
+summary(hurdle.depth.p45)
