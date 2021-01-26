@@ -2,13 +2,96 @@
 # Bivariate depth model robustness checks
 # must run after joint-cred-analysis.R 
 
-# add a control for US membership
 
+
+
+# add a control for US membership
+# LIED and constraints dummy
+beta.reg.depth.us <- betareg(latent.depth.mean.rs ~ 
+                            maxcap.lied + maxcap.cons + 
+                            econagg.dum + uncond.milsup +
+                            fp.conc.index + num.mem + wartime + asymm + 
+                            asymm.cap + non.maj.only + 
+                            mean.threat + low.kap.sc + post45 + us.mem, data = key.data)
+summary(beta.reg.depth.us)
+
+# post 45 alliances only
+beta.reg.depth.us45 <- betareg(latent.depth.mean.rs ~ 
+                               maxcap.lied + maxcap.cons + 
+                               econagg.dum + uncond.milsup +
+                               fp.conc.index + num.mem + wartime + asymm + 
+                               asymm.cap + non.maj.only + 
+                               mean.threat + low.kap.sc + us.mem, 
+                             data = key.data.p45)
+summary(beta.reg.depth.us45)
+
+
+# tabulate results
+# Tabulate results
+stargazer(list(beta.reg.depth.us, beta.reg.depth.us45),
+          style = "all2",
+          dep.var.labels=c("Latent Depth (rescaled)"),
+          covariate.labels=c(
+            "Lexical Index of Democracy","Executive Constraints", 
+            "Economic Issue Linkage", "Unconditional Support",
+            "Foreign Policy Concessions", "Number of Members",
+            "Wartime Alliance", "Asymmetric Obligations",
+            "Asymmetric Capability", "Non-Major Only",
+            "Average Threat",
+            "Foreign Policy Disagreement", "Post 1945",
+            "US Membership"
+          ),
+          keep.stat = c("n","ll"), ci=TRUE, 
+          star.char = c("", "", ""),
+          notes = "95\\% Confidence Intervals in Parentheses.", 
+          notes.append = FALSE,
+          label = c("tab:us-reg")
+)
 
 
 
 ### alternative measures of electoral competition
+key.data.rc <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
+                   fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
+                   low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.democ, maxcap.lied,
+                   dem.prop, prop.cons, joint.democ, avg.democ, maxcap.poly, maxcap.cons, maxcap.rec,
+                   us.mem, bilat) %>%
+  drop_na()
+key.data.rc$latent.depth.mean.rs <- (key.data.rc$latent.depth.mean + 1) / (1 + max(key.data.rc$latent.depth.mean) + .01)
+summary(key.data.rc$latent.depth.mean.rs)
 
+
+# vdem polyarchy
+beta.reg.poly <- betareg(latent.depth.mean.rs ~ 
+                            maxcap.poly + maxcap.cons + 
+                            econagg.dum + uncond.milsup +
+                            fp.conc.index + num.mem + wartime + asymm + 
+                            asymm.cap + non.maj.only + 
+                            mean.threat + low.kap.sc + post45, data = key.data.rc)
+summary(beta.reg.poly)
+
+
+# POLITY recruitment dummy
+beta.reg.rec <- betareg(latent.depth.mean.rs ~ 
+                           maxcap.rec + maxcap.cons + 
+                           econagg.dum + uncond.milsup +
+                           fp.conc.index + num.mem + wartime + asymm + 
+                           asymm.cap + non.maj.only + 
+                           mean.threat + low.kap.sc + post45, data = key.data.rc)
+summary(beta.reg.rec)
+
+
+# Democratic proportion
+beta.reg.prop <- betareg(latent.depth.mean.rs ~ 
+                           dem.prop + maxcap.cons +
+                          econagg.dum + uncond.milsup +
+                          fp.conc.index + num.mem + wartime + asymm + 
+                          asymm.cap + non.maj.only + 
+                          mean.threat + low.kap.sc + post45, data = key.data.rc)
+summary(beta.reg.prop)
+
+
+# tabulate results
 
 
 ### plot results
@@ -20,19 +103,17 @@ substance.plot <- function(model, label, destination){
 
   
 # list of plots
-depth.plots <- vector(mode = "list", length = length(models.comp))
+depth.plots <- vector(mode = "list", length = length(model))
   
 # for loop to plot  
 for(i in 1:length(model)){
 
 sim.data <- cbind.data.frame(
     x0 = rep(1, n = 2), # intercept
+    par = c(min(model[[i]]$model[, 2]), max(model[[i]]$model[, 2])), # placeholder
     maxcap.cons = rep(1, n = 2),
-    par = c(min(model[[i]][["X1"]][, 3]), max(model[[i]][["X1"]][, 3])), # placeholder
-    prop.cons = rep(1, n = 2), 
-    maxcap.comp = rep(1, n = 2),
-    maxcap.inc.std = rep(median(key.data.poly$maxcap.inc.std), na.rm = TRUE),
     econagg.dum = rep(0, n = 2),
+    uncond.milsup = rep(0, n = 2),
     fp.conc.index = rep(0, n = 2), # no concessions
     num.mem = rep(2, n = 2), # bilateral
     wartime = rep(0, n = 2), # peacetime
@@ -41,40 +122,36 @@ sim.data <- cbind.data.frame(
     non.maj.only = rep(0, n = 2),
     mean.threat = rep(median(key.data$mean.threat), n = 2),
     low.kap.sc = rep(median(key.data$low.kap.sc), n = 2),
-    begyr = rep(median(key.data$begyr), n = 2),
-    us.mem = rep(0, n = 2)
+    post45 = rep(1, n = 2)
   )
-  colnames(sim.data)[3] <- colnames(model[[i]][["X1"]])[3] # give proper name
+  colnames(sim.data)[2] <- colnames(model[[i]]$model)[2] # give proper name
   glimpse(sim.data)
-
-# build out predictions for depth
-pred.depth.mat <- predict(model[[i]], eq = 2,
-                          type = "lpmatrix", 
-                          newdata = sim.data)
 
 # Create vectors of parameter replciates 
 # similar to bootstrap with lm or rlm 
-rmvn <- function(n,mu,sig) { ## MVN random deviates
-  L <- mroot(sig);m <- ncol(L);
-  t(mu + L%*%matrix(rnorm(m*n),m,n)) 
+n.bs <- 5000
+
+
+bs.sim <- matrix(NA, nrow = n.bs, ncol = length(coef(model[[i]]))- 1)
+formula = model[[i]]$formula
+for (j in 1:n.bs) { # index bs by j: i is present in overall loop
+  bs.samp <- sample(1:nrow(key.data.rc), nrow(key.data.rc), replace = T)
+  bs.data <- key.data.rc[bs.samp, ]
+  bs.est <- betareg(formula, data = bs.data)
+  bs.sim[j, ] <- coef(bs.est)[1:length(coef(bs.est))-1] # removes shape parameter
 }
-
-br <- rmvn(1000,coef(model[[i]]), model[[i]]$Vb) ## 1000 replicate param. vectors
-
-dim(br[, (ncol(pred.depth.mat)+1):(ncol(pred.depth.mat) + ncol(pred.depth.mat))])
-dim(t(pred.depth.mat))
-
-# Calculate differences
-sim.res <- data.frame(linkinv(br[, (ncol(pred.depth.mat)+1):(ncol(pred.depth.mat) + 
-                                ncol(pred.depth.mat))] %*% t(pred.depth.mat)))
+# multiply bootstrapped params by simulated data
+# also inverts the link function
+sub.est <- linkinv(as.matrix(bs.sim) %*% t(as.matrix(sim.data)))
+sub.est <- as.data.frame(sub.est)
+# calculate differences
 depth.diff <- rbind.data.frame(
-  quantile(sim.res$X1, c(0.025, .975)),
-  quantile(sim.res$X2, c(0.025, .975)),
-  quantile(sim.res$X2 - sim.res$X1, c(0.025, .975))
-)
+    quantile(sub.est$V1, c(0.025, .975)),
+    quantile(sub.est$V2, c(0.025, .975)),
+    quantile(sub.est$V2 - sub.est$V1, c(0.025, .975))
+  )
 colnames(depth.diff) <- c("lower", "upper")
-depth.diff$scenario <- c("Low", "High",
-                         "Difference")
+depth.diff$scenario <- c("Low", "High", "Difference")
 
 # plot intervals
 depth.intervals <- ggplot(depth.diff, aes(x = scenario, y = upper)) +
@@ -83,17 +160,13 @@ depth.intervals <- ggplot(depth.diff, aes(x = scenario, y = upper)) +
                     ymax = upper),
                 width = .1, size = 1) +
   labs(y = "Predicted Treaty Depth",
-       x = "Scenario") +
+       x = "Electoral Democracy Value") +
   ggtitle(label[[i]]) +
   theme_bw()
 depth.intervals
 
 # add to plot list
 depth.plots[[i]] <- depth.intervals
-
-# calculate variance from inverting link transformation 
-res <- linkinv(br[, (ncol(pred.depth.mat)+1):(ncol(pred.depth.mat)+ ncol(pred.depth.mat))] %*% t(pred.depth.mat))
-mean(res);var(res)
 
 
 } # end plot loop
@@ -111,13 +184,19 @@ ggsave(destination, results.all,
 
 
 # Inputs
-models.comp = list(joint.gjrm.prop, joint.gjrm.pol, gjrm.poly.vdem)
-labels.comp = c("Proportion Electoral Democracy", "Polity Elections.", "Polyarchy (VDem)")
+model.list = list(beta.reg.poly, beta.reg.rec, beta.reg.prop)
+#formula.list = list(beta.reg.poly$formula, beta.reg.rec$formula, beta.reg.prop$formula)
+labels.comp = c("Polyarchy (VDem)", "Polity Elections.", "Proportion Electoral Democracy")
 
 
 # Apply the function 
-substance.plot(model = models.comp, label = labels.comp,
-               destination = "figures/results-other-democ.png")
+substance.plot(model = model.list, 
+               label = labels.comp,
+               destination = "appendix/results-other-democ.png")
+
+
+
+
 
 
 

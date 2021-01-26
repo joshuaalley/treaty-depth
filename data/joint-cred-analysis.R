@@ -1,19 +1,8 @@
 # Joshua Alley
 # Analysis of multiple sources of alliance credibility
 
-# data is loaded by the alliance-measures script
-
-
-# Set up unique dataframe
-key.data <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
-                   fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                   low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.democ, 
-                   dem.prop, joint.democ, avg.democ, maxcap.democ, maxcap.open,
-                   maxcap.rec, maxcap.comp, maxcap.cons, maxcap.lied, us.mem, bilat) %>%
-            drop_na()
-key.data$latent.depth.mean.rs <- (key.data$latent.depth.mean + 1) / (1 + max(key.data$latent.depth.mean) + .01)
-summary(key.data$latent.depth.mean.rs)
-table(key.data$maxcap.lied)
+# data is loaded by alliance-measures.R and
+# depth-analysis.R 
 
 # glm model of unconditional military support
 # full democ
@@ -47,16 +36,6 @@ linkage.glm <- glm(econagg.dum ~
                   family = binomial(link = "probit"),
                   data = key.data)
 summary(linkage.glm)
-
-
-# Use a beta regression with rescaled depth 
-beta.reg.depth <- betareg(latent.depth.mean.rs ~ 
-                            maxcap.cons + maxcap.lied +
-                            econagg.dum + 
-                            fp.conc.index + num.mem + wartime + asymm + 
-                            asymm.cap + non.maj.only + 
-                            mean.threat + low.kap.sc + post45, data = key.data)
-summary(beta.reg.depth)
 
 
 ### Joint analysis of unconditional military support and depth
@@ -124,6 +103,67 @@ plot(joint.gjrm, eq = 2, seWithMean = TRUE,
 plot(joint.gjrm, eq = 4, seWithMean = TRUE,
      shade = TRUE, pages = 1) # smoothed terms 
 
+
+
+### Lexical Index GJRM results 
+summary.depth.gjrm <- summary(joint.gjrm)
+
+# tabulate the results 
+summary.depth.gjrm[["tableP1"]] # uncond milsup
+summary.depth.gjrm[["tableP2"]] # depth 
+
+# Combine all the results in a single table. 
+# Start with unconditional table
+uncond.tab <- as.data.frame(rbind(summary.depth.gjrm[["tableP1"]][, 1:2],
+                                  summary.depth.gjrm[["tableNP1"]][, c(1, 3)]
+))
+uncond.tab$variable <- c("(Intercept)",  
+                         "Executive Constraints", 
+                         "Lexical Index of Democracy",
+                         "Economic Issue Linkage", 
+                         "FP Concessions", "Number of Members", 
+                         "Wartime Alliances", "Asymmetric Obligations",
+                         "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
+                         "s(Mean Threat)", "s(Start Year)")
+
+
+# table for treaty depth
+depth.tab <- as.data.frame(rbind(summary.depth.gjrm[["tableP2"]][, 1:2],
+                                 summary.depth.gjrm[["tableNP2"]][, c(1, 3)]
+))
+depth.tab$variable <- c("(Intercept)",
+                        "Executive Constraints",
+                        "Lexical Index of Democracy",
+                        "Economic Issue Linkage",
+                        "FP Concessions", "Number of Members", 
+                        "Wartime Alliances", "Asymmetric Obligations",
+                        "Asymmetric Capability", "Non-Major Only", "FP Disagreement",
+                        "s(Mean Threat)", "s(Start Year)")
+
+joint.tab <- full_join(uncond.tab, depth.tab, by = "variable")
+joint.tab <- as.data.frame(joint.tab[, c(3, 1, 2, 4, 5)])
+
+
+# Tabulate all the equations together
+# create a header
+head.xtab <- list()
+head.xtab$pos <- list(-1)
+head.xtab$command <- paste0(paste0('& \\multicolumn{2}{c}{Uncond. Mil. Support} & \\multicolumn{2}{c}{Latent Depth}',
+                                   collapse=''), '\\\\')
+
+
+
+print(
+  xtable(joint.tab, 
+         caption = c("Results from a joint generalized regression model of treaty depth and unconditional military support in 
+         offensive and defensive alliances from 1816 to 2007. 
+                     All smoothed terms report the effective degrees of freedom and the chi-squared term. 
+                     The unconditional military support model is a binomial GLM with a probit link function. 
+                     The treaty depth model is a beta regression. 
+                     I model the error correlation between the two processes with a Normal copula."),
+         label = c("tab:gjrm-res"), auto = TRUE),
+  add.to.row = head.xtab, 
+  include.rownames = FALSE)
 
 
 
