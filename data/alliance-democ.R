@@ -240,7 +240,7 @@ alliance.year <- atop.cow.year %>%
     maxcap.open.lied = max(maxcap.open.lied, na.rm = TRUE),
     maxcap.comp.lied = max(maxcap.comp.lied, na.rm = TRUE),
     maxcap.lied = max(maxcap.lied, na.rm = TRUE),
-    maxcap.liedh = ifelse(maxcap.lied == 6, 1, 0),
+    maxcap.liedh = ifelse(maxcap.lied >= 4, 1, 0),
     
     # interact lied and cons
     maxcap.lied.cons = maxcap.cons*maxcap.lied,

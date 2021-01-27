@@ -81,7 +81,7 @@ aic.gjrm <- lapply(gjrm.models, AIC)
 aic.gjrm
 
 # NB for interpretation: smoothed terms
-copulas[1] 
+copulas[17] 
 joint.gjrm <- gjrm(list(uncond.formula, depth.formula,
                         eq.sigma, theta.formula), 
                    data = key.data,
@@ -160,7 +160,7 @@ print(
                      All smoothed terms report the effective degrees of freedom and the chi-squared term. 
                      The unconditional military support model is a binomial GLM with a probit link function. 
                      The treaty depth model is a beta regression. 
-                     I model the error correlation between the two processes with a Normal copula."),
+                     I model the error correlation between the two processes with a T copula."),
          label = c("tab:gjrm-res"), auto = TRUE),
   add.to.row = head.xtab, 
   include.rownames = FALSE)

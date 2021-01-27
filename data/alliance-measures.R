@@ -423,10 +423,8 @@ atop.milsup$maxcap.open[atop.milsup$maxcap.open == -Inf] <- NA
 atop.milsup$maxcap.comp.lied[atop.milsup$maxcap.comp.lied == -Inf] <- NA
 atop.milsup$maxcap.open.lied[atop.milsup$maxcap.open.lied == -Inf] <- NA
 atop.milsup$maxcap.lied[atop.milsup$maxcap.lied == -Inf] <- NA
-atop.milsup$maxcap.lied.rc[atop.milsup$maxcap.lied.rc == -Inf] <- NA
 
 atop.milsup$maxcap.cont.std[atop.milsup$maxcap.cont.std == -Inf] <- NA
-atop.milsup$maxcap.inclus.std[atop.milsup$maxcap.inclus.std == -Inf] <- NA
 
 atop.milsup$maxcap.poly[atop.milsup$maxcap.poly == -Inf] <- NA
 

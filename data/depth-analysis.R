@@ -10,7 +10,7 @@
 # Set up unique dataframe
 key.data <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
                    fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                   low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.democ, 
+                   low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.democ, maxcap.liedh,
                    dem.prop, joint.democ, avg.democ, maxcap.comp, maxcap.lied, maxcap.open,
                    maxcap.rec, maxcap.cons, maxcap.liedh, us.mem, bilat) %>%
   drop_na()
@@ -66,7 +66,7 @@ summary(depth.breg.dem)
 
 # LIED and constraints dummy
 beta.reg.depth <- betareg(latent.depth.mean.rs ~ 
-                            maxcap.lied + maxcap.cons +
+                            maxcap.lied + maxcap.cons + 
                             econagg.dum + uncond.milsup +
                             fp.conc.index + num.mem + wartime + asymm + 
                             asymm.cap + non.maj.only + 
@@ -97,16 +97,26 @@ summary(beta.depth.p45)
 
 
 
-# US membership
-beta.reg.depth.us <- betareg(latent.depth.mean.rs ~ 
-                            maxcap.lied + maxcap.cons +
-                            econagg.dum + uncond.milsup +
-                            fp.conc.index + num.mem + wartime + asymm + 
-                            asymm.cap + non.maj.only + 
-                            mean.threat + low.kap.sc + post45 +
-                            us.mem, data = key.data)
-summary(beta.reg.depth.us)
-
+# substantive predictions using ggeffects package
+margins.beta <- ggpredict(beta.reg.depth, terms = c("maxcap.lied", "maxcap.cons"),
+                         interval = "confidence")
+plot(margins.beta)
+# full plot
+plot.depth.sep <- ggplot(margins.beta, aes(x = factor(x), y = predicted,
+                          color = factor(group))) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), 
+                size = 1, width = .05) +
+  scale_color_manual(values = c(`0` = "gray66",
+                                `1` = "gray0"),
+                     labels = c("Absent", "Present")
+  )+
+  labs(x = "Electoral Democracy",
+       y = "Predicted Treaty Depth",
+       color = "Executive Constraints") +
+  theme_bw()
+plot.depth.sep
+ggsave("figures/results-depth.png", height = 6, width = 8)
 
 ### calculate substantive effects
 # set up new data
@@ -146,6 +156,32 @@ for (i in 1:n.bs) {
 # also inverts the link function
 sub.est <- linkinv(as.matrix(bs.sim) %*% t(as.matrix(sim.data)))
 sub.est <- as.data.frame(sub.est)
+
+
+# calculate predicted values
+depth.pred <-  data.frame(apply(sub.est, 2, function(x)
+                 quantile(x, c(0.025, .975))))
+depth.pred <- cbind(t(depth.pred), select(sim.data,
+                                          maxcap.lied, maxcap.cons))
+colnames(depth.pred)[1:2] <- c("lower", "upper")
+# plot
+ggplot(depth.pred, aes(x = factor(maxcap.lied), y = upper,
+                       color = factor(maxcap.cons))) +
+  geom_hline(yintercept = 0) +
+  geom_errorbar(aes(ymin = lower,
+                    ymax = upper),
+                width = .1, size = 2,
+                position = position_dodge(.5)) +
+  scale_color_manual(values = c(`0` = "gray66",
+                                `1` = "gray0"),
+                     labels = c("Absent", "Present")
+  )+
+  labs(y = "Predicted Latent Treaty Depth",
+       x = "Lexical Index of Electoral Democracy",
+       color = "Executive Constraints") +
+  ggtitle("Predicted Treaty Depth")
+
+
 # calculate differences
 depth.diff <- rbind.data.frame(
   apply(sub.est[2:ncol(sub.est)], 2, function(x)
@@ -171,7 +207,6 @@ ggplot(depth.diff, aes(x = factor(maxcap.lied), y = upper,
        x = "Lexical Index Change from Zero",
        color = "Executive Constraints") +
   ggtitle("Predicted Difference in Treaty Depth")
-ggsave("figures/results-diff.png", height = 6, width = 8)
 
 
 
