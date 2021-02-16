@@ -196,23 +196,18 @@ substance.plot(model = model.list,
 
 
 
-
-
-
-
-
 ### try skew-t and skew-cauchy models
 # not converging 
 # use a skew-t model
 depth.reg.skewt <- selm(latent.depth.mean ~ 
                           maxcap.lied + maxcap.cons + 
-                          econagg.dum + uncond.milsup +
+                          econagg.dum + uncond.milsup + 
                           fp.conc.index + num.mem + wartime + asymm + 
                           asymm.cap + non.maj.only + 
                           mean.threat + low.kap.sc + post45,
                         data = atop.milsup,
                         family = "ST",
-                        opt.method = "CG",
+                        opt.method = "CG", # "Nelder-Mead",# "SANN", # "BFGS", # "nlminb", # 
                         param.type = "pseudo-CP")
 summary(depth.reg.skewt, "pseudo-CP")
 # plot(depth.reg.skewt, param.type = "pseudo-CP")
@@ -226,7 +221,7 @@ depth.reg.skewc <- selm(latent.depth.mean ~
                           mean.threat + low.kap.sc + post45,
                         data = atop.milsup,
                         family = "SC",
-                        opt.method = "SANN",
+                        opt.method = "CG",
                         param.type = "pseudo-CP")
 summary(depth.reg.skewc, "pseudo-CP")
 plot(depth.reg.skewc, param.type = "pseudo-CP")
@@ -267,8 +262,8 @@ skew.res.tab <- as.data.frame(rbind(sum.skewt@param.table[1:13, 1:2],
 ))
 
 skew.res.tab$variable <- rep(c("(Intercept)",  
-                               "Executive Constraints", 
                                "Lexical Index of Democracy",
+                               "Executive Constraints", 
                                "Economic Issue Linkage", 
                                "FP Concessions", "Number of Members", 
                                "Wartime Alliances", "Asymmetric Obligations",

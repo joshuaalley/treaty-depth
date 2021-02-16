@@ -51,6 +51,8 @@ depth.rlm <- rlm(latent.depth.mean ~
                 data = atop.milsup)
 summary(depth.rlm)
 
+# tabulate for the appendix at end of script
+
 
 ### beta regression
 # alliance leader polity
@@ -232,4 +234,22 @@ stargazer(list(depth.breg.dem, beta.reg.depth,
           label = c("tab:reg-est")
 )
 
-
+# results 
+stargazer(list(depth.reg, depth.rlm),
+          style = "all2",
+          dep.var.labels=c("Latent Depth (rescaled)"),
+          covariate.labels=c(
+            "Lexical Index of Democracy","Executive Constraints", 
+            "Economic Issue Linkage", "Unconditional Support",
+            "Foreign Policy Concessions", "Number of Members",
+            "Wartime Alliance", "Asymmetric Obligations",
+            "Asymmetric Capability", "Non-Major Only",
+            "Average Threat",
+            "Foreign Policy Disagreement", "Post 1945"
+          ),
+          keep.stat = c("n","ll"), ci=TRUE, 
+          star.char = c("", "", ""),
+          notes = "95\\% Confidence Intervals in Parentheses.", 
+          notes.append = FALSE,
+          label = c("tab:reg-est-ols")
+)

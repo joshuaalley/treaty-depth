@@ -281,31 +281,64 @@ Alliance leader democracy is also positively associated with Benson and Clinton'
 
 
 
-\subsection{Skew-T and Skew-Cauchy Models}
+\subsection{Mean Latent Depth Without Rescaling}
 
-To address a highly skewed distribution and facilitate inferences across a wide range of estimation strategies, results in the paper are based on rescaled mean latent treaty depth, which ranges between 0 and 1. 
+To address a highly skewed distribution and facilitate inferences across multiple estimation strategies, results in the paper are based on rescaled mean latent treaty depth, which ranges between 0 and 1. 
 I modeled the rescaled outcome with a beta distribution. 
-I make similar inferences about treaty depth and the electoral democracy of the most capable alliance member when I estimate regression models of treaty depth without this transformation, however. 
+I make similar inferences about treaty depth and the electoral democracy of the most capable alliance member when I estimate regression models of treaty depth without this transformation, however.  
+\autoref{tab:reg-est-ols} shows results with OLS and robust regression estimators. 
+The same positive association between electoral democracy and treaty depth is present here, although these estimates should be viewed with substantial caution. 
+Without rescaling treaty depth, I still find a positive relationship between electoral democracy and alliance treaty depth.  
 
 
-Latent mean treaty depth is extremely skewed. 
-This in turn leads to assumption violations and poor model fit with ordinary least squares estimators. 
-To address this problem, I fit skew-t and skew-cauchy models of treaty depth.
-Both these estimators model the skewed errors, and the skew-cauchy model allows for larger outliers.   
-The skewed regressions accommodate non-normal residuals and influential observations that might bias inferences with OLS. 
-I summarize the estimates from the skew models in \autoref{fig:skew-model-res}. 
-
-
-\begin{figure}[htbp]
-	\centering
-		\includegraphics[width=0.95\textwidth]{skew-model-res.png}
-	\caption{Coefficient plot of estimates from skew-t and skew-cauchy models of alliance treaty depth in offensive and defensive ATOP alliances from 1816 to 2012. Both estimators find a positive association between electoral democracy and treaty depth.}
-	\label{fig:skew-model-res}
-\end{figure} 
-
-
-Without rescaling treaty depth, I still find a positive relationship between electoral democracy and alliance treaty depth. 
-This inference also does not depend on how extreme the assumed skewness in the error terms is--- both the skew-t and skew-Cauchy estimators give similar inferences.  
+\begin{table}[!htbp] \centering 
+  \caption{OLS and Robust Regression Estimates of Mean Latent Treaty Depth} 
+  \label{tab:reg-est-ols} 
+\begin{tabular}{@{\extracolsep{5pt}}lcc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-3} 
+\\[-1.8ex] & \multicolumn{2}{c}{Latent Depth (rescaled)} \\ 
+\\[-1.8ex] & \textit{OLS} & \textit{robust} \\ 
+ & \textit{} & \textit{linear} \\ 
+\\[-1.8ex] & (1) & (2)\\ 
+\hline \\[-1.8ex] 
+ Lexical Index of Democracy & 0.145$^{}$ & 0.148$^{}$ \\ 
+  & (0.076, 0.214) & (0.078, 0.219) \\ 
+  Executive Constraints & $-$0.515$^{}$ & $-$0.539$^{}$ \\ 
+  & ($-$0.841, $-$0.190) & ($-$0.873, $-$0.205) \\ 
+  Economic Issue Linkage & $-$0.166 & $-$0.186 \\ 
+  & ($-$0.401, 0.069) & ($-$0.427, 0.055) \\ 
+  Unconditional Support & 0.304$^{}$ & 0.303$^{}$ \\ 
+  & (0.080, 0.528) & (0.073, 0.532) \\ 
+  Foreign Policy Concessions & $-$0.058 & $-$0.054 \\ 
+  & ($-$0.178, 0.062) & ($-$0.178, 0.069) \\ 
+  Number of Members & 0.028$^{}$ & 0.033$^{}$ \\ 
+  & (0.008, 0.048) & (0.013, 0.054) \\ 
+  Wartime Alliance & $-$0.028 & $-$0.019 \\ 
+  & ($-$0.304, 0.249) & ($-$0.303, 0.266) \\ 
+  Asymmetric Obligations & 0.144 & 0.166 \\ 
+  & ($-$0.110, 0.398) & ($-$0.095, 0.427) \\ 
+  Asymmetric Capability & 0.280 & 0.259 \\ 
+  & ($-$0.062, 0.621) & ($-$0.092, 0.609) \\ 
+  Non-Major Only & 0.150 & 0.136 \\ 
+  & ($-$0.227, 0.526) & ($-$0.250, 0.523) \\ 
+  Average Threat & 0.770$^{}$ & 0.758$^{}$ \\ 
+  & (0.157, 1.382) & (0.129, 1.387) \\ 
+  Foreign Policy Disagreement & 0.198 & 0.195 \\ 
+  & ($-$0.148, 0.545) & ($-$0.161, 0.551) \\ 
+  Post 1945 & 0.143 & 0.130 \\ 
+  & ($-$0.130, 0.416) & ($-$0.150, 0.410) \\ 
+  Constant & $-$1.077$^{}$ & $-$1.083$^{}$ \\ 
+  & ($-$1.648, $-$0.505) & ($-$1.670, $-$0.496) \\ 
+ \hline \\[-1.8ex] 
+Observations & 278 & 278 \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{2}{r}{95\% Confidence Intervals in Parentheses.} \\ 
+\end{tabular} 
+\end{table} 
 
 
 
