@@ -1,5 +1,4 @@
 # Joshua Alley
-# Texas A&M University 
 # Analysis of the sources of alliance treaty depth
 
 

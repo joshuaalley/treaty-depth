@@ -1,5 +1,4 @@
 # Joshua Alley
-# Texas A&M University
 # Create a sample of non-allied groups of states 
 
 # need same size as observed data: capture that information here
