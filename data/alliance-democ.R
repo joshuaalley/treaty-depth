@@ -1,5 +1,5 @@
 # Joshua Alley
-# Texas A&M University
+# Data cleaning- create alliance democracy measures
 
 
 # Load data
@@ -145,6 +145,7 @@ data_polity <- data_polity %>%
 table(data_polity$open.pol)
 table(data_polity$lied.recode)
 glimpse(data_polity)
+
 
 
 ### Merge polity w/ atop-cow-year data

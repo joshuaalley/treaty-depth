@@ -1,5 +1,4 @@
 # Joshua Alley
-# Texas A&M University
 # Summarizing and measuring Key alliance characteristics
 
 

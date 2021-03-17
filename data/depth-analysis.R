@@ -119,6 +119,8 @@ plot.depth.sep <- ggplot(margins.beta, aes(x = factor(x), y = predicted,
 plot.depth.sep
 ggsave("figures/results-depth.png", height = 6, width = 8)
 
+
+
 ### calculate substantive effects
 # set up new data
 sim.data <- cbind.data.frame(
