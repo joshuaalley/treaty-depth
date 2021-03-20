@@ -28,16 +28,16 @@
 \doublespace 
 
 This appendix checks the findings in the manuscript in four ways. 
-In the first section, I show results with several alternative model specifications and a bivariate model of depth and unconditional military support.
+In the first section, I show results with several alternative model specifications, including a bivariate model of depth and unconditional military support.
 Then, I assess other ways of measuring treaty depth. 
-After that, I consider some interesting findings of a negative correlation between military institutionalization and alliance performance. 
+After that, I consider prior findings of a negative correlation between military institutionalization and alliance performance. 
 In the final section, I consider how uncertainty in the latent depth measure affects inferences about the association between democracy and treaty depth. 
 
 
 \section{Alternative Model Specifications} 
 
 
-In addition to robustness checks with alternative measures of electoral democracy, I fit two models with a crucial control. 
+First alternative specification adjusts for U.S. alliance membership. 
 Perhaps the positive association between electoral democracy and treaty depth is driven by the United States, which formed multiple deep alliances after 1945. 
 To assess this possibility, I add a dummy indicator of US membership to the beta model specification in the manuscript. 
 \autoref{tab:us-reg} summarizes the resulting estimates. 
@@ -108,12 +108,16 @@ When the most capable alliance member has competitive elections, I set this dumm
 72 alliances have a leader with electoral competition, according to the Polity criteria. 
 
 
-The other measure of electoral democracy builds off of the concept of polyarchy \citep{Dahl1971}, which includes both contestation and electoral inclusiveness. 
+Another measure of electoral democracy builds off of the concept of polyarchy \citep{Dahl1971}, which includes both contestation and electoral inclusiveness. 
 Polyarchy relies on both the opportunity and freedom of actors to compete in elections for leadership, as leaders must address voters' preferences to avoid being removed from office. 
 It places more weight on inclusive participation in politics beyond elections than the lexical index of democracy, however. 
 To measure polyarchy, I use the polyarchy measure of electoral democracy from the Varieties of Democracy dataset \citep{Teorelletal2016}.
 As with the lexical index of democracy, I measure polyarchy in the most capable alliance member in the year the treaty formed.
 
+
+I also estimated a model with a dummy indicator of high electoral democracy. 
+This translates the ordinal lexical index of electoral democracy into a binary variable that is equal to one if the lexical index is greater than or equal to four. 
+I use four as the threshold because it is the value at which leadership replacement through electoral competition becomes especially plausible \citep{HydeMarinov2012}.
 
 
 As a further check, I translated my electoral democracy measure into an alternative conceptualization of democratic influence--- the proportion of democracies in the alliance.
@@ -144,6 +148,7 @@ Inferences about the association between the polity measure of electoral competi
 Moving from no electoral competition to competition increases depth by between .03 and .27, which is a large effect relative to the range of rescaled treaty depth. 
 As expected, greater electoral democracy as measured by the Varieties of Democracy polyarchy index increases treaty depth by between .21 and .59.
 This large result reflects a move from a polyarchy score of 0 to a score of .9. 
+Last, moving from low or no electoral democracy to high electoral democracy also increases alliance treaty depth. 
 In summary, these alternative measures give similar inferences about a positive association between alliance leader electoral democracy and treaty depth. 
 
 
@@ -154,8 +159,8 @@ In summary, these alternative measures give similar inferences about a positive 
 
 I also use a bivariate statistical model to examine how democratic political institutions affect treaty depth.\footnote{Bivariate refers to a model means two outcome variables, not a model with one independent and one dependent variable.} 
 Two factors encourage this research design choice. 
-First, \citet{FjelstulReiter2019}, who note that different alliance treaty design decisions are correlated.
-Because depth and conditions on support both build credibility, it is possible that they are related. 
+First, \citet{FjelstulReiter2019} note that different alliance treaty design decisions are correlated.
+Because depth and conditions on support both shape credibility, it is possible that they are related. 
 Bivariate estimation also accounts for correlated errors because common unobserved factors may affect depth and conditionality \citep{Braumoelleretal2018}.
 Independent univariate models assume that alliance treaty design decisions are uncorrelated, if this assumption is violated, biased estimates may result. 
 My approach here is analogous to the well-known bivariate probit model, but it is not fully recursive, because I do not include depth or unconditional military support as endogenous predictors.\footnote{A fully recursive model requires two instruments for identification, and valid instruments are hard to find in alliance politics.}  
@@ -184,7 +189,7 @@ In summary, the GJRM model is a general and flexible way to simultaneously model
 Like the measurement model, it uses a semiparametric approach to relax potentially problematic assumptions about the distribution of underlying correlations. 
 It also allows me to model the two outcomes with appropriate distributions. 
 \autoref{tab:gjrm-res} shows the estimates from this model specification. 
-I find the same results with a binary measure of electoral democracy- high electoral democracy increases treaty depth.
+As expected, electoral democracy increases treaty depth.
 I also find that electoral democracy decreases the probability of unconditional military support. 
 
 

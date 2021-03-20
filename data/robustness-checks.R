@@ -53,12 +53,21 @@ stargazer(list(beta.reg.depth.us, beta.reg.depth.us45),
 ### alternative measures of electoral competition
 key.data.rc <- select(atop.milsup, atopid, latent.depth.mean, econagg.dum, uncond.milsup, 
                    fp.conc.index, num.mem, wartime, asymm, deep.alliance, non.maj.only,
-                   low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.democ, maxcap.lied,
+                   low.kap.sc, begyr, post45, asymm.cap, mean.threat, maxcap.democ, maxcap.lied, maxcap.liedh,
                    dem.prop, prop.cons, joint.democ, avg.democ, maxcap.poly, maxcap.cons, maxcap.rec,
                    us.mem, bilat) %>%
   drop_na()
 key.data.rc$latent.depth.mean.rs <- (key.data.rc$latent.depth.mean + 1) / (1 + max(key.data.rc$latent.depth.mean) + .01)
 summary(key.data.rc$latent.depth.mean.rs)
+
+# lied dummmy 
+beta.reg.liedh <- betareg(latent.depth.mean.rs ~ 
+                           maxcap.liedh + maxcap.cons + 
+                           econagg.dum + uncond.milsup +
+                           fp.conc.index + num.mem + wartime + asymm + 
+                           asymm.cap + non.maj.only + 
+                           mean.threat + low.kap.sc + post45, data = key.data.rc)
+summary(beta.reg.liedh)
 
 
 # vdem polyarchy
@@ -173,9 +182,11 @@ depth.plots[[i]] <- depth.intervals
 
 # present results
 # Combine plots
-grid.arrange(depth.plots[[1]], depth.plots[[2]], depth.plots[[3]],
+grid.arrange(depth.plots[[1]], depth.plots[[2]], 
+             depth.plots[[3]], depth.plots[[4]],
              nrow = 2)
-results.all <- arrangeGrob(depth.plots[[1]], depth.plots[[2]], depth.plots[[3]],
+results.all <- arrangeGrob(depth.plots[[1]], depth.plots[[2]], 
+                           depth.plots[[3]], depth.plots[[4]],
                            nrow = 2)
 ggsave(destination, results.all,
        height = 6, width = 8)
@@ -184,9 +195,10 @@ ggsave(destination, results.all,
 
 
 # Inputs
-model.list = list(beta.reg.poly, beta.reg.rec, beta.reg.prop)
+model.list = list(beta.reg.liedh, beta.reg.poly, beta.reg.rec, beta.reg.prop)
 #formula.list = list(beta.reg.poly$formula, beta.reg.rec$formula, beta.reg.prop$formula)
-labels.comp = c("Polyarchy (VDem)", "Polity Elections.", "Proportion Electoral Democracy")
+labels.comp = c("LIED Dummy", "Polyarchy (VDem)",
+                "Polity Elections.", "Proportion Electoral Democracy")
 
 
 # Apply the function 
