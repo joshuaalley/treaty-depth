@@ -1,5 +1,4 @@
 # Joshua Alley
-# Texas A&M University
 # Script to load packages and manage conflicts in project for alliance treaty depth
 
 # Run this at the start of every session
@@ -28,6 +27,7 @@ library(gridExtra)
 library(conflicted)
 library(democracyData) 
 library(sn)
+library(modelsummary)
 
 # Look at conflicts 
 conflict_scout()

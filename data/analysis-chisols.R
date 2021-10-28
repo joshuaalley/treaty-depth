@@ -180,7 +180,7 @@ modelplot(list(depth.breg.ch5, depth.breg.lch5,
                        "maxcap.solsch10" = "SOLS Changes in 10 Years",
                        "log.solsch10" = "Log SOLS Changes in 10 Years")) +
           scale_color_grey() +
-          ggtitle("Previous Changes in Ruling Coalition and Alliance Treaty Depth")
+          ggtitle("Previous Changes in Ruling Coalition and\n Alliance Treaty Depth")
 ggsave("figures/ch-plot.png", height = 4, width = 6)
 
 

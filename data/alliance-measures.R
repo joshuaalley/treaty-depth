@@ -518,3 +518,30 @@ par(mfrow=c(1, 1))
 plot(density(diag.geweke$z))
 lines(density(rnorm(10000, 0, 1)))
 # decidedly not- some fat tails. 
+
+
+
+# quick summary of duration
+atop.milsup$duration <- ifelse(atop.milsup$endyr != 0,
+                               atop.milsup$endyr - atop.milsup$begyr,
+                               2016 - atop.milsup$begyr)
+
+ggplot(atop.milsup, aes(x = avg.democ, y = duration,
+                        color = latent.depth.mean,
+                        shape = factor(post45))) +
+  scale_colour_gradient2() +
+   geom_hline(yintercept = 10) +
+   geom_jitter(size = 2)
+
+ggplot(atop.milsup, aes(x = duration,
+                        fill = factor(post45))) +
+  facet_wrap(~ factor(maxcap.democ)) +
+  geom_vline(xintercept = 10) +
+  geom_histogram()
+
+
+ggplot(filter(atop.milsup, maxcap.democ == 10),
+       aes(x = duration, 
+           fill = factor(post45))) +
+  geom_vline(xintercept = 10) +
+  geom_histogram()
